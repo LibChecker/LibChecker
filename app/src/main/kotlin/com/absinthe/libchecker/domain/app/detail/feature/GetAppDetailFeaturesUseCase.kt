@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.AdaptiveIconDrawable
+import androidx.core.content.res.ResourcesCompat
 import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.compat.PackageManagerCompat
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -307,7 +308,7 @@ class GetAppDetailFeaturesUseCase(
     if (!hasAddedMonochrome && OsUtils.atLeastT() && applicationInfo.icon != 0) {
       try {
         val resources = packageManager.getResourcesForApplication(applicationInfo)
-        val rawIcon = resources.getDrawable(applicationInfo.icon, null)
+        val rawIcon = ResourcesCompat.getDrawable(resources, applicationInfo.icon, null)
 
         if (rawIcon is AdaptiveIconDrawable && rawIcon.monochrome != null) {
           icons.add(AppIconItem(rawIcon, true))

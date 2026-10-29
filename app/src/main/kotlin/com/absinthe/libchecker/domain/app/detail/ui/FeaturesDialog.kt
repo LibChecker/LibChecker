@@ -11,6 +11,7 @@ import android.widget.LinearLayout.LayoutParams
 import android.widget.ScrollView
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.FragmentActivity
@@ -53,7 +54,7 @@ object FeaturesDialog {
   fun show(context: Context, spec: FeatureDialogSpec) {
     val icon = spec.iconTint?.let {
       UiUtils.changeDrawableColor(context, spec.iconRes, it)
-    } ?: requireNotNull(context.getDrawable(spec.iconRes))
+    } ?: requireNotNull(AppCompatResources.getDrawable(context, spec.iconRes))
     val dialog = BaseAlertDialogBuilder(context)
       .setIcon(icon)
       .setTitle(spec.titleRes)

@@ -11,6 +11,7 @@ import android.text.style.ReplacementSpan
 import android.text.style.StyleSpan
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.drawable.DrawableCompat
@@ -93,7 +94,8 @@ class SnapshotDetailTitleView(context: Context) : AViewGroup(context) {
     setBackgroundColor(context.getColorByAttr(MaterialR.attr.colorSurface))
     importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
     isFocusable = true
-    foreground = context.getDrawable(
+    foreground = AppCompatResources.getDrawable(
+      context,
       context.getResourceIdByAttr(android.R.attr.selectableItemBackground)
     )
   }
