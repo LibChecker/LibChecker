@@ -691,20 +691,21 @@ object PackageUtils {
         .forEach { entry ->
           checkCancelled()
           if (remainingScanBytes <= 0) return@runCatching false
-          val remainingMarkers = KOTLIN_RUNTIME_STRING_MARKERS.filterNot(foundMarkers::contains)
+          val remainingMarkers = KOTLIN_RUNTIME_ALL_MARKERS.filterNot(foundMarkers::contains)
           val scanResult = zipFile.getInputStream(entry).use { inputStream ->
             StreamingDexClassScanner.findStringMatches(
               inputStream = inputStream,
               stringPatterns = remainingMarkers,
-              stopAfterMatches = KOTLIN_RUNTIME_STRING_THRESHOLD - foundMarkers.size,
+              stopAfterMatches = remainingMarkers.size,
               entrySize = entry.size.takeIf { it >= 0 },
               maxScanBytes = remainingScanBytes,
+              stopWhen = { matches -> hasSufficientKotlinRuntimeEvidence(foundMarkers + matches) },
               checkCancelled = checkCancelled
             )
           }
           remainingScanBytes -= scanResult.bytesRead
           foundMarkers += scanResult.matches
-          if (foundMarkers.size >= KOTLIN_RUNTIME_STRING_THRESHOLD) {
+          if (hasSufficientKotlinRuntimeEvidence(foundMarkers)) {
             return@runCatching true
           }
         }
@@ -713,6 +714,11 @@ object PackageUtils {
       if (it is java.util.concurrent.CancellationException) throw it
       false
     }
+  }
+
+  private fun hasSufficientKotlinRuntimeEvidence(markers: Set<String>): Boolean {
+    return KOTLIN_RUNTIME_STRING_MARKERS.count(markers::contains) >= KOTLIN_RUNTIME_STRING_THRESHOLD ||
+      KOTLIN_RUNTIME_STRING_PAIRS.any { (first, second) -> first in markers && second in markers }
   }
 
   /**
@@ -1269,6 +1275,17 @@ object PackageUtils {
     "kotlinx.coroutines.internal.StackTraceRecoveryKt",
     "COROUTINE_SUSPENDED"
   )
+
+  // Exact pairs from Kotlin's reflection runtime, Intrinsics/collections and
+  // suspend state machines. Keep these separate from the legacy two-marker rule:
+  // unrelated messages or one legacy marker plus one new message are insufficient.
+  private val KOTLIN_RUNTIME_STRING_PAIRS = listOf(
+    " (Kotlin reflection is not available)" to "kotlin.reflect.jvm.internal.ReflectionFactoryImpl",
+    "Parameter specified as non-null is null: method " to "Operation is not supported for read-only collection",
+    "call to 'resume' before 'invoke' with coroutine" to "This continuation is already complete"
+  )
+  private val KOTLIN_RUNTIME_ALL_MARKERS = KOTLIN_RUNTIME_STRING_MARKERS +
+    KOTLIN_RUNTIME_STRING_PAIRS.flatMap { (first, second) -> listOf(first, second) }
 
   /**
    * Get permissions of an application

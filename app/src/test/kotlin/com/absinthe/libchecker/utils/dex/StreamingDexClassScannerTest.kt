@@ -135,6 +135,61 @@ class StreamingDexClassScannerTest {
   }
 
   @Test
+  fun stopsWhenMatchedStringsSatisfyAPairBeforeReadingTheLongTail() {
+    val markers = listOf("first marker", "second marker")
+    val dex = createDex(classWithStringConstants(markers + "z".repeat(2 * MAX_DESCRIPTOR_BYTES)))
+    val input = CountingInputStream(dex.inputStream())
+    val observedMatches = mutableListOf<List<String>>()
+
+    val result = StreamingDexClassScanner.findStringMatches(
+      inputStream = input,
+      stringPatterns = markers + "absent marker",
+      entrySize = dex.size.toLong(),
+      stopWhen = { matches ->
+        observedMatches += matches
+        matches.containsAll(markers)
+      }
+    )
+
+    assertEquals(markers, result.matches)
+    assertEquals(listOf(markers.take(1), markers), observedMatches)
+    assertTrue("The unrelated long string must not be decoded", input.bytesRead < 64 * 1024)
+  }
+
+  @Test
+  fun keepsTheMatchCountLimitWhenTheCustomStopConditionIsFalse() {
+    val markers = listOf("first marker", "second marker")
+    val dex = createDex(classWithStringConstants(markers))
+
+    val result = StreamingDexClassScanner.findStringMatches(
+      inputStream = dex.inputStream(),
+      stringPatterns = markers,
+      stopAfterMatches = 1,
+      entrySize = dex.size.toLong(),
+      stopWhen = { false }
+    )
+
+    assertEquals(markers.take(1), result.matches)
+  }
+
+  @Test
+  fun cancellationStopsStringScanningWithACustomStopCondition() {
+    val dex = createDex(classWithStringConstants(listOf("a".repeat(50_000)) + KOTLIN_RUNTIME_MARKERS))
+    val input = CountingInputStream(dex.inputStream())
+
+    assertThrows(CancellationException::class.java) {
+      StreamingDexClassScanner.findStringMatches(
+        inputStream = input,
+        stringPatterns = KOTLIN_RUNTIME_MARKERS,
+        entrySize = dex.size.toLong(),
+        stopWhen = { false },
+        checkCancelled = { if (input.bytesRead >= 8192) throw CancellationException() }
+      )
+    }
+    assertTrue(input.bytesRead < 17_000)
+  }
+
+  @Test
   fun findsMarkersAfterAnOversizedNonmatchingString() {
     val dex = createDex(
       classWithStringConstants(
