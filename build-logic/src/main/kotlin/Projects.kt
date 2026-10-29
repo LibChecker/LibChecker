@@ -3,6 +3,7 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
 import java.io.File
 import org.gradle.api.Project
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 const val baseVersionName = "2.5.5"
 
@@ -74,6 +75,8 @@ private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossin
   extensions.configure<CommonExtension>("android") {
     compileSdk = 37
     compileSdkMinor = 0
+
+    lint.toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 
     // App and compat intentionally keep Java parser and shim sources under src/*/kotlin.
     sourceSets.configureEach {
