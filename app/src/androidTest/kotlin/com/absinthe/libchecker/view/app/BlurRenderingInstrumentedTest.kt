@@ -27,6 +27,7 @@ import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.PERMISSION
+import com.absinthe.libchecker.compat.BackdropBlurCompat
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.home.ui.MainActivity
 import com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity
@@ -42,6 +43,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -49,6 +51,39 @@ import org.junit.runner.RunWith
 @SdkSuppress(minSdkVersion = 33)
 class BlurRenderingInstrumentedTest {
   private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+  @Test
+  fun nativeBackdropBlursPreviousPixelsAndPreservesForeground() {
+    assumeTrue("Requires API 37.2", BackdropBlurCompat.isSupported)
+    withActivity { activity ->
+      lateinit var content: View
+      val backdrop = BackdropBlurCompat()
+      instrumentation.runOnMainSync {
+        content = object : View(activity) {
+          private val paint = Paint()
+          override fun onDraw(canvas: Canvas) {
+            canvas.drawColor(Color.BLACK)
+            paint.color = Color.WHITE
+            canvas.drawRect(width / 2f, 0f, width.toFloat(), height.toFloat(), paint)
+            val saved = canvas.save()
+            canvas.clipRect(0, 100, width, 300)
+            assertTrue(backdrop.draw(canvas, 0f, 100f, width, 200, 20f))
+            canvas.restoreToCount(saved)
+            paint.color = Color.RED
+            canvas.drawRect(width / 2f - 10, 220f, width / 2f + 10, 240f, paint)
+          }
+        }
+        activity.setContentView(content)
+      }
+      settle()
+      val edge = content.width / 2
+      val blurred = Color.red(pixel(activity, content, edge - 3, 180))
+      assertTrue("Native backdrop must mix the black/white edge: $blurred", blurred in 10..245)
+      assertEquals(Color.BLACK, pixel(activity, content, edge - 3, 60))
+      assertEquals(Color.RED, pixel(activity, content, edge, 230))
+      instrumentation.runOnMainSync { backdrop.clear() }
+    }
+  }
 
   @Test
   fun xmlBackgroundColorIsResolvedBeforeDrawing() = withActivity { activity ->
