@@ -27,6 +27,7 @@ import androidx.core.graphics.withScale
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.compat.BackdropBlurCompat
 import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -45,6 +46,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private val contentViewId: Int = R.id.viewpager
 ) : CoordinatorLayout(context, attrs) {
 
+  private val navigationBackdrop = BackdropBlurCompat()
   private var contentNode: RenderNode? = null
   private var appbarSourceNode: RenderNode? = null
   private var navDownsampleNode: RenderNode? = null
@@ -258,7 +260,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         drawAppbarBlur(canvas, appbarSource)
       }
       if (navView != null && navView.visibility == VISIBLE && navView.alpha > 0f) {
-        val navSource = obtainNavDownsampleNode(content)
+        val navSource = if (BackdropBlurCompat.isSupported) content else obtainNavDownsampleNode(content)
         drawNavBlur(canvas, navSource, navView)
       }
     }
@@ -688,13 +690,24 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     right: Float,
     bottom: Float
   ) {
-    val paint = obtainScrimPaint()
-    paint.shader = null
-    paint.style = Paint.Style.FILL
-    paint.blendMode = BlendMode.SRC_OVER
-    paint.color = surfaceColor and BASE_FILL_ALPHA_MASK.toInt()
-    canvas.drawRect(left, top, right, bottom, paint)
-    drawNavBlurredSource(canvas, source)
+    // Filter before adding the tint: otherwise the opaque base fill hides the backdrop.
+    if (!navigationBackdrop.draw(
+        canvas,
+        left,
+        top,
+        ceil(right - left).toInt(),
+        ceil(bottom - top).toInt(),
+        NAV_BLUR_RADIUS_PX * NAV_BACKDROP_DOWNSAMPLE
+      )
+    ) {
+      val paint = obtainScrimPaint()
+      paint.shader = null
+      paint.style = Paint.Style.FILL
+      paint.blendMode = BlendMode.SRC_OVER
+      paint.color = surfaceColor and BASE_FILL_ALPHA_MASK.toInt()
+      canvas.drawRect(left, top, right, bottom, paint)
+      drawNavBlurredSource(canvas, source)
+    }
     drawSurfaceTint(canvas, top, bottom)
   }
 
@@ -805,6 +818,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     blurAnimator = null
     appbarMaskAnimator?.cancel()
     appbarMaskAnimator = null
+    navigationBackdrop.clear()
     contentNode = null
     appbarSourceNode = null
     navDownsampleNode = null
