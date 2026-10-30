@@ -2,7 +2,7 @@ package com.absinthe.libchecker.utils.apk
 
 import com.absinthe.libchecker.LibCheckerApp
 import com.absinthe.libchecker.api.ApiManager
-import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.manifest.FullManifestReader
 import com.absinthe.libraries.utils.manager.TimeRecorder
 import java.io.ByteArrayOutputStream

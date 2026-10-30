@@ -15,6 +15,7 @@ import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
@@ -101,7 +102,7 @@ class GetLibReferenceAppsUseCase(
   private fun LCItem.hasNativeReference(name: String, checkCancelled: () -> Unit): Boolean {
     return runCatching {
       val packageInfo = installedAppRepository.getPackageInfo(packageName) ?: return@runCatching false
-      val nativeLibNames = PackageUtils.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled).map { it.name }
+      val nativeLibNames = NativeLibraryAnalyzer.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled).map { it.name }
       name in nativeLibNames && RulesRepository.checkNativeLibValidation(packageName, name, nativeLibNames)
     }.onFailure {
       if (it is CancellationException) throw it

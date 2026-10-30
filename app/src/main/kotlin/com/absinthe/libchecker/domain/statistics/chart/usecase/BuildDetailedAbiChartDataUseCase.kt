@@ -2,8 +2,9 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import android.content.Context
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import java.io.File
 import java.util.TreeMap
 import kotlinx.coroutines.currentCoroutineContext
@@ -40,7 +41,7 @@ class BuildDetailedAbiChartDataUseCase(
           ?: installedAppRepository.getPackageInfo(item.packageName)
           ?: return@runCatching
         val source = packageInfo.applicationInfo?.sourceDir ?: return@runCatching
-        PackageUtils.getAbiSet(
+        NativeLibraryAnalyzer.getAbiSet(
           file = File(source),
           packageInfo = packageInfo,
           isApk = false,
@@ -65,7 +66,7 @@ class BuildDetailedAbiChartDataUseCase(
       groups = result.map { (abi, items) ->
         DetailedAbiChartGroup(
           abi = abi,
-          label = PackageUtils.getAbiString(context, abi, showExtraInfo = false),
+          label = PackageInfoFormatter.getAbiString(context, abi, showExtraInfo = false),
           items = items
         )
       }

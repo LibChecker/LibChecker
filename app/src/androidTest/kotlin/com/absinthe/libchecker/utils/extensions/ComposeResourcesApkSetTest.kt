@@ -6,6 +6,7 @@ import android.os.ParcelFileDescriptor
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.domain.app.buildmetadata.ComposeResourcesDetector.usesComposeMultiplatformResources
 import com.absinthe.libchecker.domain.app.packageinfo.GetArchivePackageInfoUseCase
 import java.io.ByteArrayOutputStream
 import java.io.File

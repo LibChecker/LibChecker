@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.app.detail.action
 
 import com.absinthe.libchecker.domain.app.model.AppInstallSource
-import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
+import com.absinthe.libchecker.utils.dex.DexOptimizationReader.DexFileOptimizationInfo
 
 data class AppInstallSourceDetails(
   val installSource: AppInstallSource?,

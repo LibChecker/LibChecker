@@ -5,6 +5,8 @@ import android.content.pm.PackageInfo
 import android.content.pm.ProviderInfo
 import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.database.entity.Features
+import com.absinthe.libchecker.domain.app.buildmetadata.ComposeResourcesDetector.hasComposeMultiplatformResources
+import com.absinthe.libchecker.domain.app.feature.PackageFeatureDetector.getFeatures
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.util.Collections

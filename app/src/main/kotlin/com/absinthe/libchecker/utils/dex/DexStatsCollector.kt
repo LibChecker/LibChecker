@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexArchiveScanner
 import com.absinthe.libchecker.utils.toJson
 import com.squareup.moshi.JsonClass
 import java.io.File
@@ -159,7 +160,7 @@ object DexStatsCollector {
           zipFile.getZipEntries()
             .asSequence()
             .filter { entry ->
-              PackageUtils.isDexEntryName(entry.name)
+              DexArchiveScanner.isDexEntryName(entry.name)
             }
             .take(remainingDexEntries + 1)
             .map { entry ->

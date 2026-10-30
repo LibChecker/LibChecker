@@ -11,9 +11,10 @@ import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ZipDataOffsetReader
 import com.absinthe.libchecker.utils.elf.ElfParser
-import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
-import com.absinthe.libchecker.utils.extensions.ABI_VALUE_TO_INSTRUCTION_SET_MAP
-import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.ABI_STRING_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.ABI_VALUE_TO_INSTRUCTION_SET_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.PAGE_SIZE_16_KB
 import java.io.File
 import java.util.zip.ZipEntry
 import kotlinx.coroutines.CancellationException
@@ -48,7 +49,7 @@ class BuildPageSize16KBChartDataUseCase(
 
       runCatching {
         val abi = item.abi.toInt()
-        if (PackageUtils.hasNoNativeLibs(abi)) {
+        if (NativeLibraryAnalyzer.hasNoNativeLibs(abi)) {
           noNativeLibs.add(item)
           return@runCatching
         }

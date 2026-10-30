@@ -7,7 +7,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
+import com.absinthe.libchecker.utils.dex.DexOptimizationReader.DexFileOptimizationInfo
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getColorStateListByAttr

@@ -7,8 +7,8 @@ import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.OVERLAY
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.ABI_STRING_MAP
 import java.io.File
 
 // Pre-reuse reader retained as a differential oracle for the default ABI path.
@@ -31,7 +31,7 @@ internal object BaselineNativeLibReader {
             LibStringItem(
               name = it.name,
               size = FileUtils.getFileSize(it),
-              elfInfo = PackageUtils.parseNativeDirElfInfo(it, parseElf, checkCancelled),
+              elfInfo = NativeLibraryAnalyzer.parseNativeDirElfInfo(it, parseElf, checkCancelled),
               source = it.path
             )
           }
@@ -41,13 +41,13 @@ internal object BaselineNativeLibReader {
 
     if (result.isEmpty()) {
       val abi =
-        specifiedAbi ?: runCatching { PackageUtils.getAbi(packageInfo) }.getOrNull() ?: return emptyList()
+        specifiedAbi ?: runCatching { NativeLibraryAnalyzer.getAbi(packageInfo) }.getOrNull() ?: return emptyList()
 
       if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) {
         return emptyList()
       }
       val sourceDir = ABI_STRING_MAP[abi % MULTI_ARCH]
-      val libs = PackageUtils.getSourceLibs(
+      val libs = NativeLibraryAnalyzer.getSourceLibs(
         packageInfo = packageInfo,
         specifiedAbi = abi,
         includeNativeLibsDir = false,

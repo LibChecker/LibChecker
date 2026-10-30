@@ -5,7 +5,7 @@ import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.api.bean.GetAppUpdateInfo
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getVersionCode
@@ -44,7 +44,7 @@ class BuildInAppUpdateDiffDataUseCase(
           localVersionCode,
           displayedRemoteApp?.versionCode?.toLong() ?: localVersionCode
         ),
-        abiDiff = SnapshotDiffItem.DiffNode(PackageUtils.getAbi(packageInfo).toShort()),
+        abiDiff = SnapshotDiffItem.DiffNode(NativeLibraryAnalyzer.getAbi(packageInfo).toShort()),
         targetApiDiff = SnapshotDiffItem.DiffNode(
           appInfo.targetSdkVersion.toShort(),
           displayedRemoteApp?.extra?.target?.toShort() ?: appInfo.targetSdkVersion.toShort()

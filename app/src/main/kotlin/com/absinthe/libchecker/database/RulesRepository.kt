@@ -12,6 +12,7 @@ import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.data.rules.RuleBundleStore
 import com.absinthe.libchecker.domain.rules.RuleBundleManifest
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexArchiveScanner
 import com.absinthe.libchecker.utils.extensions.isTempApk
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.rulesbundle.LCRemoteRepo
@@ -291,7 +292,7 @@ object RulesRepository {
       emptySet()
     } else {
       runCatching {
-        PackageUtils.findDexClasses(source, patterns.toList()).toSet()
+        DexArchiveScanner.findDexClasses(source, patterns.toList()).toSet()
       }.getOrDefault(emptySet())
     }
 

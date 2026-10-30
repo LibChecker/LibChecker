@@ -1,6 +1,7 @@
 package com.absinthe.libchecker.utils
 
 import com.absinthe.libchecker.compat.ZipFileCompat
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinUsageDetector
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
 import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
@@ -30,14 +31,14 @@ class PackageUtilsKotlinDetectionTest {
       createDex(KOTLIN_RUNTIME_MARKERS[1])
     )
 
-    assertTrue(PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+    assertTrue(KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
   }
 
   @Test
   fun ignoresAStandaloneKotlinLookingString() {
     val apk = createApk(createDex(KOTLIN_RUNTIME_MARKERS[0]))
 
-    assertFalse(PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+    assertFalse(KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
   }
 
   @Test
@@ -49,7 +50,7 @@ class PackageUtilsKotlinDetectionTest {
         createApk(createDex(second), createDex(first))
       )
       for (apk in fixtures) {
-        assertTrue(first, PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+        assertTrue(first, KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
       }
     }
   }
@@ -58,10 +59,10 @@ class PackageUtilsKotlinDetectionTest {
   fun rejectsSinglePairMembersAndUnrelatedCombinations() {
     val pairMembers = KOTLIN_RUNTIME_PAIRS.flatMap { listOf(it.first, it.second) }
     for (marker in pairMembers) {
-      assertFalse(marker, PackageUtils.hasKotlinRuntimeEvidenceInClassDex(createApk(createDex(marker))))
+      assertFalse(marker, KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(createApk(createDex(marker))))
       for (legacyMarker in KOTLIN_RUNTIME_MARKERS) {
         val apk = createApk(createDex(legacyMarker), createDex(marker))
-        assertFalse("$legacyMarker + $marker", PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+        assertFalse("$legacyMarker + $marker", KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
       }
     }
     for ((index, firstPair) in KOTLIN_RUNTIME_PAIRS.withIndex()) {
@@ -69,7 +70,7 @@ class PackageUtilsKotlinDetectionTest {
         for (first in listOf(firstPair.first, firstPair.second)) {
           for (second in listOf(secondPair.first, secondPair.second)) {
             val apk = createApk(createDex(first), createDex(second))
-            assertFalse("$first + $second", PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+            assertFalse("$first + $second", KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
           }
         }
       }
@@ -87,7 +88,7 @@ class PackageUtilsKotlinDetectionTest {
       }
       for (markers in nearMatches) {
         val apk = createApk(createDex(*markers.toTypedArray()))
-        assertFalse(markers.toString(), PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+        assertFalse(markers.toString(), KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
       }
     }
   }
@@ -102,7 +103,7 @@ class PackageUtilsKotlinDetectionTest {
     )
 
     for (apk in fixtures) {
-      assertTrue(PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+      assertTrue(KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
     }
   }
 
@@ -112,7 +113,7 @@ class PackageUtilsKotlinDetectionTest {
 
     ZipFileCompat(apk).use { zip ->
       assertThrows(CancellationException::class.java) {
-        PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zip) { throw CancellationException() }
+        KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(zip) { throw CancellationException() }
       }
     }
   }
@@ -121,7 +122,7 @@ class PackageUtilsKotlinDetectionTest {
   fun ignoresMarkersBeyondTheRuntimeFallbackScanBudget() {
     val apk = createApk(createDexWithLateMarkers())
 
-    assertFalse(PackageUtils.hasKotlinRuntimeEvidenceInClassDex(apk))
+    assertFalse(KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(apk))
   }
 
   private fun createDex(vararg markers: String): ByteArray {

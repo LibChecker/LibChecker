@@ -15,10 +15,11 @@ import com.absinthe.libchecker.domain.app.detail.header.AppDetailHeaderExtraInfo
 import com.absinthe.libchecker.domain.app.detail.header.AppDetailHeaderTitleData
 import com.absinthe.libchecker.domain.app.detail.packageinfo.AppDetailPackageSize
 import com.absinthe.libchecker.domain.app.detail.packageinfo.GetAppDetailPackageSizeUseCase
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersionString
@@ -49,7 +50,7 @@ class DetailPresentationLoader(
     val trueAbi = abi.mod(Constants.MULTI_ARCH)
     if (abiSet.isEmpty() || abiSet.contains(Constants.OVERLAY) || abiSet.contains(Constants.ERROR)) {
       return AppDetailAbiLabelData(
-        is64Bit = PackageUtils.isAbi64Bit(trueAbi),
+        is64Bit = NativeLibraryAnalyzer.isAbi64Bit(trueAbi),
         labels = emptyList()
       )
     }
@@ -62,7 +63,7 @@ class DetailPresentationLoader(
       }
     }
     return AppDetailAbiLabelData(
-      is64Bit = PackageUtils.isAbi64Bit(trueAbi),
+      is64Bit = NativeLibraryAnalyzer.isAbi64Bit(trueAbi),
       labels = labels
     )
   }
@@ -186,28 +187,28 @@ class DetailPresentationLoader(
       contentDescription = if (abi == Constants.MULTI_ARCH) {
         context.getString(R.string.multiArch)
       } else {
-        PackageUtils.getAbiString(context, abi, showExtraInfo = false)
+        PackageInfoFormatter.getAbiString(context, abi, showExtraInfo = false)
       },
-      is64Bit = PackageUtils.isAbi64Bit(abi),
+      is64Bit = NativeLibraryAnalyzer.isAbi64Bit(abi),
       opensMultiArchInfo = opensMultiArchInfo
     )
   }
 
   private fun getAppDetailAbi(packageInfo: PackageInfo, isApk: Boolean): AppDetailAbi? {
     val source = runCatching { packageInfo.applicationInfo?.sourceDir }.getOrNull() ?: return null
-    val abiSet = PackageUtils.getAbiSet(
+    val abiSet = NativeLibraryAnalyzer.getAbiSet(
       file = File(source),
       packageInfo = packageInfo,
       isApk = isApk,
       ignoreArch = true
     ).toSet()
-    return buildAppDetailAbi(PackageUtils.getAbi(packageInfo, isApk = isApk, abiSet = abiSet), abiSet)
+    return buildAppDetailAbi(NativeLibraryAnalyzer.getAbi(packageInfo, isApk = isApk, abiSet = abiSet), abiSet)
   }
 
   private fun buildAppDetailAbi(abi: Int, abiSet: Collection<Int>): AppDetailAbi {
     return AppDetailAbi(
       abi = abi,
-      abiSet = abiSet.sortedByDescending { it == abi || PackageUtils.isAbi64Bit(it) }
+      abiSet = abiSet.sortedByDescending { it == abi || NativeLibraryAnalyzer.isAbi64Bit(it) }
     )
   }
 

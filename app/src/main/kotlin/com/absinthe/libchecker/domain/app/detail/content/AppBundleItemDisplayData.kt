@@ -8,7 +8,7 @@ import com.absinthe.libchecker.domain.app.detail.model.AppBundleItem
 import com.absinthe.libchecker.domain.app.detail.model.buildDetailItemDescription
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.STRING_ABI_MAP
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import java.io.File
 import java.util.Locale

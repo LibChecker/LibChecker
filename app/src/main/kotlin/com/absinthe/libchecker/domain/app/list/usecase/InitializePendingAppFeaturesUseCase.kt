@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.domain.app.list.usecase
 
 import android.content.pm.PackageManager
+import com.absinthe.libchecker.domain.app.feature.PackageFeatureDetector.getFeatures
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
-import com.absinthe.libchecker.utils.extensions.getFeatures
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive

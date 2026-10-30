@@ -6,6 +6,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexArchiveScanner
 import com.absinthe.libchecker.utils.extensions.toClassDefType
 import com.absinthe.libchecker.utils.showToast
 import java.io.File
@@ -23,7 +24,7 @@ object VersionCompat {
       val sourceDir =
         PackageUtils.getPackageInfo(Constants.PackageNames.SYSTEMUI).applicationInfo?.sourceDir
           ?: return@runCatching false
-      PackageUtils.findDexClasses(
+      DexArchiveScanner.findDexClasses(
         File(sourceDir),
         listOf(CLASS_NAME_CLIPBOARD_OVERLAY_VIEW.toClassDefType())
       ).isNotEmpty()

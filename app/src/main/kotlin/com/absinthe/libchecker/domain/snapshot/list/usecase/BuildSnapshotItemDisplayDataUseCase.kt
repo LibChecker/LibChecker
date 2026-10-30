@@ -6,6 +6,7 @@ import androidx.core.text.buildSpannedString
 import androidx.core.text.scale
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayData
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotAbiDisplayItem
 import com.absinthe.libchecker.domain.snapshot.display.SnapshotUpdateTimeDisplayData
@@ -25,7 +26,6 @@ import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotPackageIconSource
 import com.absinthe.libchecker.utils.DateUtils
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.PREINSTALLED_TIMESTAMP
 import com.absinthe.libchecker.utils.extensions.sizeToString
 import java.text.SimpleDateFormat
@@ -280,8 +280,8 @@ class BuildSnapshotItemDisplayDataUseCase(private val context: Context) {
   private fun buildAbiDisplayItem(abi: Short): SnapshotAbiDisplayItem {
     val abiInt = abi.toInt()
     return SnapshotAbiDisplayItem(
-      text = PackageUtils.getAbiString(context, abiInt, showExtraInfo = false),
-      badgeRes = PackageUtils.getAbiBadgeResource(abiInt).takeIf {
+      text = PackageInfoFormatter.getAbiString(context, abiInt, showExtraInfo = false),
+      badgeRes = PackageInfoFormatter.getAbiBadgeResource(abiInt).takeIf {
         abiInt != Constants.ERROR && abiInt != Constants.OVERLAY && it != 0
       },
       isMultiArch = abi / Constants.MULTI_ARCH == 1

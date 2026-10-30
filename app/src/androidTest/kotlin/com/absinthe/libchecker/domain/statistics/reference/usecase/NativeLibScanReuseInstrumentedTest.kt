@@ -14,7 +14,7 @@ import com.absinthe.libchecker.constant.Constants.ARMV8
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.detail.content.DetailContentResolver
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.zip.ZipEntry
@@ -71,7 +71,7 @@ class NativeLibScanReuseInstrumentedTest {
     val targets = GlobalContext.get().get<InstalledAppRepository>().getApplicationList()
     assertTrue(targets.size > 50)
     for (target in targets) {
-      assertEquals(target.packageName, BaselineNativeLibReader.getNativeDirLibs(target), PackageUtils.getNativeDirLibs(target))
+      assertEquals(target.packageName, BaselineNativeLibReader.getNativeDirLibs(target), NativeLibraryAnalyzer.getNativeDirLibs(target))
     }
     InstrumentationRegistry.getInstrumentation().sendStatus(
       0,
@@ -109,14 +109,14 @@ class NativeLibScanReuseInstrumentedTest {
             }
           }
           val expected = BaselineNativeLibReader.getNativeDirLibs(target)
-          assertEquals("$base split=$split", expected, PackageUtils.getNativeDirLibs(target))
+          assertEquals("$base split=$split", expected, NativeLibraryAnalyzer.getNativeDirLibs(target))
           if (base == "base.apk") assertEquals(listOfNotNull("libfixture.so", "libsplit.so".takeIf { split }), expected.map { it.name })
           if (base == "empty.apk" && split) assertEquals(listOf("libsplit.so"), expected.map { it.name })
           for (parseElf in listOf(false, true)) {
             assertEquals(
               "$base split=$split explicit ABI parseElf=$parseElf",
               BaselineNativeLibReader.getNativeDirLibs(target, ARMV8, parseElf),
-              PackageUtils.getNativeDirLibs(target, ARMV8, parseElf)
+              NativeLibraryAnalyzer.getNativeDirLibs(target, ARMV8, parseElf)
             )
           }
         }
@@ -127,7 +127,7 @@ class NativeLibScanReuseInstrumentedTest {
       }
       var checks = 0
       try {
-        PackageUtils.getNativeDirLibs(target, checkCancelled = {
+        NativeLibraryAnalyzer.getNativeDirLibs(target, checkCancelled = {
           checks++
           if (checks == 3) throw CancellationException("stop archive scan")
         })
@@ -164,12 +164,12 @@ class NativeLibScanReuseInstrumentedTest {
       }
       for (parseElf in listOf(false, true)) {
         for (abi in listOf(null, ARMV8)) {
-          val result = PackageUtils.getSourceLibs(target, specifiedAbi = abi, parseElf = parseElf)
+          val result = NativeLibraryAnalyzer.getSourceLibs(target, specifiedAbi = abi, parseElf = parseElf)
           assertEquals(setOf("libapp.so", "libflutter.so"), result["arm64-v8a"].orEmpty().map { it.name }.toSet())
           assertEquals(abi == null, "armeabi-v7a" in result)
         }
       }
-      assertEquals(setOf("libapp.so", "libflutter.so"), PackageUtils.getNativeDirLibs(target).map { it.name }.toSet())
+      assertEquals(setOf("libapp.so", "libflutter.so"), NativeLibraryAnalyzer.getNativeDirLibs(target).map { it.name }.toSet())
     } finally {
       shell("rm -f " + fixtures.keys.joinToString(" ") { "$directory/$it" })
       shell("rmdir $directory")
@@ -192,10 +192,10 @@ class NativeLibScanReuseInstrumentedTest {
   fun measureDingdingNativeReaders() {
     val target = GlobalContext.get().get<InstalledAppRepository>().getPackageInfo("com.alibaba.android.rimet")!!
     val readers = linkedMapOf<String, () -> Any>(
-      "source-list" to { PackageUtils.getSourceLibs(target, parseElf = false) },
-      "source-selected-elf" to { PackageUtils.getSourceLibs(target, parseElf = false, parseElfForAbi = ARMV8) },
-      "source-explicit-elf" to { PackageUtils.getSourceLibs(target, specifiedAbi = ARMV8, parseElf = true) },
-      "statistics-native-dir" to { PackageUtils.getNativeDirLibs(target) }
+      "source-list" to { NativeLibraryAnalyzer.getSourceLibs(target, parseElf = false) },
+      "source-selected-elf" to { NativeLibraryAnalyzer.getSourceLibs(target, parseElf = false, parseElfForAbi = ARMV8) },
+      "source-explicit-elf" to { NativeLibraryAnalyzer.getSourceLibs(target, specifiedAbi = ARMV8, parseElf = true) },
+      "statistics-native-dir" to { NativeLibraryAnalyzer.getNativeDirLibs(target) }
     )
     readers.forEach { (name, read) ->
       repeat(3) { read() }

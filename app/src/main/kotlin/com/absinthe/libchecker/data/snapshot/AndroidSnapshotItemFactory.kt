@@ -11,6 +11,7 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.domain.snapshot.SnapshotItemFactory
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.DexStatsCollector
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -43,11 +44,11 @@ class AndroidSnapshotItemFactory : SnapshotItemFactory {
       versionName = packageInfo.versionName.orEmpty(),
       versionCode = packageInfo.getVersionCode(),
       isArchived = isArchived,
-      abi = PackageUtils.getAbi(packageInfo).toShort(),
+      abi = NativeLibraryAnalyzer.getAbi(packageInfo).toShort(),
       targetApi = packageInfo.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
       compileSdk = packageInfo.getCompileSdkVersion().toShort(),
       minSdk = packageInfo.applicationInfo?.minSdkVersion?.toShort() ?: 0,
-      nativeLibs = PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty(),
+      nativeLibs = NativeLibraryAnalyzer.getNativeDirLibs(packageInfo).toJson().orEmpty(),
       services = PackageUtils.getComponentStringList(
         flaggedPi,
         SERVICE,

@@ -29,7 +29,8 @@ import com.absinthe.libchecker.domain.statistics.reference.traceReferenceCompute
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSection
 import com.absinthe.libchecker.domain.statistics.reference.traceReferenceSuspendSection
 import com.absinthe.libchecker.utils.IntentFilterUtils
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.dex.DexArchiveScanner
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.rulesbundle.Rule
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CancellationException
@@ -245,7 +246,7 @@ class ComputeLibReferenceUseCase(
       when (type) {
         NATIVE -> {
           val packageInfo = getPackageInfo(packageName) ?: return
-          val list = PackageUtils.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled)
+          val list = NativeLibraryAnalyzer.getNativeDirLibs(packageInfo, checkCancelled = checkCancelled)
           val nativeLibNames = list.map { it.name }
           val validationResults = RulesRepository.checkNativeLibValidations(
             packageName = packageName,
@@ -286,7 +287,7 @@ class ComputeLibReferenceUseCase(
 
         DEX -> {
           val packageInfo = getPackageInfo(packageName) ?: return
-          val list = PackageUtils.getDexList(packageInfo)
+          val list = DexArchiveScanner.getDexList(packageInfo)
             .asSequence()
             .filter { it.name.startsWith(packageName).not() }
             .map { it.name }
