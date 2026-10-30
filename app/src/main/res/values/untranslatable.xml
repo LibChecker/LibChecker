@@ -24,4 +24,5 @@
   </plurals>
 
   <string name="snapshot_none" translatable="false">None</string>
+  <string name="app_function">AppFunction</string>
 </resources>

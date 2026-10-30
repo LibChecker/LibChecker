@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.Features
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
+import com.absinthe.libchecker.domain.app.model.AppFunctionInfo
 import com.absinthe.libchecker.domain.app.model.VersionedFeature
 
 class BuildAppDetailFeatureItemUseCase {
@@ -65,6 +66,12 @@ class BuildAppDetailFeatureItemUseCase {
         icon = resourceIcon(R.drawable.ic_feature_live_update),
         titleRes = R.string.feature_live_update_notification,
         action = AppDetailFeatureAction.LiveUpdateNotification
+      )
+
+      Features.Ext.APP_FUNCTION -> AppDetailFeatureItemData(
+        icon = resourceIcon(R.drawable.ic_app_function),
+        titleRes = R.string.app_function,
+        action = AppDetailFeatureAction.AppFunction(feature.appFunctions)
       )
 
       Features.Ext.APPLICATION_PROP -> AppDetailFeatureItemData(
@@ -169,6 +176,7 @@ sealed interface AppDetailFeatureAction {
   data class JetpackCompose(val version: String?) : Dialog
   data class ComposeMultiplatformResources(val version: String?) : Dialog
   data object LiveUpdateNotification : Dialog
+  data class AppFunction(val functions: List<AppFunctionInfo>) : Dialog
   data object AppProp : AppDetailFeatureAction
   data object InstallSource : AppDetailFeatureAction
   data object ElfPageSize16Kb : Dialog

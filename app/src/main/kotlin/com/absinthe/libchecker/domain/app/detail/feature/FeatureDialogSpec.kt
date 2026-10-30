@@ -12,7 +12,9 @@ data class FeatureDialogSpec(
   @StringRes val messageRes: Int? = null,
   @ColorInt val iconTint: Int? = null,
   val titleEntries: List<FeatureDialogTitleEntry>? = null,
-  val sourceUrl: String? = null
+  val sourceUrl: String? = null,
+  val items: List<FeatureDialogTitleEntry>? = null,
+  @DrawableRes val itemIconRes: Int? = null
 )
 
 data class FeatureDialogTitleEntry(
@@ -32,6 +34,15 @@ sealed interface FeatureDialogTitleLabel {
 
 fun AppDetailFeatureAction.Dialog.toDialogSpec(): FeatureDialogSpec {
   return when (this) {
+    is AppDetailFeatureAction.AppFunction -> FeatureDialogSpec(
+      iconRes = R.drawable.ic_app_function,
+      titleRes = R.string.app_function,
+      messageRes = R.string.app_function_details,
+      itemIconRes = R.drawable.ic_app_function,
+      items = functions.map { FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text(it.name), it.description) },
+      sourceUrl = "https://developer.$ANDROID_DEV_HOST/ai/appfunctions"
+    )
+
     is AppDetailFeatureAction.Kotlin -> FeatureDialogSpec(
       iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
       titleRes = R.string.kotlin_string,

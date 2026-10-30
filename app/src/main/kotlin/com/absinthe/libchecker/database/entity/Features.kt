@@ -17,5 +17,6 @@ object Features {
     const val ELF_PAGE_SIZE_16KB = -1 shl 2
     const val ELF_PAGE_SIZE_16KB_COMPAT = -1 shl 3
     const val APPLICATION_ICONS = -1 shl 4
+    const val APP_FUNCTION = -1 shl 5
   }
 }
