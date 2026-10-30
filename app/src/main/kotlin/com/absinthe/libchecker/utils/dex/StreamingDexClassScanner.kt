@@ -161,6 +161,7 @@ internal object StreamingDexClassScanner {
     stopAfterMatches: Int = stringPatterns.size,
     entrySize: Long? = null,
     maxScanBytes: Int = Int.MAX_VALUE,
+    stopWhen: ((List<String>) -> Boolean)? = null,
     checkCancelled: () -> Unit = {}
   ): StringMatchResult {
     if (stringPatterns.isEmpty()) return StringMatchResult(emptyList(), 0)
@@ -212,7 +213,11 @@ internal object StreamingDexClassScanner {
       }
       cursor.skipTo(stringOffset)
       cursor.readUleb128()
-      matchCount += cursor.matchExactStrings(patternBytes, found, candidates)
+      val newMatches = cursor.matchExactStrings(patternBytes, found, candidates)
+      matchCount += newMatches
+      // Evaluate grouped evidence only when a requested string is found, not for
+      // every DEX string. The caller can also combine evidence from earlier DEX files.
+      if (newMatches > 0 && stopWhen?.invoke(patterns.filterIndexed { index, _ -> found[index] }) == true) break
       if (matchCount >= requiredMatches) break
     }
 
