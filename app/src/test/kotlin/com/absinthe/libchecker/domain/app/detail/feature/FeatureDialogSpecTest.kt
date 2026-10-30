@@ -1,11 +1,29 @@
 package com.absinthe.libchecker.domain.app.detail.feature
 
+import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadata
 import com.absinthe.libchecker.domain.app.buildmetadata.KotlinVersionSource
+import com.absinthe.libchecker.domain.app.model.AppFunctionInfo
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class FeatureDialogSpecTest {
+
+  @Test
+  fun appFunctionsAreListItemsRatherThanDialogTitleMarkup() {
+    val functions = listOf(AppFunctionInfo("sample.Service#search", description = "Find <items>"), AppFunctionInfo("sample.<literal>"))
+    val spec = AppDetailFeatureAction.AppFunction(functions).toDialogSpec()
+    assertEquals(
+      listOf(
+        FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text("search"), "Find <items>"),
+        FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text("sample.<literal>"), null)
+      ),
+      spec.items
+    )
+    assertEquals(null, spec.titleEntries)
+    assertEquals(R.string.app_function_details, spec.messageRes)
+    assertEquals(R.drawable.ic_app_function, spec.itemIconRes)
+  }
 
   @Test
   fun kotlinDialogPreservesAllPluginTitleEntriesInOrder() {

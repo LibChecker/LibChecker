@@ -403,4 +403,5 @@
   <string name="lib_reference_other_description">其他：%1$d 个库，%2$d 次引用</string>
   <string name="legacy_snapshot_detail">旧式快照详情页面</string>
   <string name="legacy_snapshot_detail_summary">使用经典卡片布局显示快照详情</string>
+  <string name="app_function_details">AppFunctions 是 Android 平台 API，并提供配套的 Jetpack 库，用于简化 Android 的 MCP 集成。</string>
 </resources>

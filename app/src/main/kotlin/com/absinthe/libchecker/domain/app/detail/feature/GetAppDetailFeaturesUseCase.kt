@@ -20,6 +20,7 @@ import com.absinthe.libchecker.domain.app.model.VersionedFeature
 import com.absinthe.libchecker.domain.app.repository.AppListRepository
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.OsUtils
+import com.absinthe.libchecker.utils.apk.AppFunctionReader
 import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.hasXposedModuleMetadata
 import com.absinthe.libchecker.utils.extensions.isPWA
@@ -168,6 +169,11 @@ class GetAppDetailFeaturesUseCase(
     }
     if (packageInfo.isPWA()) {
       emitFeature(VersionedFeature(Features.PWA))
+    }
+
+    val appFunctions = AppFunctionReader.read(packageInfo)
+    if (appFunctions.isNotEmpty()) {
+      emitFeature(VersionedFeature(Features.Ext.APP_FUNCTION, appFunctions = appFunctions))
     }
 
     val appIcons = getAllAppIcons(packageInfo)

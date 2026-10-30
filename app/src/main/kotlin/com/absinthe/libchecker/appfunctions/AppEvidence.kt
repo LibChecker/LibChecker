@@ -81,6 +81,7 @@ internal fun VersionedFeature.toEvidence(): EvidenceRecord {
 }
 
 private val extraFeatureNames = mapOf(
+  Features.Ext.APP_FUNCTION to "app_function",
   Features.Ext.APPLICATION_PROP to "application",
   Features.Ext.APPLICATION_INSTALL_SOURCE to "install_source",
   Features.Ext.ELF_PAGE_SIZE_16KB to "16kb_page_size",

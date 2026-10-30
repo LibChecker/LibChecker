@@ -74,7 +74,7 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
 private inline fun <reified T : CommonExtension> Project.setupBaseModule(crossinline block: T.() -> Unit = {}) {
   extensions.configure<CommonExtension>("android") {
     compileSdk = 37
-    compileSdkMinor = 0
+    compileSdkMinor = 2
 
     lint.toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 
