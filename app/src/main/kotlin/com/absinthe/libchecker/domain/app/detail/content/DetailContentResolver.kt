@@ -40,18 +40,21 @@ import com.absinthe.libchecker.domain.app.detail.trace.TRACE_DETAIL_SOURCE_LIBS
 import com.absinthe.libchecker.domain.app.detail.trace.TRACE_DETAIL_SUPPORTS_16KB
 import com.absinthe.libchecker.domain.app.detail.trace.traceDetailSection
 import com.absinthe.libchecker.domain.app.detail.trace.traceDetailSuspendSection
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.ParsedIntentFilter
 import com.absinthe.libchecker.utils.apk.ApkPreviewInfo
-import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
-import com.absinthe.libchecker.utils.extensions.PAGE_SIZE_16_KB
-import com.absinthe.libchecker.utils.extensions.STRING_ABI_MAP
-import com.absinthe.libchecker.utils.extensions.getSignatures
+import com.absinthe.libchecker.utils.apk.PackageSignatureReader.getSignatures
+import com.absinthe.libchecker.utils.dex.DexArchiveScanner
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.ABI_STRING_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.PAGE_SIZE_16_KB
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.STRING_ABI_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.is16KBAligned
 import com.absinthe.libchecker.utils.extensions.getStatefulPermissionsList
-import com.absinthe.libchecker.utils.extensions.is16KBAligned
 import com.absinthe.libchecker.utils.extensions.maybeResourceId
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
@@ -95,7 +98,7 @@ class DetailContentResolver(
     }
     val itemsByAbi = traceDetailSection(TRACE_DETAIL_SOURCE_LIBS) {
       if (!isApkPreview && apkPreviewInfo == null) {
-        PackageUtils.getSourceLibs(
+        NativeLibraryAnalyzer.getSourceLibs(
           packageInfo = packageInfo,
           specifiedAbi = specifiedAbi,
           parseElf = false,
@@ -200,7 +203,7 @@ class DetailContentResolver(
 
     val abi = STRING_ABI_MAP[tab] ?: return items
     return traceDetailSection(TRACE_DETAIL_PARSE_SELECTED_ABI) {
-      PackageUtils.getSourceLibs(
+      NativeLibraryAnalyzer.getSourceLibs(
         packageInfo = packageInfo,
         specifiedAbi = abi,
         parseElf = true
@@ -501,7 +504,7 @@ class DetailContentResolver(
   ): List<LibStringItemChip> {
     Timber.d("getDexChipList")
     val items = runCatching {
-      PackageUtils.getDexList(packageInfo)
+      DexArchiveScanner.getDexList(packageInfo)
     }.onFailure {
       Timber.e(it)
     }.getOrDefault(emptyList())
@@ -686,10 +689,10 @@ class DetailContentResolver(
   ): NativeLibraryItemDisplayData {
     val elfInfo = item.elfInfo
     return NativeLibraryItemDisplayData(
-      sizeText = PackageUtils.sizeToString(context, item),
+      sizeText = PackageInfoFormatter.sizeToString(context, item),
       labels = buildList {
         if (elfInfo.elfType != ET_NOT_SET && elfInfo.elfType != ET_DYN) {
-          add(PackageUtils.elfTypeToString(elfInfo.elfType))
+          add(PackageInfoFormatter.elfTypeToString(elfInfo.elfType))
         }
         if (elfInfo.elfType != ET_NOT_ELF) {
           if (elfInfo.pageSize > 0 && elfInfo.pageSize % PAGE_SIZE_16_KB == 0) {

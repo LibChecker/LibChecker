@@ -5,10 +5,10 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.feature.PackageFeatureDetector.getFeatures
 import com.absinthe.libchecker.domain.app.list.AppListItemFactory
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getAppName
-import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.getVersionCode
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
 import com.absinthe.libchecker.utils.harmony.ApplicationDelegate
@@ -41,7 +41,7 @@ class AndroidAppListItemFactory(context: Context) : AppListItemFactory {
       packageInfo.firstInstallTime,
       packageInfo.lastUpdateTime,
       (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
-      PackageUtils.getAbi(packageInfo).toShort(),
+      NativeLibraryAnalyzer.getAbi(packageInfo).toShort(),
       if (delayInitFeatures) -1 else packageInfo.getFeatures(),
       applicationInfo.targetSdkVersion.toShort(),
       variant

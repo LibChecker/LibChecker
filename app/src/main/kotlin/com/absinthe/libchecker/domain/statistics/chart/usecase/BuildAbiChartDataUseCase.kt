@@ -2,9 +2,9 @@ package com.absinthe.libchecker.domain.statistics.chart.usecase
 
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.utils.PackageUtils
-import com.absinthe.libchecker.utils.extensions.ABI_32_BIT
-import com.absinthe.libchecker.utils.extensions.ABI_64_BIT
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.ABI_32_BIT
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.ABI_64_BIT
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 
@@ -26,7 +26,7 @@ class BuildAbiChartDataUseCase {
         return null
       }
 
-      if (PackageUtils.hasNoNativeLibs(item.abi.toInt())) {
+      if (NativeLibraryAnalyzer.hasNoNativeLibs(item.abi.toInt())) {
         noNativeLibs.add(item)
       } else {
         when (item.abi % MULTI_ARCH) {

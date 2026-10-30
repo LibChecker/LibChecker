@@ -26,7 +26,7 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOper
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringPattern
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtifactQuery
 import com.absinthe.libchecker.domain.statistics.chart.usecase.BuildDetailedAbiChartDataUseCase
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.view.app.RingDotsView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
@@ -180,7 +180,7 @@ class MissingPackageMetadataInstrumentedTest {
     val tree = errorTree(errors)
     Timber.plant(tree)
     try {
-      assertEquals(setOf(ERROR), PackageUtils.getAbiSet(unreadableApk, PackageInfo(), isApk = false))
+      assertEquals(setOf(ERROR), NativeLibraryAnalyzer.getAbiSet(unreadableApk, PackageInfo(), isApk = false))
       assertTrue("Unreadable APKs must not be reported as Crashlytics errors: $errors", errors.isEmpty())
     } finally {
       Timber.uproot(tree)

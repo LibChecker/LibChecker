@@ -14,7 +14,7 @@ import com.absinthe.libchecker.domain.app.detail.trace.traceDetailSuspendSection
 import com.absinthe.libchecker.domain.app.detail.ui.Referable
 import com.absinthe.libchecker.domain.app.detail.ui.base.BaseDetailFragment
 import com.absinthe.libchecker.domain.app.detail.ui.base.EXTRA_TYPE
-import com.absinthe.libchecker.utils.extensions.ABI_STRING_MAP
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer.ABI_STRING_MAP
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.launchIn

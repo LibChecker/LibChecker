@@ -10,7 +10,10 @@ import androidx.appfunctions.AppFunctionInvalidArgumentException
 import androidx.appfunctions.AppFunctionService as JetpackAppFunctionService
 import androidx.appfunctions.AppFunctionServiceEntryPoint
 import com.absinthe.libchecker.database.entity.LCItem
+import com.absinthe.libchecker.domain.app.buildmetadata.ComposeResourcesDetector.usesComposeMultiplatformResources
+import com.absinthe.libchecker.domain.app.feature.PackageFeatureDetector.getFeatures
 import com.absinthe.libchecker.domain.app.list.AppListItemFactory
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.CompareSnapshotDiffsUseCase
@@ -18,11 +21,8 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailDiffTe
 import com.absinthe.libchecker.domain.snapshot.detail.usecase.SnapshotDetailSectionBuilder
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.statistics.reference.usecase.ComputeLibReferenceUseCase
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.extensions.getAppName
-import com.absinthe.libchecker.utils.extensions.getFeatures
 import com.absinthe.libchecker.utils.extensions.isArchivedPackage
-import com.absinthe.libchecker.utils.extensions.usesComposeMultiplatformResources
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -298,7 +298,7 @@ abstract class BaseAppFunctionService : JetpackAppFunctionService() {
     versionCode,
     isSystem,
     targetApi.toInt(),
-    PackageUtils.getAbiString(this@BaseAppFunctionService, abi.toInt(), true),
+    PackageInfoFormatter.getAbiString(this@BaseAppFunctionService, abi.toInt(), true),
     matches
   )
 

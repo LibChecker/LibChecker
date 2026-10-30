@@ -3,7 +3,7 @@ package com.absinthe.libchecker.data.app
 import android.content.Context
 import com.absinthe.libchecker.BuildConfig
 import com.absinthe.libchecker.domain.app.list.export.AppListExportMetadata
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 
 class AndroidAppListExportMetadata(context: Context) : AppListExportMetadata {
 
@@ -16,6 +16,6 @@ class AndroidAppListExportMetadata(context: Context) : AppListExportMetadata {
     get() = BuildConfig.VERSION_CODE.toLong()
 
   override fun formatAbi(abi: Short): String {
-    return PackageUtils.getAbiString(appContext, abi.toInt(), false)
+    return PackageInfoFormatter.getAbiString(appContext, abi.toInt(), false)
   }
 }

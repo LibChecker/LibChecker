@@ -18,6 +18,7 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.domain.app.buildmetadata.COMPOSE_VERSION_ENTRIES
 import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadataDetector
+import com.absinthe.libchecker.domain.app.buildmetadata.KotlinUsageDetector
 import com.absinthe.libchecker.domain.app.buildmetadata.KotlinVersionInferenceHints
 import com.absinthe.libchecker.domain.app.buildmetadata.readAgpVersion
 import com.absinthe.libchecker.domain.app.buildmetadata.readFirstPresentLine
@@ -25,7 +26,6 @@ import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
 import com.absinthe.libchecker.utils.JsonUtil
 import com.absinthe.libchecker.utils.OsUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.ApkSignatureSchemeDetector
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -458,7 +458,7 @@ object LcAppsExporter {
             zip.getEntry("META-INF/services/kotlinx.coroutines.CoroutineExceptionHandler") != null ||
             zip.getEntry("META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory") != null ||
             KotlinBuildMetadataDetector.hasKotlinModuleMetadata(zip) ||
-            PackageUtils.hasKotlinRuntimeEvidenceInClassDex(zip)
+            KotlinUsageDetector.hasKotlinRuntimeEvidenceInClassDex(zip)
         val kotlinInfo = KotlinBuildMetadataDetector.detect(
           apk = sourceFile,
           zip = zip,

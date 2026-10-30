@@ -6,7 +6,7 @@ import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceItemConte
 import com.absinthe.libchecker.domain.app.detail.model.AppInstallSourceRequesterAccess
 import com.absinthe.libchecker.domain.app.detail.related.RelatedAppDisplayData
 import com.absinthe.libchecker.domain.app.model.AppInstallSource
-import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
+import com.absinthe.libchecker.utils.dex.DexOptimizationReader.DexFileOptimizationInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame

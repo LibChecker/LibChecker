@@ -22,7 +22,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotNoDiffBSVi
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotPackageChangeView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTitleView
 import com.absinthe.libchecker.ui.app.BottomSheetRecyclerView
-import com.absinthe.libchecker.utils.extensions.DexFileOptimizationInfo
+import com.absinthe.libchecker.utils.dex.DexOptimizationReader.DexFileOptimizationInfo
 import com.absinthe.libchecker.view.app.AppIconPlaceholder
 import com.google.android.material.card.MaterialCardView
 import org.junit.Assert.assertEquals

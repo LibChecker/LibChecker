@@ -16,6 +16,7 @@ import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 import com.absinthe.libchecker.domain.app.repository.AppListSettingsRepository
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.visitComponentSnapshotDiff
 import com.absinthe.libchecker.domain.snapshot.comparison.usecase.visitKeyedSnapshotDiff
@@ -42,7 +43,6 @@ import com.absinthe.libchecker.domain.snapshot.model.REMOVED
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDetailItem
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.LCAppUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.DexEntryInfo
 import com.absinthe.libchecker.utils.dex.ResourceEntryInfo
 import com.absinthe.libchecker.utils.extensions.sizeToString
@@ -320,7 +320,7 @@ class SnapshotDetailSectionBuilder(
           append(formatSnapshotSizeChange(context, new.size - old.size, old.size))
         }
       } else {
-        PackageUtils.sizeToString(context, item)
+        PackageInfoFormatter.sizeToString(context, item)
       }
       add(SnapshotDetailItem(item.name, item.name, extra, status, NATIVE))
     }

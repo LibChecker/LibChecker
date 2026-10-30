@@ -13,8 +13,8 @@ import com.absinthe.libchecker.domain.statistics.chart.model.StatisticStringOper
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticArtifactQuery
 import com.absinthe.libchecker.domain.statistics.chart.repository.StatisticEvidenceRepository
 import com.absinthe.libchecker.utils.IntentFilterUtils
-import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.FastDexFileFactory
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.manifest.ApplicationReader
 import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.iface.ClassDef
@@ -92,7 +92,7 @@ class AndroidStatisticEvidenceRepository(
         val libraryNames = if (extractedLibraries.isNotEmpty()) {
           extractedLibraries.mapTo(mutableSetOf(), File::getName)
         } else {
-          PackageUtils.getNativeDirLibs(packageInfo, parseElf = false, checkCancelled = checkCancellation)
+          NativeLibraryAnalyzer.getNativeDirLibs(packageInfo, parseElf = false, checkCancelled = checkCancellation)
             .mapTo(mutableSetOf()) { it.name }
         }
         nativeQueries.forEach { query -> results[query] = query.name in libraryNames }

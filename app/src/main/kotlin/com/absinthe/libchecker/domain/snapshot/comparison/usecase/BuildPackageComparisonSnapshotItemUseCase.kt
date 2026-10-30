@@ -10,6 +10,7 @@ import com.absinthe.libchecker.annotation.SERVICE
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.DexStatsCollector
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -49,8 +50,8 @@ class BuildPackageComparisonSnapshotItemUseCase(
         analysisPackage.getVersionCode()
       ),
       abiDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getAbi(basePackage).toShort(),
-        PackageUtils.getAbi(analysisPackage).toShort()
+        NativeLibraryAnalyzer.getAbi(basePackage).toShort(),
+        NativeLibraryAnalyzer.getAbi(analysisPackage).toShort()
       ),
       targetApiDiff = SnapshotDiffItem.DiffNode(
         basePackage.applicationInfo?.targetSdkVersion?.toShort() ?: 0,
@@ -65,8 +66,8 @@ class BuildPackageComparisonSnapshotItemUseCase(
         analysisPackage.applicationInfo?.minSdkVersion?.toShort()
       ),
       nativeLibsDiff = SnapshotDiffItem.DiffNode(
-        PackageUtils.getNativeDirLibs(basePackage).toJson().orEmpty(),
-        PackageUtils.getNativeDirLibs(analysisPackage).toJson().orEmpty()
+        NativeLibraryAnalyzer.getNativeDirLibs(basePackage).toJson().orEmpty(),
+        NativeLibraryAnalyzer.getNativeDirLibs(analysisPackage).toJson().orEmpty()
       ),
       servicesDiff = SnapshotDiffItem.DiffNode(
         basePackage.getComponentJson(SERVICE),

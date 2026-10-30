@@ -6,8 +6,8 @@ import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.list.related.RelatedAppListItem
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
-import com.absinthe.libchecker.utils.PackageUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -23,7 +23,7 @@ internal suspend fun buildRelatedAppDisplayData(
   val item = relatedApp.item
   val packageInfo = relatedApp.packageInfo
   val abi = item.abi.toInt()
-  val abiBadgeRes = PackageUtils.getAbiBadgeResource(abi).takeIf {
+  val abiBadgeRes = PackageInfoFormatter.getAbiBadgeResource(abi).takeIf {
     abi != Constants.OVERLAY && abi != Constants.ERROR && it != 0
   }
   return RelatedAppDisplayData(
@@ -33,9 +33,9 @@ internal suspend fun buildRelatedAppDisplayData(
     label = item.label,
     versionInfo = "${item.versionName} (${item.versionCode})",
     abiInfo = buildString {
-      append(PackageUtils.getAbiString(context, abi, true))
+      append(PackageInfoFormatter.getAbiString(context, abi, true))
       append(
-        PackageUtils.getBuildVersionsInfo(
+        PackageInfoFormatter.getBuildVersionsInfo(
           packageInfo = packageInfo,
           packageName = packageName,
           isApexPackage = isApexPackage

@@ -17,6 +17,7 @@ import com.absinthe.libchecker.domain.snapshot.selection.SnapshotSelection
 import com.absinthe.libchecker.domain.snapshot.timenode.usecase.RefreshSnapshotRepresentativeAppsUseCase
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.dex.DexStatsCollector
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getAppName
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
@@ -144,7 +145,7 @@ class CaptureInstalledSnapshotUseCase(
           PackageManager.GET_META_DATA
       ) ?: return null
     }
-    val abi = PackageUtils.getAbi(packageInfo)
+    val abi = NativeLibraryAnalyzer.getAbi(packageInfo)
     if (abi == Constants.ERROR) {
       return null
     }
@@ -163,7 +164,7 @@ class CaptureInstalledSnapshotUseCase(
       isSystem = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
       abi = abi.toShort(),
       targetApi = applicationInfo.targetSdkVersion.toShort(),
-      nativeLibs = PackageUtils.getNativeDirLibs(packageInfo).toJson().orEmpty(),
+      nativeLibs = NativeLibraryAnalyzer.getNativeDirLibs(packageInfo).toJson().orEmpty(),
       services = PackageUtils.getComponentStringList(othersPi, SERVICE, false)
         .toJson().orEmpty(),
       activities = PackageUtils.getComponentStringList(activitiesPi, ACTIVITY, false)

@@ -131,9 +131,12 @@ Important `:app` boundaries:
   prepared domain/display data in; do not import `data/*` from views.
 - `compat/` wraps platform/API-level differences. Check here before adding new
   SDK-version branches.
-- `utils/apk`, `utils/manifest`, `utils/dex`, `utils/elf`, `PackageUtils`,
-  `PackageManagerCompat`, and `PackageInfoExtensions` own package parsing and
-  package-manager helpers. Reuse them before adding another parser.
+- `PackageUtils`, `PackageManagerCompat`, and `PackageInfoExtensions` own basic
+  package-manager queries and package properties. Feature detection belongs in
+  `domain/app/feature/` and `domain/app/buildmetadata/`; display formatting belongs
+  in `domain/app/model/PackageInfoFormatter`. Keep archive, signature, DEX, and
+  native-library analysis in `utils/apk`, `utils/dex`, and `utils/elf`; reuse these
+  and `utils/manifest` before adding another parser. Preserve shared ZIP scans.
 - `database/` owns Room entities, DAO, repository, migrations, schemas, and
   backup helpers.
 - `app/src/foss/` and `app/src/market/` are flavor source sets. Keep matching

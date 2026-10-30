@@ -15,6 +15,7 @@ import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.utils.PackageUtils
 import com.absinthe.libchecker.utils.apk.APKSParser
 import com.absinthe.libchecker.utils.dex.DexStatsCollector
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import com.absinthe.libchecker.utils.extensions.getCompileSdkVersion
 import com.absinthe.libchecker.utils.extensions.getPackageSize
 import com.absinthe.libchecker.utils.extensions.getPermissionsList
@@ -83,9 +84,9 @@ class BuildArchiveSnapshotItemUseCase(
       installedTime = firstInstallTime,
       lastUpdatedTime = lastUpdateTime,
       isSystem = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) > 0,
-      abi = PackageUtils.getAbi(this).toShort(),
+      abi = NativeLibraryAnalyzer.getAbi(this).toShort(),
       targetApi = applicationInfo.targetSdkVersion.toShort(),
-      nativeLibs = PackageUtils.getNativeDirLibs(this).toJson().orEmpty(),
+      nativeLibs = NativeLibraryAnalyzer.getNativeDirLibs(this).toJson().orEmpty(),
       services = PackageUtils.getComponentStringList(this, SERVICE, false)
         .toJson().orEmpty(),
       activities = PackageUtils.getComponentStringList(this, ACTIVITY, false)

@@ -6,7 +6,8 @@ import androidx.annotation.DrawableRes
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.database.entity.LCItem
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.domain.app.model.PackageInfoFormatter
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 
 data class AppListItemViewState(
   val packageInfo: PackageInfo?,
@@ -38,16 +39,16 @@ data class AppListItemViewState(
     ): AppListItemViewState {
       val abi = item.abi.toInt()
       val baseAbi = abi % Constants.MULTI_ARCH
-      val buildVersionsInfo = PackageUtils.getBuildVersionsInfo(
+      val buildVersionsInfo = PackageInfoFormatter.getBuildVersionsInfo(
         packageInfo = packageState.packageInfo,
         packageName = item.packageName,
         isApexPackage = isApexPackage
       )
       val abiInfo = StringBuilder()
-        .append(PackageUtils.getAbiString(context, abi, false))
+        .append(PackageInfoFormatter.getAbiString(context, abi, false))
         .append(buildVersionsInfo)
       val accessibilityAbiInfo = StringBuilder()
-        .append(PackageUtils.getAbiString(context, abi, true))
+        .append(PackageInfoFormatter.getAbiString(context, abi, true))
         .append(buildVersionsInfo)
 
       return AppListItemViewState(
@@ -59,7 +60,7 @@ data class AppListItemViewState(
         useDetachedAbiBadges = shouldUseDetachedAbiBadges(options),
         abiBadgeRes = getAbiBadgeResource(abi),
         largeAbiBadgeRes = getLargeAbiBadgeResource(abi),
-        isAbiBadge64Bit = PackageUtils.isAbi64Bit(baseAbi),
+        isAbiBadge64Bit = NativeLibraryAnalyzer.isAbi64Bit(baseAbi),
         showMultiArchBadge = abi / Constants.MULTI_ARCH == 1,
         tintAbiLabels = (options and AdvancedOptions.TINT_ABI_LABEL) > 0,
         packageBadge = when {
@@ -103,7 +104,7 @@ data class AppListItemViewState(
       return if (abi == Constants.OVERLAY || abi == Constants.ERROR) {
         0
       } else {
-        PackageUtils.getAbiBadgeResource(abi)
+        PackageInfoFormatter.getAbiBadgeResource(abi)
       }
     }
 
@@ -111,7 +112,7 @@ data class AppListItemViewState(
       return if (abi == Constants.OVERLAY || abi == Constants.ERROR) {
         0
       } else {
-        PackageUtils.getLargeAbiBadgeResource(abi)
+        PackageInfoFormatter.getLargeAbiBadgeResource(abi)
       }
     }
   }

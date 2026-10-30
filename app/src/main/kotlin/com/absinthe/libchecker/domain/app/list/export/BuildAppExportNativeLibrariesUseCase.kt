@@ -1,14 +1,14 @@
 package com.absinthe.libchecker.domain.app.list.export
 
 import android.content.pm.PackageInfo
-import com.absinthe.libchecker.utils.PackageUtils
+import com.absinthe.libchecker.utils.elf.NativeLibraryAnalyzer
 import timber.log.Timber
 
 class BuildAppExportNativeLibrariesUseCase {
 
   operator fun invoke(packageInfo: PackageInfo): List<AppExportNativeLibrary> {
     val sourceLibs = runCatching {
-      PackageUtils.getSourceLibs(
+      NativeLibraryAnalyzer.getSourceLibs(
         packageInfo = packageInfo,
         includeNativeLibsDir = true,
         parseElf = false
