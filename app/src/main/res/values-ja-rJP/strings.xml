@@ -263,4 +263,5 @@
   <string name="snapshot_menu_diff_highlight">差分のハイライト表示</string>
   <string name="snapshot_menu_use_iec_units">IEC単位を使用</string>
   <!-- A11y -->
+  <!-- Official overview: https://developer.android.com/ai/appfunctions -->
 </resources>

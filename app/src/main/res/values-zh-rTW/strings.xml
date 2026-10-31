@@ -407,4 +407,5 @@
   <string name="lib_reference_other_description">其他：%1$d 個函式庫，%2$d 次參照</string>
   <string name="legacy_snapshot_detail">舊版快照詳細資訊頁面</string>
   <string name="legacy_snapshot_detail_summary">使用經典卡片配置檢視快照詳細資訊</string>
+  <!-- Official overview: https://developer.android.com/ai/appfunctions -->
 </resources>

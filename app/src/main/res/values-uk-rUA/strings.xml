@@ -276,4 +276,5 @@
   <string name="snapshot_menu_diff_highlight">Показати відмінності</string>
   <string name="snapshot_menu_use_iec_units">Використовувати одиниці IEC</string>
   <!-- A11y -->
+  <!-- Official overview: https://developer.android.com/ai/appfunctions -->
 </resources>
