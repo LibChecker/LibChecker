@@ -158,6 +158,7 @@ class LibStringAdapter(
     itemView.bind(
       display = display,
       highlightText = highlightText,
+      colorfulRuleIcon = renderState.colorfulRuleIcon,
       onResourceClick = onAction?.let { callback ->
         { clickedDisplay -> callback(LibStringAction.MetadataResourceClicked(item, clickedDisplay)) }
       }

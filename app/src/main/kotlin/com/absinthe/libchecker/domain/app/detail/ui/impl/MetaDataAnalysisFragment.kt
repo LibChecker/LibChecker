@@ -17,7 +17,7 @@ class MetaDataAnalysisFragment :
   override fun inflateBinding(inflater: LayoutInflater) = FragmentLibComponentBinding.inflate(inflater)
 
   override fun getRecyclerView() = binding.list
-  override val needShowLibDetailDialog = false
+  override val needShowLibDetailDialog = true
 
   override suspend fun getItems(): List<LibStringItemChip> {
     return viewModel.contentState.metaDataItems.valueOrAwait()

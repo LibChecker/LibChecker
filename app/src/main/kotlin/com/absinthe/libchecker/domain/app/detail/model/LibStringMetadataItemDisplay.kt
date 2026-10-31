@@ -1,13 +1,16 @@
 package com.absinthe.libchecker.domain.app.detail.model
 
 import com.absinthe.libchecker.annotation.METADATA
+import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
 import com.absinthe.libchecker.domain.app.detail.resource.AppResourceReference
+import com.absinthe.rulesbundle.Rule
 
 data class LibStringMetadataItemDisplay(
   override val name: LibStringItemNameDisplay,
   val originalDisplayValue: String,
   val resource: AppResourceReference?,
+  val rule: Rule? = null,
   val preview: AppResourcePreview = AppResourcePreview.Original
 ) : LibStringItemDisplay {
 
@@ -16,7 +19,7 @@ data class LibStringMetadataItemDisplay(
     else -> originalDisplayValue
   }
 
-  override val contentDescription: String = buildDetailItemDescription(name.text, visibleValue)
+  override val contentDescription: String = buildDetailItemDescription(name.text, visibleValue, rule?.label)
 
   val isTransformed: Boolean = preview != AppResourcePreview.Original
 
@@ -49,6 +52,7 @@ data class LibStringMetadataItemDisplay(
             resourceType = item.labels.firstOrNull()
           )
         },
+        rule = item.rule.takeIf { itemDisplayOptions.isOptionEnabled(AdvancedOptions.SHOW_MARKED_LIB) },
         preview = preview
       )
     }
