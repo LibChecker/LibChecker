@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.ACTION
@@ -20,6 +21,7 @@ import com.absinthe.libchecker.domain.statistics.reference.presentation.LibRefer
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
@@ -98,7 +100,8 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     val name = refName ?: return
     val type = refType
     actionBarIconJob = lifecycleScope.launch {
-      supportActionBar?.setIcon(viewModel.getReferenceIcon(name, type))
+      val icon = AppCompatResources.getDrawable(this@LibReferenceActivity, viewModel.getReferenceIcon(name, type))
+      supportActionBar?.setIcon(icon?.boundedReferenceIcon(24.dp))
     }
   }
 
