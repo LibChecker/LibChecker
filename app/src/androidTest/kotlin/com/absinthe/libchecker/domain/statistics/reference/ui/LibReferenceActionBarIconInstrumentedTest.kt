@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.statistics.reference.ui
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.test.core.app.ActivityScenario
@@ -11,7 +12,9 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.utils.UiUtils
+import com.absinthe.libchecker.utils.extensions.dp
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -20,11 +23,22 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class LibReferenceActionBarIconInstrumentedTest {
   @Test
+  fun oversizedIconsAreBoundedWithoutStretchingOrUpscaling() {
+    for ((width, height) in listOf(1024 to 1024, 1024 to 256, 256 to 1024, 12 to 6)) {
+      val icon = GradientDrawable().apply { setSize(width, height) }.boundedReferenceIcon(24)
+      assertTrue(icon.intrinsicWidth in 1..24)
+      assertTrue(icon.intrinsicHeight in 1..24)
+      assertEquals(width.toFloat() / height, icon.intrinsicWidth.toFloat() / icon.intrinsicHeight, 0.001f)
+      assertEquals(minOf(24, maxOf(width, height)), maxOf(icon.intrinsicWidth, icon.intrinsicHeight))
+    }
+  }
+
+  @Test
   fun actionBarShowsReferenceIcon() {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val rule = requireNotNull(runBlocking { RulesRepository.getRule("libAGFX.so", NATIVE, true) })
     assertNotEquals(R.drawable.ic_question, rule.iconRes)
-    val expectedIcon = requireNotNull(ContextCompat.getDrawable(context, rule.iconRes))
+    val expectedIcon = requireNotNull(ContextCompat.getDrawable(context, rule.iconRes)).boundedReferenceIcon(24.dp)
     val intent = Intent(context, LibReferenceActivity::class.java)
       .putExtra(EXTRA_REF_NAME, "libAGFX.so")
       .putExtra(EXTRA_REF_LABEL, "BytePlus RTC")
