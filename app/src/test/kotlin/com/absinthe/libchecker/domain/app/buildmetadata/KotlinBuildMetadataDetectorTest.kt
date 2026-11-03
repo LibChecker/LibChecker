@@ -11,9 +11,9 @@ import com.android.tools.smali.dexlib2.Opcodes
 import com.android.tools.smali.dexlib2.immutable.ImmutableAnnotation
 import com.android.tools.smali.dexlib2.immutable.ImmutableAnnotationElement
 import com.android.tools.smali.dexlib2.immutable.ImmutableClassDef
-import com.android.tools.smali.dexlib2.immutable.ImmutableDexFile
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableArrayEncodedValue
 import com.android.tools.smali.dexlib2.immutable.value.ImmutableIntEncodedValue
+import com.android.tools.smali.dexlib2.writer.io.MemoryDataStore
 import com.android.tools.smali.dexlib2.writer.pool.DexPool
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
@@ -30,6 +30,36 @@ class KotlinBuildMetadataDetectorTest {
 
   @get:Rule
   val temporaryFolder = TemporaryFolder()
+
+  @Test
+  fun sharedR8VisitorReadsEachDexOnceWithAndWithoutToolingMetadata() {
+    for (toolingMetadata in listOf(null, TOOLING_METADATA)) {
+      val apk = createApk(
+        toolingMetadata = toolingMetadata,
+        dexMetadataVersions = listOf(listOf(2, 1, 0)),
+        secondDexClasses = listOf(DexMetadataFixture("fixture.Other", listOf(2, 1, 0))),
+        r8Marker = "~~R8{\"version\":\"9.5.28\",\"r8-mode\":\"full\"}"
+      )
+      ZipFileCompat(apk).use { zip ->
+        val reads = mutableMapOf<String, Int>()
+        val countedZip = object : IZipFile by zip {
+          override fun getInputStream(entry: ZipEntry) = zip.getInputStream(entry).also {
+            if (entry.name.endsWith(".dex")) reads.merge(entry.name, 1, Int::plus)
+          }
+        }
+        val markers = linkedSetOf<String>()
+        var visits = 0
+        val result = KotlinBuildMetadataDetector.detect(apk, countedZip, onDexRead = { dex ->
+          visits++
+          markers.addAll(R8BuildMetadataDetector.detect(dex))
+        })
+        assertEquals(if (toolingMetadata == null) "2.1.x" else "2.3.20", result.kotlinVersion)
+        assertEquals(setOf("9.5.28 (Full)"), markers)
+        assertEquals(2, visits)
+        assertEquals(mapOf("classes.dex" to 1, "classes2.dex" to 1), reads)
+      }
+    }
+  }
 
   @Test
   fun prefersExactToolingPluginVersionAndKeepsBuildDetails() {
@@ -314,7 +344,8 @@ class KotlinBuildMetadataDetectorTest {
     dexMetadataVersions: List<List<Int>> = emptyList(),
     dexMetadataClasses: List<DexMetadataFixture> = emptyList(),
     kotlinModuleVersion: List<Int>? = null,
-    secondDexClasses: List<DexMetadataFixture> = emptyList()
+    secondDexClasses: List<DexMetadataFixture> = emptyList(),
+    r8Marker: String? = null
   ): File {
     return temporaryFolder.newFile("fixture-${System.nanoTime()}.apk").apply {
       outputStream().use { output ->
@@ -331,12 +362,12 @@ class KotlinBuildMetadataDetectorTest {
           }
           if (dexFixtures.isNotEmpty()) {
             zip.putNextEntry(ZipEntry("classes.dex"))
-            zip.write(createDex(dexFixtures))
+            zip.write(createDex(dexFixtures, r8Marker))
             zip.closeEntry()
           }
           if (secondDexClasses.isNotEmpty()) {
             zip.putNextEntry(ZipEntry("classes2.dex"))
-            zip.write(createDex(secondDexClasses))
+            zip.write(createDex(secondDexClasses, r8Marker))
             zip.closeEntry()
           }
           kotlinModuleVersion?.let { version ->
@@ -349,8 +380,7 @@ class KotlinBuildMetadataDetectorTest {
     }
   }
 
-  private fun createDex(fixtures: List<DexMetadataFixture>): ByteArray {
-    val dexFile = temporaryFolder.newFile()
+  private fun createDex(fixtures: List<DexMetadataFixture>, r8Marker: String? = null): ByteArray {
     val classes = fixtures.map { fixture ->
       val metadataAnnotation = ImmutableAnnotation(
         AnnotationVisibility.RUNTIME,
@@ -373,8 +403,12 @@ class KotlinBuildMetadataDetectorTest {
         null
       )
     }
-    DexPool.writeTo(dexFile.path, ImmutableDexFile(Opcodes.getDefault(), classes))
-    return dexFile.readBytes()
+    val pool = DexPool(Opcodes.getDefault())
+    classes.forEach(pool::internClass)
+    r8Marker?.let(pool.stringSection::intern)
+    val store = MemoryDataStore()
+    pool.writeTo(store)
+    return store.data
   }
 
   private data class DexMetadataFixture(

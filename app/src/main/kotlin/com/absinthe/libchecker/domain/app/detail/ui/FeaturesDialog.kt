@@ -65,7 +65,16 @@ object FeaturesDialog {
       .setPositiveButton(android.R.string.ok, null)
 
     val message = buildSpannedString {
+      spec.subtitleEntries?.forEach { entry ->
+        if (isNotEmpty()) append(", ")
+        bold { append(entry.label.resolve(context)) }
+        entry.value?.let {
+          append(" ")
+          append(it)
+        }
+      }
       spec.messageRes?.let { messageRes ->
+        if (isNotEmpty()) append("\n\n")
         append(HtmlCompat.fromHtml(context.getString(messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
       }
       spec.items?.forEach { item ->

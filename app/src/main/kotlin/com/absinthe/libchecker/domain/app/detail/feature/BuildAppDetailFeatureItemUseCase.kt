@@ -28,8 +28,8 @@ class BuildAppDetailFeatureItemUseCase {
 
       Features.AGP -> AppDetailFeatureItemData(
         icon = resourceIcon(R.drawable.ic_gradle),
-        titleRes = R.string.agp,
-        action = AppDetailFeatureAction.Agp(feature.version)
+        titleRes = if (feature.version == null && feature.extras?.containsKey("R8") == true) R.string.r8 else R.string.agp,
+        action = AppDetailFeatureAction.Agp(feature.version, feature.extras)
       )
 
       Features.XPOSED_MODULE -> AppDetailFeatureItemData(
@@ -169,7 +169,7 @@ sealed interface AppDetailFeatureAction {
 
   data object SplitApks : AppDetailFeatureAction
   data class Kotlin(val extras: Map<String, String?>?) : Dialog
-  data class Agp(val version: String?) : Dialog
+  data class Agp(val version: String?, val extras: Map<String, String?>? = null) : Dialog
   data object XposedModule : AppDetailFeatureAction
   data object PlaySigning : Dialog
   data object Pwa : Dialog
