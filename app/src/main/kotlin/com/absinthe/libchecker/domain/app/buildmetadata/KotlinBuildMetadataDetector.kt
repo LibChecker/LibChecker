@@ -6,6 +6,7 @@ import com.absinthe.libchecker.domain.app.detail.model.KotlinToolingMetadata
 import com.absinthe.libchecker.utils.dex.ZipDexContainer2
 import com.absinthe.libchecker.utils.fromJson
 import com.android.tools.smali.dexlib2.Opcodes
+import com.android.tools.smali.dexlib2.dexbacked.DexBackedDexFile
 import com.android.tools.smali.dexlib2.iface.ClassDef
 import com.android.tools.smali.dexlib2.iface.value.ArrayEncodedValue
 import com.android.tools.smali.dexlib2.iface.value.IntEncodedValue
@@ -83,20 +84,18 @@ internal object KotlinBuildMetadataDetector {
     inferenceHints: KotlinVersionInferenceHints? = null,
     loadInferenceHints: (() -> KotlinVersionInferenceHints?)? = null,
     checkCancelled: () -> Unit = {},
-    onReadFailure: () -> Unit = {}
+    onReadFailure: () -> Unit = {},
+    onDexRead: ((DexBackedDexFile) -> Unit)? = null
   ): KotlinBuildMetadata {
     checkCancelled()
     val toolingMetadata = readToolingMetadata(zip, onReadFailure)
-    if (toolingMetadata.kotlinVersion != null) {
-      return toolingMetadata
-    }
-    if (!inferVersion) {
-      return toolingMetadata
-    }
+    val needsInference = toolingMetadata.kotlinVersion == null && inferVersion
+    if (!needsInference && onDexRead == null) return toolingMetadata
 
-    val hints = loadInferenceHints?.invoke() ?: inferenceHints
-    val container = ZipDexContainer2(apk, Opcodes.getDefault(), zip)
-    val dexMetadata = readDexMetadataVersions(container, checkCancelled, onReadFailure)
+    val hints = if (needsInference) loadInferenceHints?.invoke() ?: inferenceHints else null
+    val container = ZipDexContainer2(apk, Opcodes.getDefault(), zip, MAX_BUILD_METADATA_DEX_BYTES, checkCancelled)
+    val dexMetadata = readDexMetadataVersions(container, checkCancelled, onReadFailure, needsInference, onDexRead)
+    if (!needsInference) return toolingMetadata
     val scopedDexVersions = dexMetadata.selectVersions(hints)
     if (scopedDexVersions != null) {
       val version = scopedDexVersions.versions.singleOrNull() ?: return toolingMetadata
@@ -162,19 +161,34 @@ internal object KotlinBuildMetadataDetector {
   private fun readDexMetadataVersions(
     container: ZipDexContainer2,
     checkCancelled: () -> Unit,
-    onReadFailure: () -> Unit
+    onReadFailure: () -> Unit,
+    readKotlin: Boolean,
+    onDexRead: ((DexBackedDexFile) -> Unit)?
   ): List<ClassMetadataVersion> {
     return runCatching {
-      buildList {
+      var failed = false
+      val versions = buildList {
         container.dexEntryNames.forEach entryLoop@{ entryName ->
           checkCancelled()
-          val dexFile = container.getEntry(entryName)?.dexFile ?: return@entryLoop
-          dexFile.classes.forEachIndexed { index, classDef ->
-            if (index % 256 == 0) checkCancelled()
-            readClassMetadata(classDef)?.let(::add)
+          try {
+            val dexFile = container.getEntry(entryName)?.dexFile ?: return@entryLoop
+            onDexRead?.invoke(dexFile)
+            if (readKotlin) {
+              dexFile.classes.forEachIndexed { index, classDef ->
+                if (index % 256 == 0) checkCancelled()
+                readClassMetadata(classDef)?.let(::add)
+              }
+            }
+          } catch (e: CancellationException) {
+            throw e
+          } catch (_: Exception) {
+            failed = true
+            onReadFailure()
           }
         }
       }
+      // Partial class metadata must not establish a Kotlin version, but other DEX visitors still run.
+      if (failed) emptyList() else versions
     }.getOrElse {
       if (it is CancellationException) throw it
       onReadFailure()

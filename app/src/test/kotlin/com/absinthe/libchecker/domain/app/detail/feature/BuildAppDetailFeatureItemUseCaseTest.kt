@@ -9,6 +9,25 @@ import org.junit.Test
 class BuildAppDetailFeatureItemUseCaseTest {
 
   @Test
+  fun r8OnlyFeatureHasR8LabelAndDialogEntry() {
+    val item = BuildAppDetailFeatureItemUseCase()(
+      AppDetailFeatureItemRequest(
+        feature = VersionedFeature(Features.AGP, extras = mapOf("R8" to "9.5.28 (Full)")),
+        currentFeatureCount = 0,
+        apkAnalyticsMode = false,
+        canShowInstallSource = true,
+        canShowAppIcons = true,
+        appIcons = emptyList()
+      )
+    )!!
+    assertEquals(R.string.r8, item.titleRes)
+    assertEquals(
+      "9.5.28 (Full)",
+      (item.action as AppDetailFeatureAction.Dialog).toDialogSpec().titleEntries?.single()?.value
+    )
+  }
+
+  @Test
   fun composeFeaturesPreserveTheirOwnVersionThroughDialogMapping() {
     val featureTitles = mapOf(
       Features.JETPACK_COMPOSE to R.string.jetpack_compose,

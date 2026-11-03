@@ -13,6 +13,7 @@ data class FeatureDialogSpec(
   @ColorInt val iconTint: Int? = null,
   val titleEntries: List<FeatureDialogTitleEntry>? = null,
   val sourceUrl: String? = null,
+  val subtitleEntries: List<FeatureDialogTitleEntry>? = null,
   val items: List<FeatureDialogTitleEntry>? = null,
   @DrawableRes val itemIconRes: Int? = null
 )
@@ -47,18 +48,36 @@ fun AppDetailFeatureAction.Dialog.toDialogSpec(): FeatureDialogSpec {
       iconRes = com.absinthe.lc.rulesbundle.R.drawable.ic_lib_kotlin,
       titleRes = R.string.kotlin_string,
       messageRes = R.string.kotlin_details,
-      titleEntries = extras?.map { (label, version) ->
+      titleEntries = extras?.filterKeys { it != "Gradle" && it != "Java" }?.map { (label, version) ->
+        FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text(label), version)
+      }?.takeIf { it.isNotEmpty() },
+      subtitleEntries = extras?.filterKeys { it == "Gradle" || it == "Java" }?.map { (label, version) ->
         FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text(label), version)
       },
       sourceUrl = "https://kotlinlang.org/"
     )
 
-    is AppDetailFeatureAction.Agp -> versionDialogSpec(
+    is AppDetailFeatureAction.Agp -> FeatureDialogSpec(
       iconRes = R.drawable.ic_gradle,
-      titleRes = R.string.agp,
-      messageRes = R.string.agp_details,
-      version = version,
-      sourceUrl = "https://developer.$ANDROID_DEV_HOST/build/gradle-build-overview"
+      titleRes = if (version == null && !extras.isNullOrEmpty()) R.string.r8 else R.string.agp,
+      messageRes = if (version == null && !extras.isNullOrEmpty()) R.string.r8_details else R.string.agp_details,
+      titleEntries = if (version != null || extras.isNullOrEmpty()) {
+        listOf(FeatureDialogTitleEntry(FeatureDialogTitleLabel.Resource(R.string.agp), version))
+      } else {
+        listOf(FeatureDialogTitleEntry(FeatureDialogTitleLabel.Resource(R.string.r8), extras["R8"]?.substringBefore(" / ")))
+      },
+      subtitleEntries = if (version != null) {
+        extras?.map { (label, value) -> FeatureDialogTitleEntry(FeatureDialogTitleLabel.Text(label), value) }
+      } else {
+        extras?.get("R8")?.substringAfter(" / ", "")?.takeIf(String::isNotEmpty)?.let {
+          listOf(FeatureDialogTitleEntry(FeatureDialogTitleLabel.Resource(R.string.r8), it))
+        }
+      },
+      sourceUrl = if (version == null && !extras.isNullOrEmpty()) {
+        "https://developer.$ANDROID_DEV_HOST/topic/performance/app-optimization/enable-app-optimization"
+      } else {
+        "https://developer.$ANDROID_DEV_HOST/build/gradle-build-overview"
+      }
     )
 
     AppDetailFeatureAction.PlaySigning -> versionDialogSpec(

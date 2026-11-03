@@ -58,11 +58,17 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
 
   /** Borrows an already open archive. The caller retains ownership. */
   public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes, @NonNull IZipFile openedZipFile) {
+    this(zipFilePath, opcodes, openedZipFile, Long.MAX_VALUE, () -> {});
+  }
+
+  /** Borrows an open archive while bounding each read and honoring cancellation. */
+  public ZipDexContainer2(@NonNull File zipFilePath, @Nullable Opcodes opcodes, @NonNull IZipFile openedZipFile,
+      long maxEntrySize, @NonNull Runnable checkCancellation) {
     this.zipFilePath = zipFilePath;
     this.opcodes = opcodes;
-    this.maxEntrySize = Long.MAX_VALUE;
+    this.maxEntrySize = maxEntrySize;
     this.openedZipFile = openedZipFile;
-    this.checkCancellation = () -> {};
+    this.checkCancellation = checkCancellation;
   }
 
   /**
@@ -150,7 +156,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
         return createEntry(zipEntry, output.readByteArray());
       }
     }
-    if (declaredSize < 0 || declaredSize > maxEntrySize) {
+    if (declaredSize < 0 || declaredSize > maxEntrySize || declaredSize > Integer.MAX_VALUE) {
       throw new IOException("DEX entry exceeds the supported size");
     }
     try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
@@ -170,6 +176,7 @@ public class ZipDexContainer2 implements MultiDexContainer<DexBackedDexFile> {
           offset += read;
         }
       }
+      checkCancellation.run();
       if (inputStream.read() != -1) {
         throw new IOException("DEX entry exceeds its declared size");
       }

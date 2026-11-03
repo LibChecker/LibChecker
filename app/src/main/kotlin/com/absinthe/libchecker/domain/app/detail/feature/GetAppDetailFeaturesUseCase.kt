@@ -14,6 +14,7 @@ import com.absinthe.libchecker.domain.app.buildmetadata.ComposeResourcesDetector
 import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadata
 import com.absinthe.libchecker.domain.app.buildmetadata.KotlinBuildMetadataDetector
 import com.absinthe.libchecker.domain.app.buildmetadata.KotlinVersionInferenceHints
+import com.absinthe.libchecker.domain.app.buildmetadata.R8BuildMetadataDetector
 import com.absinthe.libchecker.domain.app.buildmetadata.readAgpVersion
 import com.absinthe.libchecker.domain.app.buildmetadata.readFirstPresentLine
 import com.absinthe.libchecker.domain.app.detail.model.AppIconItem
@@ -208,10 +209,6 @@ class GetAppDetailFeaturesUseCase(
     emitFeature: suspend (VersionedFeature) -> Unit,
     openedZip: ZipFileCompat? = null
   ) {
-    if (!readKotlin && !readAgp && !readCompose && !readXposedMarker) {
-      return
-    }
-
     suspend fun emitFallbackFeatures() {
       if (readKotlin) {
         emitFeature(VersionedFeature(Features.KOTLIN_USED, extras = DEFAULT_KOTLIN_PLUGIN_INFO))
@@ -231,16 +228,40 @@ class GetAppDetailFeaturesUseCase(
     }
 
     suspend fun emitFromZip(zip: ZipFileCompat) {
+      val context = currentCoroutineContext()
+      val checkCancelled = { context.ensureActive() }
+      val r8 = linkedSetOf<String>()
       if (readKotlin) {
         emitFeature(
           VersionedFeature(
             Features.KOTLIN_USED,
-            extras = readKotlinBuildInfo(packageInfo, File(sourceDir), zip, isApk)
+            extras = readKotlinBuildInfo(packageInfo, File(sourceDir), zip, isApk, r8, checkCancelled)
           )
         )
+      } else {
+        r8.addAll(R8BuildMetadataDetector.detect(File(sourceDir), zip, checkCancelled = checkCancelled))
       }
-      if (readAgp) {
-        emitFeature(VersionedFeature(Features.AGP, zip.readAgpVersion()))
+      packageInfo.applicationInfo?.splitSourceDirs.orEmpty().distinct().forEach { path ->
+        context.ensureActive()
+        try {
+          ZipFileCompat(File(path)).use { splitZip ->
+            r8.addAll(R8BuildMetadataDetector.detect(File(path), splitZip) { context.ensureActive() })
+          }
+        } catch (e: CancellationException) {
+          throw e
+        } catch (_: Exception) {
+          // Keep base APK metadata if a split is unavailable.
+        }
+      }
+      val agpVersion = zip.readAgpVersion()
+      if (readAgp || agpVersion != null || r8.isNotEmpty()) {
+        emitFeature(
+          VersionedFeature(
+            Features.AGP,
+            agpVersion,
+            extras = r8.takeIf { it.isNotEmpty() }?.let { mapOf("R8" to formatR8Versions(it)) }
+          )
+        )
       }
       if (readCompose) {
         emitFeature(
@@ -279,7 +300,9 @@ class GetAppDetailFeaturesUseCase(
     packageInfo: PackageInfo,
     apk: File,
     zip: ZipFileCompat,
-    isApk: Boolean
+    isApk: Boolean,
+    r8: MutableSet<String>,
+    checkCancelled: () -> Unit
   ): Map<String, String?> {
     val componentPackageInfo = if (isApk) {
       null
@@ -293,7 +316,9 @@ class GetAppDetailFeaturesUseCase(
     return KotlinBuildMetadataDetector.detect(
       apk = apk,
       zip = zip,
-      inferenceHints = KotlinVersionInferenceHints.from(packageInfo, componentPackageInfo)
+      inferenceHints = KotlinVersionInferenceHints.from(packageInfo, componentPackageInfo),
+      checkCancelled = checkCancelled,
+      onDexRead = { dex -> r8.addAll(R8BuildMetadataDetector.detect(dex, checkCancelled = checkCancelled)) }
     ).toKotlinDialogEntries()
   }
 
