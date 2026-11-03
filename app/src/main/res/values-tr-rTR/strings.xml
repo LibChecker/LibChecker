@@ -410,4 +410,5 @@
   <string name="lib_reference_other_description">Diğer: %1$d kütüphane, %2$d referans</string>
   <string name="legacy_snapshot_detail">Klasik durum ayrıntısı sayfası</string>
   <string name="legacy_snapshot_detail_summary">Kayıt ayrıntılarında eski kartlı yerleşimi kullanın</string>
+  <!-- Official overview: https://developer.android.com/ai/appfunctions -->
 </resources>

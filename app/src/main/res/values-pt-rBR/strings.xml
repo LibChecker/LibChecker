@@ -277,4 +277,5 @@
   <string name="snapshot_menu_diff_highlight">Realce do diff</string>
   <string name="snapshot_menu_use_iec_units">Usar Unidades IEC</string>
   <!-- A11y -->
+  <!-- Official overview: https://developer.android.com/ai/appfunctions -->
 </resources>

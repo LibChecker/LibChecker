@@ -290,4 +290,5 @@
   <!-- A11y -->
   <string name="a11y_state_expanded">موسع</string>
   <string name="a11y_state_collapsed">مطوي</string>
+  <!-- Official overview: https://developer.android.com/ai/appfunctions -->
 </resources>
