@@ -35,6 +35,17 @@ class LibReferenceTreemapDataTest {
     assertTrue(buildLibReferenceTreemapData(emptyList()).isEmpty())
   }
 
+  @Test
+  fun searchKeepsSmallAndLargeReferencesIndividually() {
+    val references = listOf(reference("one", 1), reference("five", 5), reference("six", 6))
+    val items = buildLibReferenceTreemapData(references, aggregateSmallReferences = false)
+    assertEquals(references, items.map { it.reference })
+    assertEquals(listOf(1L, 5L, 6L), items.map { it.count })
+    assertEquals(3, items.map { it.id }.toSet().size)
+    assertSame(references.first(), buildLibReferenceTreemapData(references.take(1), false).single().reference)
+    assertTrue(buildLibReferenceTreemapData(emptyList(), false).isEmpty())
+  }
+
   private fun reference(name: String, count: Int): LibReference = LibReference(
     libName = name,
     rule = null,

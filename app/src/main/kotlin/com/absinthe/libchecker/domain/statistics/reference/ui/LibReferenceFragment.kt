@@ -105,6 +105,7 @@ class LibReferenceFragment :
       (activity as? MainActivity)?.updateStatisticsIcon(value)
     }
   private var displayedReferences = emptyList<LibReference>()
+  private var displayedSearchQuery = ""
   private val insetBounds = Rect()
   private val contentLocation = IntArray(2)
   private val chromeLocation = IntArray(2)
@@ -293,6 +294,7 @@ class LibReferenceFragment :
                 ) {
                   return@setDiffNewData
                 }
+                displayedSearchQuery = searchResult.query
                 displayedReferences = searchResult.references
                 onSearchResultsApplied(searchResult.query, searchResult.references.isEmpty())
                 isListReady = true
@@ -470,6 +472,7 @@ class LibReferenceFragment :
           if (!isActive) {
             return@launch
           }
+          displayedSearchQuery = searchResult.query
           displayedReferences = searchResult.references
           refAdapter.setList(searchResult.references)
           onSearchResultsApplied(searchResult.query, searchResult.references.isEmpty())
@@ -545,7 +548,7 @@ class LibReferenceFragment :
   private fun renderTreemap(animate: Boolean = false) {
     binding.treemap.isVisible = true
     binding.treemapEmpty.isVisible = displayedReferences.isEmpty()
-    binding.treemap.submitReferences(displayedReferences, animate)
+    binding.treemap.submitReferences(displayedReferences, animate, aggregateSmallReferences = displayedSearchQuery.isEmpty())
   }
 
   private fun flip(child: Int) {
