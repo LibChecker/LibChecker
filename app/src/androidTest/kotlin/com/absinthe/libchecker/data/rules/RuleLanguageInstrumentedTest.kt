@@ -58,12 +58,16 @@ class RuleLanguageInstrumentedTest {
     }
   }
 
-  @Test fun defaultsToEnglishAndRefreshesExistingLabelsAndNativeCache() = runBlocking {
+  @Test fun defaultsToDeviceLanguageAndRefreshesExistingLabelsAndNativeCache() = runBlocking {
     val saved = SPUtils.sp.getString(Constants.PREF_RULE_LANGUAGE, null)
     val systemLocale = Locale.getDefault()
     try {
       SPUtils.sp.edit().remove(Constants.PREF_RULE_LANGUAGE).commit()
       Locale.setDefault(Locale.SIMPLIFIED_CHINESE)
+      assertEquals("zh-Hans", GlobalValues.preferredRuleLanguage)
+      assertEquals("信鸽推送", RulesRepository.getRule("libxguardian.so", NATIVE, true)!!.label)
+      assertNull(SPUtils.sp.getString(Constants.PREF_RULE_LANGUAGE, null))
+      Locale.setDefault(Locale.US)
       assertEquals("en", GlobalValues.preferredRuleLanguage)
       val state = DetailContentState()
       val english = requireNotNull(RulesRepository.getRule("libxguardian.so", NATIVE, true))
@@ -71,6 +75,7 @@ class RuleLanguageInstrumentedTest {
       val items = listOf(LibStringItemChip(LibStringItem("libxguardian.so"), english))
       state.nativeLibItems.value = items
       state.cacheNativeLibItems("arm64-v8a", true, items)
+      Locale.setDefault(Locale.SIMPLIFIED_CHINESE)
       for ((language, label) in listOf("zh-Hans" to "信鸽推送", "ja" to "Xinge Push", "zh_Hant" to "信鸽推送", "en" to "Xinge Push")) {
         GlobalValues.preferredRuleLanguage = language
         state.refreshRuleLabels()
@@ -81,7 +86,7 @@ class RuleLanguageInstrumentedTest {
       }
     } finally {
       Locale.setDefault(systemLocale)
-      GlobalValues.preferredRuleLanguage = saved ?: "en"
+      GlobalValues.preferredRuleLanguage = saved.orEmpty()
       if (saved == null) SPUtils.sp.edit().remove(Constants.PREF_RULE_LANGUAGE).commit()
     }
   }
