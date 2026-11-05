@@ -1,0 +1,8 @@
+- Online statistics, app rule checks, library treemaps
+- Kotlin version charts; supported SDK and R8 version detection
+- Built for Android MCP on Android 16 and later, with AppFunctions detection and query interfaces
+- Recent visits and pinned shortcuts
+- Redesigned snapshots: update heatmaps, DEX/resource diffs, text report sharing
+- Pure black theme, blur, floating navigation
+- View and copy adaptive icon layers
+- Redesigned in-app downloads and installation for FOSS/CI builds

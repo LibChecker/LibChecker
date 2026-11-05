@@ -1,4 +1,39 @@
-2.5.4
+## 2.5.5
+
+- Added online statistics that can be added, removed, and reordered on the Charts page
+- Added "Analyze online rules" to the app details page to check whether an app matches the online statistics you have added
+- Added SDK version detection and additional details for libraries covered by supported rules (Flutter and Jetpack), with specific versions shown on the rule details page when available
+- Added a treemap mode to library reference statistics, with tile sizes based on reference counts and pinch gestures to explore smaller regions
+- Added a detailed Kotlin chart grouped by detected version
+- Improved Kotlin detection in obfuscated apps and Kotlin build version identification
+- Added R8 build metadata detection, with detected versions and Full or Compatibility mode information shown in the AGP details dialog for supported apps (inspired by @vvb2060 on GitHub)
+- Added support for detecting APK Signature Scheme v3.2
+- Replaced Compose Multiplatform detection with Compose Multiplatform Resources detection to reduce false positives
+- Added detection of AppFunctions declared by apps, with function information available on the details page
+- Built for Android MCP on Android 16 and later, with new AppFunctions interfaces for compatible callers to query and analyze apps, find library references, and query and compare snapshots
+- Added recent visits accessible by long-pressing the Apps or Statistics navigation item, with support for pinning app and library reference shortcuts
+- Added an update heatmap to the snapshot time selection page to show snapshot dates and recorded app updates by day
+- Redesigned snapshot comparison details, added an option to emphasize differences, and retained an option to use the classic card layout
+- Newly saved snapshots now record DEX metadata and resource sizes, allowing comparisons of DEX class counts, file sizes, and content changes, as well as resource size changes
+- Added support for sharing lengthy snapshot text reports as files
+- Added pure black theme and floating navigation options, and grouped appearance options on a dedicated settings page
+- Added a blur design option on Android 13 and later
+- Added support for long-pressing adaptive icons on the app details page to inspect their foreground and background layers and copy either layer or the complete icon
+- Added "Provider reference" to the permission long-press menu to show content providers that use the permission
+- Added automatic hot reload declarations to Xposed module details and improved the display of apps in the module's scope
+- Redesigned in-app updates for FOSS and CI builds, with downloads and installation requests handled within the app
+- Added a GitHub token setting for frequent requests, such as checking the latest update dates of SDKs covered by certain rules
+- Improved performance for startup, app lists, app details, charts, library reference statistics, and snapshot processing
+- Improved APK, APKS, XAPK, and ZIP64 archive compatibility and fixed incomplete native library lists and reference statistics
+- Improved search and list state restoration, bottom sheet scrolling, and accessibility
+- Updated UI designs, translations, and dependencies
+- Updated the bundled rules database
+
+---
+
+This is the last version to support Android 7
+
+## 2.5.4
 - Adapted for Android 17
 - Added app info export in Settings. Exported files can now be opened in WebUI¹ and viewed visually
 - Added a detail page for Overlay apps
