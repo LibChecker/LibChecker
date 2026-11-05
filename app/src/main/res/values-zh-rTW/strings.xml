@@ -170,6 +170,7 @@
   <string name="lib_detail_dialog_title">庫詳細資料</string>
   <string name="lib_permission_dialog_title">權限詳細資料</string>
   <string name="lib_permission_provided_by_format">由 %s 提供</string>
+  <string name="r8_details">R8 是 Android 的程式碼壓縮與最佳化工具，會移除未使用的程式碼、最佳化保留的程式碼，並縮短類別、欄位與方法名稱以縮減應用程式大小。相較於相容模式（Compatibility mode），完整模式（Full mode）會啟用更積極的最佳化處理。</string>
   <string name="agp_details">Android Studio 建置系統以 Gradle 為基礎，並且 Android Gradle 外掛程式新增了幾項專用於建置 Android 應用程式的功能。雖然 Android 外掛程式通常會與 Android Studio 的更新步調保持一致，但外掛程式 (以及 Gradle 系統的其餘部分) 可獨立於 Android Studio 執行並單獨更新。</string>
   <string name="xposed_module">Xposed 模組</string>
   <string name="xposed_module_details">Xposed 是一個模組架構，可以在不接觸任何 APK 的狀況下變更系統和應用程式的行為。這很棒，因為這意味著模組可以在不同版本甚至 ROM 上運作而無需任何變更。</string>
@@ -178,6 +179,7 @@
   <string name="pwa_details">漸進式 Web 應用程式 (PWA) 使用現代 API 建置並增強，以提供增強的功能、可靠性和可安裝性，同時使用單個程式碼存放庫在任何裝置上存取任何人、任何位置。</string>
   <string name="jetpack_compose_details">Jetpack Compose 是 Android 的新型工具組，用於建置原生 UI。可簡化並加快 Android 平台上的 UI 開發作業。透過較少的程式碼、強大的工具和直觀的 Kotlin API，快速將應用程式上架。</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform 是由 JetBrains 開發的現代宣告式且反應式的使用者介面框架，提供一種簡單的方式，用少量 Kotlin 程式碼來建立使用者介面。它也允許你只需撰寫一次 UI，就能在任何支援的平台上運行——iOS、Android、桌面（Windows、macOS、Linux 和網頁版）。</string>
+  <string name="compose_multiplatform_resources_details">Compose Multiplatform Resources 為 Android 與其他平台提供共用資源。此程式庫可能由應用程式的相依項目引入，並不一定代表該應用程式本身為跨平台應用程式。</string>
   <string name="multi_arch_dialog_details"><![CDATA[如果應用程式將 API 暴露給其他 32 位元或 64 位元的應用程式，該應用程式必須在其清單中將 <b>android：multiarch</b> 屬性設為 true，以避免潛在錯誤。]]></string>
   <string name="xml_detail">XML 詳細資料</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB 分頁大小支援</string>
@@ -264,6 +266,7 @@
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
   <string name="snapshot_report_share_failed">分享快照報告失敗</string>
   <string name="toast_use_another_file_manager">請使用其它檔案管理員開啟此 APK</string>
+  <string name="toast_document_picker_unavailable">找不到系統檔案選擇器，請啟用文件提供者後再試一次。</string>
   <string name="toast_cant_open_app">無法啟動此應用程式</string>
   <string name="toast_cloud_rules_update_error">無法更新雲端規則，請再試一次</string>
   <string name="toast_not_enough_storage_space">儲存空間不足</string>
@@ -407,4 +410,5 @@
   <string name="lib_reference_other_description">其他：%1$d 個函式庫，%2$d 次參照</string>
   <string name="legacy_snapshot_detail">舊版快照詳細資訊頁面</string>
   <string name="legacy_snapshot_detail_summary">使用經典卡片配置檢視快照詳細資訊</string>
+  <string name="app_function_details">AppFunctions 是 Android 平台 API，並附帶 Jetpack 程式庫以簡化 Android MCP 整合。</string>
 </resources>
