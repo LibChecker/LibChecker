@@ -1,7 +1,9 @@
 package com.absinthe.libchecker.domain.app.detail.model
 
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.domain.app.detail.resource.AppResourcePreview
+import com.absinthe.rulesbundle.Rule
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -10,6 +12,21 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LibStringMetadataItemDisplayTest {
+
+  @Test
+  fun ruleLabelRespectsDisplayOptionsWithoutRemovingResourceAction() {
+    val rule = Rule("example.policy", METADATA, "Example library", -1, "", null, false)
+    val item = LibStringItemChip(LibStringItem("example.policy", 0x7f120001, "@xml/policy"), rule, listOf("xml"))
+    val visible = LibStringMetadataItemDisplay.create(item, AdvancedOptions.SHOW_MARKED_LIB, "Not available")
+    val hidden = LibStringMetadataItemDisplay.create(item, 0, "Not available")
+    assertEquals(rule, visible.rule)
+    assertTrue(visible.contentDescription.contains("Example library"))
+    assertNotNull(visible.resource)
+    assertNull(hidden.rule)
+    assertFalse(hidden.contentDescription.contains("Example library"))
+    assertEquals(visible.resource, hidden.resource)
+    assertEquals(visible.originalDisplayValue, hidden.originalDisplayValue)
+  }
 
   @Test
   fun createsLinkableInstalledResourceState() {

@@ -11,6 +11,7 @@ import com.absinthe.libchecker.annotation.ET_DYN
 import com.absinthe.libchecker.annotation.ET_NOT_ELF
 import com.absinthe.libchecker.annotation.ET_NOT_SET
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
@@ -78,7 +79,8 @@ private const val LIVE_UPDATE_NOTIFICATION_PERMISSION = "android.permission.POST
 
 class DetailContentResolver(
   private val context: Context,
-  private val installedAppRepository: InstalledAppRepository
+  private val installedAppRepository: InstalledAppRepository,
+  private val metadataRuleLookup: suspend (String) -> Rule? = { RulesRepository.getRule(it, METADATA, true) }
 ) {
 
   private var nativeMetadataCache: Pair<NativeMetadataCacheKey, NativeMetadata>? = null
@@ -523,7 +525,7 @@ class DetailContentResolver(
     return chipList
   }
 
-  fun getMetadataChips(
+  suspend fun getMetadataChips(
     packageInfo: PackageInfo,
     apkPreviewInfo: ApkPreviewInfo?,
     isApkPreview: Boolean
@@ -545,7 +547,7 @@ class DetailContentResolver(
             null
           )
         }
-    }.toMutableList()
+    }.map { it.copy(rule = metadataRuleLookup(it.item.name)) }.toMutableList()
 
     items.sortByDescending { it.item.name }
     return items
