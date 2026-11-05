@@ -9,6 +9,7 @@ import com.absinthe.libchecker.constant.options.AdvancedOptions
 import com.absinthe.libchecker.constant.options.LibReferenceOptions
 import com.absinthe.libchecker.constant.options.SnapshotOptions
 import com.absinthe.libchecker.domain.app.detail.ui.MODE_SORT_BY_SIZE
+import com.absinthe.libchecker.domain.rules.defaultRuleLanguage
 import com.absinthe.libchecker.utils.GitHubTokenStore
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -76,15 +77,15 @@ object GlobalValues {
 
   var isDetailedAbiChart: Boolean by SPDelegates(Constants.PREF_DETAILED_ABI_CHART, false)
 
-  private var storedRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "en")
-  private val ruleLanguageState by lazy { MutableStateFlow(storedRuleLanguage) }
+  private var storedRuleLanguage: String by SPDelegates(Constants.PREF_RULE_LANGUAGE, "")
+  private val ruleLanguageState by lazy { MutableStateFlow(preferredRuleLanguage) }
   val ruleLanguage get() = ruleLanguageState.asStateFlow()
 
   var preferredRuleLanguage: String
-    get() = storedRuleLanguage
+    get() = storedRuleLanguage.ifEmpty { defaultRuleLanguage(Locale.getDefault()) }
     set(value) {
       storedRuleLanguage = value
-      ruleLanguageState.value = value
+      ruleLanguageState.value = preferredRuleLanguage
     }
 
   var githubApiTokenVersion: Int by SPDelegates(Constants.PREF_GITHUB_API_TOKEN_VERSION, 0)
