@@ -7,13 +7,13 @@ data class LibReferenceTreemapItem(
   val libraryCount: Int = 1
 )
 
-fun buildLibReferenceTreemapData(references: List<LibReference>): List<LibReferenceTreemapItem> {
+fun buildLibReferenceTreemapData(references: List<LibReference>, aggregateSmallReferences: Boolean = true): List<LibReferenceTreemapItem> {
   val items = ArrayList<LibReferenceTreemapItem>()
   var otherCount = 0L
   var otherLibraries = 0
   references.forEach { reference ->
     val count = reference.referredList.size
-    if (count <= 5) {
+    if (aggregateSmallReferences && count <= 5) {
       otherCount += count
       otherLibraries++
     } else {

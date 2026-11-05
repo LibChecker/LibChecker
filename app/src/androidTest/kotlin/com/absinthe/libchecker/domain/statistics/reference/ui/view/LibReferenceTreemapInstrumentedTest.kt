@@ -198,6 +198,26 @@ class LibReferenceTreemapInstrumentedTest {
   }
 
   @Test
+  fun aggregationChangesRebuildIdenticalReferences() {
+    ActivityScenario.launch(TrackActivity::class.java).use { scenario ->
+      scenario.onActivity { activity ->
+        val view = LibReferenceTreemapView(activity)
+        activity.setContentView(view)
+        val references = listOf(LibReference("libsmall.so", null, setOf("pkg"), NATIVE))
+        val itemsField = LibReferenceTreemapView::class.java.getDeclaredField("items").apply { isAccessible = true }
+        fun ids() = (itemsField.get(view) as Map<*, *>).keys
+        view.submitReferences(references)
+        view.layout(0, 0, 600, 900)
+        assertEquals(setOf("other"), ids())
+        view.submitReferences(references, aggregateSmallReferences = false)
+        assertEquals(setOf("$NATIVE:libsmall.so"), ids())
+        view.submitReferences(references)
+        assertEquals(setOf("other"), ids())
+      }
+    }
+  }
+
+  @Test
   fun filteringAnimatesCellsWithoutFadingTheWholeViewAndKeepsLatestResult() {
     ActivityScenario.launch(TrackActivity::class.java).use { scenario ->
       scenario.onActivity { activity ->

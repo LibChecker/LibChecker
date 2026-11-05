@@ -178,6 +178,7 @@ class LibReferenceTreemapView @JvmOverloads constructor(
     IconStyle(drawable, background, foreground)
   }
   private var references = emptyList<LibReference>()
+  private var aggregateSmallReferences = true
   private var items = buildLibReferenceTreemapData(references).associateBy { it.id }
   private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
   private var downX = 0f
@@ -340,11 +341,12 @@ class LibReferenceTreemapView @JvmOverloads constructor(
     filterCells = emptyList()
   }
 
-  fun submitReferences(references: List<LibReference>, animate: Boolean = false) {
-    if (this.references == references) return
+  fun submitReferences(references: List<LibReference>, animate: Boolean = false, aggregateSmallReferences: Boolean = true) {
+    if (this.references == references && this.aggregateSmallReferences == aggregateSmallReferences) return
     val previous = if (filterCells.isEmpty()) cells.map { it to 1f } else filterCells.map { it.rendered.copy(bounds = RectF(it.rendered.bounds)) to it.alpha }
     this.references = references.toList()
-    items = buildLibReferenceTreemapData(this.references).associateBy { it.id }
+    this.aggregateSmallReferences = aggregateSmallReferences
+    items = buildLibReferenceTreemapData(this.references, aggregateSmallReferences).associateBy { it.id }
     partition = null
     visibleIds = null
     zoomHistory.clear()
