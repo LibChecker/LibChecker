@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <string name="package_list_load_failed">تعذر تحميل التطبيقات المثبتة. يرجى المحاولة مرة أخرى.</string>
   <!--  General  -->
   <string name="title_app_list">التطبيقات</string>
   <string name="title_statistics">الإحصائيات</string>
@@ -7,12 +8,29 @@
   <string name="title_settings">الاعدادات</string>
   <string name="title_album">ألبوم</string>
   <string name="loading">جارٍ التحميل…</string>
+  <string name="chart_no_data">لا توجد بيانات للجدول</string>
+  <string name="lib_permission_label_not_provided">لا توجد تسمية</string>
+  <string name="lib_permission_description_not_provided">لا يوجد وصف</string>
+  <string name="lib_permission_load_failed">تعذر تحميل تفاصيل الإذن</string>
   <string name="channel_shoot">حفظ نِقَاط الاستعادة</string>
   <string name="noti_shoot_title">حفظ نقطة الاستعادة الحالية</string>
   <string name="noti_shoot_title_saved">تم حفظ نقطة الاستعادة</string>
   <!--  App list  -->
   <string name="menu_search">بحث</string>
   <string name="menu_sort">الفرز</string>
+  <string name="chart_statistics_add">إضافة إحصائيات</string>
+  <string name="chart_statistics_edit">تعديل الإحصائيات</string>
+  <string name="chart_statistics_added">المضافة</string>
+  <string name="chart_statistics_available">المتاحة</string>
+  <string name="chart_statistics_loading_online">جارٍ تحميل الإحصائيات عبر الإنترنت…</string>
+  <string name="chart_statistics_online_error">تعذر تحميل الإحصائيات عبر الإنترنت. يتم عرض العناصر التي تم تنزيلها.</string>
+  <string name="chart_statistics_no_available">لا توجد إحصائيات أخرى متاحة.</string>
+  <string name="chart_statistics_source_builtin">مدمجة</string>
+  <string name="chart_statistics_source_online">عبر الإنترنت</string>
+  <string name="chart_statistics_drag">اسحب لإعادة الترتيب</string>
+  <string name="chart_statistics_drag_hint">اضغط واسحب لإعادة الترتيب</string>
+  <string name="chart_statistics_remove_description">إزالة %1$s</string>
+  <string name="chart_statistics_add_description">إضافة %1$s</string>
   <string name="menu_filter">فلتر</string>
   <string name="search_hint">البحث…</string>
   <string name="string_64_bit">64 بت</string>
@@ -21,9 +39,20 @@
   <string name="cannot_read">لا يمكن القراءة</string>
   <string name="unknown">غير معروف</string>
   <string name="empty_list">قائمة فارغة</string>
+  <string name="recent_apps">التطبيقات المعروضة مؤخرًا</string>
+  <string name="recent_libraries">المكتبات المعروضة مؤخرًا</string>
+  <string name="recent_visits_empty">لم يُعرض شيء مؤخرًا</string>
+  <string name="shortcuts_pinned">المثبتة</string>
+  <string name="shortcuts_recent">الأخيرة</string>
+  <string name="shortcuts_pin">تثبيت اختصار</string>
+  <string name="shortcuts_drag_hint">اضغط مطولًا على عنصر من القائمة، ثم اسحبه إلى هنا</string>
+  <string name="shortcuts_drop_hint">أفلت للتثبيت</string>
+  <string name="shortcuts_pinned_feedback">تم تثبيت %s</string>
   <string name="uncharted_territory">منطقة مجهولة</string>
   <string name="get_app_list_denied_tip">الرجاء منح إذن \n \"الحصول على معلومات حول التطبيقات المثبتة\" \n  لـLibChecker</string>
   <string name="advanced_menu">قائمة متقدمة</string>
+  <string name="snapshot_version_archived">مؤرشف</string>
+  <string name="toast_archived_app_detail_unavailable">استعد هذا التطبيق المؤرشف قبل عرض تفاصيله.</string>
   <!-- Statistics   -->
   <string name="title_statistics_dialog">التطبيقات ذات %s ABI</string>
   <string name="title_statistics_dialog_no_native_libs">تطبيقات بدون مكتبات أصلية</string>
@@ -63,14 +92,27 @@
   <string name="settings_rate_us_summary">هذا يمكن أن يزيد شعبيتنا عند المزيد من الأشخاص</string>
   <string name="settings_get_updates">الحصول على التحديث</string>
   <string name="settings_get_updates_summary">الحصول على أحدث إصدار أكثر استقراراً ومعبأ بالمميزات</string>
+  <string name="settings_update_available">يتوفر تحديث</string>
   <string name="settings_get_updates_in_app">داخل التطبيق</string>
   <string name="settings_get_updates_in_app_chip_stable">إصدار ثابت</string>
   <string name="settings_get_updates_in_app_chip_ci">CI</string>
+  <string name="settings_github_token">رمز GitHub</string>
+  <string name="settings_github_token_summary_not_set">غير معيّن</string>
+  <string name="settings_github_token_summary_set">معيّن</string>
+  <string name="settings_github_token_dialog_title">رمز GitHub</string>
+  <string name="settings_github_token_dialog_message">يُستخدم فقط لطلبات GitHub API الرسمية، ويُخزَّن محليًا بعد تشفيره بمفتاح يحميه النظام. ولا يُكشف عبر أي طريق آخر.</string>
+  <string name="settings_github_token_dialog_hint">رمز الوصول الشخصي</string>
+  <string name="settings_github_token_clear">مسح</string>
   <string name="about_info">يستخدم هذا التطبيق لعرض مكتبات الجهات الخارجية التي تستخدمها التطبيقات في جهازك.</string>
   <string name="resource_declaration">جزء من الموارد في التطبيق يأتي من: </string>
   <string name="library_declaration">تأتي جميع معلومات المكتبات المميزة في LibChecker من وثائق التطوير أو مستودع التعليمات البرمجية ل SDK الذي تنتمي إليه. إذا كانت المعلومات غير صحيحة ، يرجى الاتصال بـ: absinthe@absinthe.life</string>
   <!--  Settings  -->
   <string name="pref_group_normal">عادي</string>
+  <string name="pref_group_appearance">المظهر</string>
+  <string name="pref_appearance_summary">تخصيص الواجهة</string>
+  <string name="pref_group_rules">القواعد والشبكة</string>
+  <string name="pref_group_data">البيانات والأدوات</string>
+  <string name="pref_group_about">حول التطبيق والدعم</string>
   <string name="apk_analytics">تحليلات APK</string>
   <string name="colorful_icon">أيقونة ملونة</string>
   <string name="rules_repo_title">مستودع القواعد</string>
@@ -82,11 +124,13 @@
   <string name="anonymous_statistics">إحصائيات مجهولة المصدر</string>
   <string name="cloud_rules">قواعد السحابة</string>
   <string name="dark_mode">الوضع الداكن</string>
+  <string name="amoled_theme">مظهر أسود خالص</string>
   <string name="snapshot_keep">نقطة استعادة قاعدة الاحتفاظ الافتراضية</string>
   <string name="export_log">تصدير السجل</string>
   <string name="export_apps">تصدير معلومات التطبيق</string>
   <string name="apk_analytics_summary">افتح صفحة التفاصيل عند النقر فوق ملف APK</string>
   <string name="colorful_icon_summary">سيظهر جزء من المكتبات المميزة كشعار ملون</string>
+  <string name="amoled_theme_summary">استخدام أسطح سوداء خالصة في الوضع الداكن</string>
   <string name="lib_ref_threshold_summary">يتم عرض المكتبات التي يصل عدد مراجع المكتبة فيها إلى الحد الأدنى فقط في القائمة</string>
   <string name="reload_apps_summary">جربه عندما تظهر قائمة التطبيقات بشكل غير طبيعي</string>
   <string name="export_log_summary">تصدير ملف سجل التطبيق</string>
@@ -112,12 +156,21 @@
   <string name="kotlin_details">Kotlin هي لغة برمجة للأغراض العامة عبر الأنظمة الأساسية ، مكتوبة بشكل ثابت ، مع استدلال النوع. تم تصميم Kotlin للتفاعل بشكل كامل مع Java ، ويعتمد إصدار JVM من مكتبة Kotlin القياسية على مكتبة فئة Java ، لكن استدلال النوع يسمح ببناء الجملة الخاص به ليكون أكثر إيجازا أو اختصارا.</string>
   <string name="items_count">عدد العناصر: </string>
   <string name="further_operation">مزيد من العمليات</string>
+  <string name="app_detail_online_rules_action">تحليل القواعد عبر الإنترنت</string>
+  <string name="app_detail_online_rules_title">فحص القواعد عبر الإنترنت</string>
+  <string name="app_detail_online_rules_loading">جارٍ تحليل القواعد عبر الإنترنت… %1$d%%</string>
+  <string name="app_detail_online_rules_empty">لم تُضف أي إحصائيات عبر الإنترنت إلى الجداول</string>
+  <string name="app_detail_online_rules_error">تعذر تحليل القواعد عبر الإنترنت</string>
+  <string name="app_detail_online_rules_matched">مطابق</string>
+  <string name="app_detail_online_rules_unmatched">غير مطابق</string>
+  <string name="app_detail_online_rules_detected_features">الميزات المكتشفة:</string>
   <string name="app_info_launch">تشغيل</string>
   <string name="app_info_settings">الاعدادات</string>
   <string name="app_info_share">مشاركة</string>
   <string name="lib_detail_dialog_title">تفاصيل المكتبة</string>
   <string name="lib_permission_dialog_title">تفاصيل الإذن</string>
   <string name="lib_permission_provided_by_format">مقدمة من قِبل %s</string>
+  <string name="r8_details">R8 هو أداة تقليص الشفرة وتحسينها في Android. يزيل الشفرة غير المستخدمة، ويحسّن الشفرة المتبقية، ويختصر أسماء الفئات والحقول والدوال لتقليل حجم التطبيق. يتيح الوضع الكامل تحسينًا أقوى من وضع التوافق.</string>
   <string name="agp_details">يعتمد نظام بناء Android Studio على Gradle, ويضيف المكون الإضافي Android Gradle العديد من الميزات الخاصة بإنشاء تطبيقات Android. على الرغم من أن المكون الإضافي لنظام Android يتم تحديثه عادة في خطوة قفل مع Android Studio ، إلا أن المكون الإضافي (وبقية نظام Gradle) يمكن تشغيله بشكل مستقل عن Android Studio ويتم تحديثه بشكل منفصل.</string>
   <string name="xposed_module">وحدة Xposed</string>
   <string name="xposed_module_details">Xposed هو إطار عمل للوحدات النمطية التي يمكنها تغيير سلوك النظام والتطبيقات دون لمس أي ملفات APK. هذا رائع لأنه يعني أن الوحدات يمكن أن تعمل مع إصدارات مختلفة وحتى ذاكرة القراءة فقط دون أي تغييرات.</string>
@@ -126,6 +179,7 @@
   <string name="pwa_details">تم إنشاء تطبيقات الويب التقدمية (PWA) وتحسينها باستخدام واجهات برمجة التطبيقات الحديثة لتوفير إمكانات محسنة وموثوقية وإمكانية تثبيت أثناء الوصول إلى أي شخص في أي مكان وعلى أي جهاز باستخدام قاعدة بيانات واحدة.</string>
   <string name="jetpack_compose_details">(Jetpack Compose) هي مجموعة أدوات Android الحديثة لبناء واجهة مستخدم أصلية. إنه يبسط ويسرع تطوير واجهة المستخدم على Android. اجعل تطبيقك ينبض بالحياة بسرعة باستخدام تعليمات برمجية أقل وأدوات قوية وواجهات برمجة تطبيقات Kotlin سهلة الاستخدام.</string>
   <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform هو إطار واجهة مستخدم حديث تفاعلي وتعبيري طورته شركة JetBrains، ويوفر طريقة بسيطة لإنشاء واجهات المستخدم بقليل من كود كوتلن. كما يسمح لك بكتابة واجهتك مرة واحدة وتشغيلها على أي من المنصات المدعومة – iOS وأندرويد وسطح المكتب (Windows, macOS, Linux) والويب.</string>
+  <string name="compose_multiplatform_resources_details">توفر Compose Multiplatform Resources موارد مشتركة لنظام Android والمنصات الأخرى. قد تكون مضمنة عبر إحدى تبعيات التطبيق، ولا يعني ذلك بالضرورة أن التطبيق نفسه متعدد المنصات.</string>
   <string name="multi_arch_dialog_details"><![CDATA[إذا كان أحد التطبيقات يوفر واجهة برمجة تطبيقات (API) لتطبيقات أخرى يمكن أن تكون 32 بت أو 64 بت، يجب تعيين الخاصية <b>android:multiarch</b> إلى true داخل ملف Manifest لتجنب حدوث أخطاء محتملة.]]></string>
   <string name="xml_detail">تفاصيل XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">دعم حجم الصفحة 16 كيلوبايت</string>
@@ -165,6 +219,8 @@
   <string name="lib_detail_app_props_tip">المزيد من المعلومات</string>
   <string name="lib_detail_xposed_min_version">الحد الأدنى للإصدار</string>
   <string name="lib_detail_xposed_target_version">الإصدار المستهدف</string>
+  <string name="lib_detail_xposed_auto_hot_reload">إعادة تحميل فورية تلقائية</string>
+  <string name="lib_detail_xposed_hot_reload_declared">مُعلَن</string>
   <string name="lib_detail_xposed_static_scope">نطاق ثابت</string>
   <string name="lib_detail_xposed_default_scope">النطاق الافتراضي</string>
   <string name="lib_detail_xposed_init_class">فئة النشاط</string>
@@ -179,6 +235,10 @@
   <string name="lib_detail_app_install_source_shizuku_usage">نظرا لأن Android يقيد واجهة برمجة التطبيقات للحصول على مقدم التثبيت ، فإننا نستخدم Shizuku للحصول على طالب التثبيت.</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted">شيزوكو غير مصرح به</string>
   <string name="lib_detail_app_install_source_shizuku_permission_not_granted_detail">انقر هنا للحصول على إذن Shizuku مقدم التثبيت</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable">خدمة Shizuku غير متاحة</string>
+  <string name="lib_detail_app_install_source_shizuku_unavailable_detail">شغّل مدير Shizuku متوافقًا، ثم عد إلى هذه الصفحة</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old">إصدار Shizuku API قديم جدًا</string>
+  <string name="lib_detail_app_install_source_shizuku_api_too_old_detail">حدّث مدير Shizuku المتوافق النشط</string>
   <string name="lib_detail_app_dexopt_title">تحسين ملفات DEX</string>
   <string name="lib_detail_app_dexopt_status">الحالة</string>
   <string name="lib_detail_app_dexopt_reason">السبب</string>
@@ -186,6 +246,8 @@
   <string name="lib_detail_elf_extract">استخرج</string>
   <string name="lib_detail_elf_extract_success">ملف ELF محفوظ في التنزيلات</string>
   <string name="lib_detail_elf_extract_failed">فشل في استخراج ملف ELF</string>
+  <string name="lib_detail_permission_providers">مرجع موفر المحتوى</string>
+  <string name="lib_detail_permission_providers_empty">لا يستخدم أي موفر محتوى هذا الإذن</string>
   <string name="lib_detail_dependency_tip">التبعيات</string>
   <string name="lib_detail_entry_points_tip">نقاط الدخول</string>
   <string name="lib_detail_optimization_tip">تحسين</string>
@@ -193,14 +255,26 @@
   <string name="lib_detail_optimization_off">لم تتم إزالة الرموز الأصلية، مما يمنع خفض حجم التطبيق.</string>
   <string name="apk_preview">معاينة APK</string>
   <string name="apk_preview_item_not_available">لا يمكن عرضها في وضع المعاينة</string>
+  <string name="adaptive_icon_layer_background">الخلفية</string>
+  <string name="adaptive_icon_layer_foreground">الواجهة</string>
+  <string name="adaptive_icon_copy_full">نسخ الأيقونة كاملة</string>
+  <string name="adaptive_icon_copy_background">نسخ طبقة الخلفية</string>
+  <string name="adaptive_icon_copy_foreground">نسخ طبقة الواجهة</string>
   <string name="feature_live_update_notification">إشعار التحديث المباشر</string>
   <string name="feature_live_update_notification_summary">ويعزز النظام إشعارات التحديث المباشر. الإشعارات الترويجية تظهر بشكل أكثر بروزا على أسطح النظام، بما في ذلك في الجزء العلوي من درج الإشعارات وشاشة القفل، وكشريحة في شريط الحالة.</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">نسخ إلى الحافظة</string>
+  <string name="snapshot_report_share_failed">فشلت مشاركة تقرير نقطة الاستعادة</string>
   <string name="toast_use_another_file_manager">الرجاء استخدام مدير ملفات آخر لفتح APK</string>
+  <string name="toast_document_picker_unavailable">لا يتوفر منتقي ملفات في النظام. فعّل موفر مستندات ثم حاول مرة أخرى.</string>
   <string name="toast_cant_open_app">لا يمكن فتح هذا التطبيق</string>
   <string name="toast_cloud_rules_update_error">فشل تحديث قواعد السحابة. يرجى المحاولة مرة أخرى.</string>
   <string name="toast_not_enough_storage_space">لا توجد مساحة تخزين كافية</string>
+  <string name="toast_app_update_started">جارٍ تحضير التحديث</string>
+  <string name="toast_app_update_installed">اكتمل التحديث</string>
+  <string name="toast_app_update_unsupported">التحديثات داخل التطبيق غير متاحة على هذا الجهاز</string>
+  <string name="toast_app_update_pending_user_action">يتطلب هذا الجهاز تأكيدًا قبل تثبيت التحديث</string>
+  <string name="toast_app_update_failed">فشل التحديث: %s</string>
   <string name="toast_long_tap_share_button_tip">اضغط مطولاً على زر \"مشاركة\" لاختيار مكان للحفظ</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">حفظ نقطة الاستعادة الحالية</string>
@@ -210,16 +284,49 @@
   <string name="snapshot_indicator_added">تمت الاضافة</string>
   <string name="snapshot_indicator_removed">تمت الإزالة</string>
   <string name="snapshot_indicator_changed">تم التغيير</string>
+  <string name="snapshot_content_changed">تغيّر المحتوى</string>
   <string name="snapshot_indicator_moved">تم النقل</string>
+  <string name="snapshot_detail_size_label">الحجم</string>
+  <string name="snapshot_detail_metric_description">%1$s، %2$s</string>
+  <plurals name="snapshot_detail_changes_count">
+    <item quantity="zero">%d تغيير</item>
+    <item quantity="one">%d تغيير</item>
+    <item quantity="two">%d تغييران</item>
+    <item quantity="few">%d تغييرات</item>
+    <item quantity="many">%d تغييرًا</item>
+    <item quantity="other">%d تغيير</item>
+  </plurals>
   <string name="snapshot_empty_list_title">لا تغييرات في المكونات</string>
   <string name="snapshot_no_snapshot">نقطة استعادة أو Snapshot</string>
   <string name="snapshot_detail_new_install_title">تم تثبيت هذا التطبيق حديثا</string>
   <string name="snapshot_detail_deleted_title">تمت إزالة هذا التطبيق</string>
+  <string name="snapshot_time_node_current">الحالية</string>
+  <plurals name="snapshot_time_node_apps_count">
+    <item quantity="zero">%d تطبيق</item>
+    <item quantity="one">%d تطبيق</item>
+    <item quantity="two">%d تطبيقان</item>
+    <item quantity="few">%d تطبيقات</item>
+    <item quantity="many">%d تطبيقًا</item>
+    <item quantity="other">%d تطبيق</item>
+  </plurals>
   <string name="snapshot_preinstalled_app">التطبيق المثبت مسبقا</string>
   <string name="snapshot_generate_text_report">إنشاء تقرير نصي</string>
   <string name="snapshot_scheme_tip"><![CDATA[نصيحة: يمكنك الآن إنشاء نقاط استعادة في الخلفية عبر:<br><b>%s</b>]]></string>
   <string name="snapshot_build_id">معرف البناء</string>
   <string name="snapshot_build_security_patch">تصحيح الأمان</string>
+  <plurals name="snapshot_contribution_updates_count">
+    <item quantity="zero">%d تحديث</item>
+    <item quantity="one">%d تحديث</item>
+    <item quantity="two">%d تحديثان</item>
+    <item quantity="few">%d تحديثات</item>
+    <item quantity="many">%d تحديثًا</item>
+    <item quantity="other">%d تحديث</item>
+  </plurals>
+  <string name="snapshot_contribution_recent_days">الأيام الأخيرة: %d</string>
+  <string name="snapshot_contribution_tile_detail_with_snapshot">%1$s: %2$s · تم التقاط نقطة استعادة</string>
+  <string name="snapshot_contribution_hint">اضغط على مربع لعرض التحديثات اليومية</string>
+  <string name="snapshot_contribution_no_updates">لا توجد تحديثات للتطبيقات في هذا اليوم</string>
+  <string name="snapshot_contribution_snapshot_captured">تم التقاط نقطة استعادة</string>
   <!--  Dialog  -->
   <string name="dialog_title_reload_apps">إعادة تحميل جميع التطبيقات؟</string>
   <string name="dialog_subtitle_reload_apps">قد يستغرق هذا بضع ثوان</string>
@@ -228,6 +335,8 @@
   <string name="dialog_message_keep_previous_snapshot">هل تريد الاحتفاظ بنقطة الاستعادة السابقة؟</string>
   <string name="dialog_title_select_to_delete">اختر تاريخا لحذف نقطة إستعادة</string>
   <string name="dialog_title_confirm_to_delete">حذف نقطة الاستعادة هذه؟</string>
+  <string name="dialog_message_confirm_to_delete">%s\n\nسيتم حذف عقدة الوقت هذه وجميع سجلات تطبيقاتها نهائيًا. لا يمكن التراجع عن هذا الإجراء.</string>
+  <string name="dialog_action_delete">حذف</string>
   <string name="btn_keep">حفظ</string>
   <string name="btn_drop">تجاهل</string>
   <string name="dialog_title_compare_diff_apk">انتباه</string>
@@ -251,7 +360,14 @@
   <string name="album_item_track_subtitle">حدد التطبيقات لفرض تغيير المقارنة</string>
   <string name="album_backup">النسخ الاحتياطي</string>
   <string name="album_backup_summary">إدارة جميع نقاط الاستعادة</string>
+  <string name="album_backup_sheet_backup_description">حفظ ملف محلي يمكن استعادته لاحقًا</string>
+  <string name="album_backup_detail">تم نسخ العناصر احتياطيًا: %1$d</string>
+  <string name="album_backup_database_detail">اكتمل النسخ الاحتياطي لقاعدة البيانات</string>
   <string name="album_restore">استعادة</string>
+  <string name="album_restore_from_file">استعادة من ملف</string>
+  <string name="album_restore_auto_detect_summary">اكتشاف تنسيق النسخة الاحتياطية تلقائيًا</string>
+  <string name="album_restore_result_summary">تمت استعادة العناصر: %1$d، من نقاط الاستعادة: %2$d</string>
+  <string name="album_restore_result_item_count">العناصر: %1$d</string>
   <string name="album_click_to_choose">انقر للاختيار</string>
   <!--  Integration  -->
   <string name="integration_monkey_king_menu_block">حظره عبر \"MonkeyKing Purify\"</string>
@@ -265,6 +381,8 @@
   <string name="rules_btn_restart_to_update">إعادة التشغيل للتحديث</string>
   <string name="rules_btn_update">تحديث</string>
   <!-- Advanced menu -->
+  <string name="adv_app_filter">فلاتر التطبيقات</string>
+  <string name="adv_app_appearance">مظهر قائمة التطبيقات</string>
   <string name="adv_show_system_apps">إظهار تطبيقات النظام</string>
   <string name="adv_show_overlays">إظهار التراكبات</string>
   <string name="adv_show_64_bit">إظهار تطبيقات 64-بت</string>
@@ -286,8 +404,24 @@
   <string name="snapshot_menu_show_update_time">إظهار وقت التحديث</string>
   <string name="snapshot_menu_hide_no_component_changes">إخفاء عدم وجود تغييرات في المكونات</string>
   <string name="snapshot_menu_diff_highlight">تحديد الفروق</string>
+  <string name="snapshot_menu_diff_emphasis">إبراز الفروق</string>
   <string name="snapshot_menu_use_iec_units">استخدام وحدات IEC</string>
   <!-- A11y -->
   <string name="a11y_state_expanded">موسع</string>
   <string name="a11y_state_collapsed">مطوي</string>
+  <string name="library_insight_loading">جارٍ اكتشاف إصدار SDK…</string>
+  <string name="library_insight_unavailable">تفاصيل الإصدار غير متاحة · اضغط لإعادة المحاولة</string>
+  <string name="library_insight_show_details">معلومات أكثر</string>
+  <string name="library_insight_hide_details">معلومات أقل</string>
+  <string name="blur_design">تصميم ضبابي</string>
+  <string name="blur_design_summary">يضيف مزيدًا من تأثيرات الضبابية في الواجهة كلها</string>
+  <string name="floating_nav_bar">تنقل عائم</string>
+  <string name="floating_nav_bar_summary">إظهار شريط التنقل بنمط عائم</string>
+  <string name="lib_reference_switch_to_treemap">التبديل إلى المخطط الشجري</string>
+  <string name="lib_reference_switch_to_list">التبديل إلى القائمة</string>
+  <string name="lib_reference_other">أخرى</string>
+  <string name="lib_reference_other_description">أخرى: المكتبات %1$d، المراجع %2$d</string>
+  <string name="legacy_snapshot_detail">صفحة تفاصيل نقطة الاستعادة القديمة</string>
+  <string name="legacy_snapshot_detail_summary">استخدام تخطيط البطاقات الكلاسيكي لتفاصيل نقطة الاستعادة</string>
+  <string name="app_function_details">AppFunctions واجهة برمجية في نظام Android، ترافقها مكتبة Jetpack لتبسيط تكامل Android مع MCP.</string>
 </resources>
