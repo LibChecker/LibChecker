@@ -5,7 +5,7 @@ import java.io.File
 import org.gradle.api.Project
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 
-const val baseVersionName = "2.5.5"
+const val baseVersionName = "2.5.5.1"
 
 fun Project.setupLibraryModule(block: LibraryExtension.() -> Unit = {}) {
   setupBaseModule(block)

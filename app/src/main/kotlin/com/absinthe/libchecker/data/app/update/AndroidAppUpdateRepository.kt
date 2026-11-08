@@ -63,7 +63,7 @@ class AndroidAppUpdateRepository(
   private fun Throwable.isUpdateRequestFailure(): Boolean = this is IOException || this is HttpException || this is JsonDataException || this is JsonEncodingException
 
   override suspend fun installUpdate(url: String): AppUpdateInstallResult = withContext(Dispatchers.IO) {
-    if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
+    if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_DEV_VERSION)) {
       return@withContext AppUpdateInstallResult.Unsupported
     }
 

@@ -4,8 +4,8 @@ import android.os.Build
 
 object AppSelfUpdatePolicy {
 
-  fun isSelfUpdateEnabled(isFoss: Boolean, isDevVersion: Boolean): Boolean {
-    return isFoss || isDevVersion
+  fun isSelfUpdateEnabled(isDevVersion: Boolean): Boolean {
+    return isDevVersion
   }
 
   internal fun defaultUpdateChannel(isDevVersion: Boolean): AppUpdateChannel {

@@ -15,7 +15,7 @@ private val SELF_UPDATE_PERMISSIONS = setOf(
   "android.permission.REQUEST_INSTALL_PACKAGES"
 )
 
-class MarketStableManifestPlugin : Plugin<Project> {
+class StableManifestPlugin : Plugin<Project> {
 
   override fun apply(project: Project) {
     project.plugins.withId("com.android.application") {
@@ -24,7 +24,7 @@ class MarketStableManifestPlugin : Plugin<Project> {
       }.standardOutput.asText.get().trim().isEmpty()
 
       project.tasks.configureEach {
-        if (name.startsWith("processMarket") && name.endsWith("MainManifest")) {
+        if ((name.startsWith("processFoss") || name.startsWith("processMarket")) && name.endsWith("MainManifest")) {
           inputs.property("selfUpdateManifestMode", if (isDevVersion) "keep" else "remove")
           if (!isDevVersion) {
             doLast {

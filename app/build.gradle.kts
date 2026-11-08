@@ -13,7 +13,7 @@ plugins {
   alias(libs.plugins.firebase.crashlytics)
   id("build-logic")
   id("res-opt")
-  id("market-stable-manifest")
+  id("stable-manifest")
 }
 
 val rulesBundleTestData = configurations.create("rulesBundleTestData") {

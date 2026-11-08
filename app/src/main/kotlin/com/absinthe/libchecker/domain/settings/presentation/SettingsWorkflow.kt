@@ -70,7 +70,7 @@ class SettingsWorkflow(
   }
 
   suspend fun hasAvailableAppUpdate(): Boolean {
-    if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
+    if (!AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_DEV_VERSION)) {
       return false
     }
     return requestUpdateInfo(AppSelfUpdatePolicy.defaultUpdateChannel(BuildConfig.IS_DEV_VERSION))
@@ -163,7 +163,7 @@ class SettingsWorkflow(
       )
     )
 
-    val visibleItems = if (AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_FOSS, BuildConfig.IS_DEV_VERSION)) {
+    val visibleItems = if (AppSelfUpdatePolicy.isSelfUpdateEnabled(BuildConfig.IS_DEV_VERSION)) {
       items + GetUpdatesItem(
         text = context.getString(R.string.settings_get_updates_in_app),
         iconRes = R.drawable.ic_logo,
