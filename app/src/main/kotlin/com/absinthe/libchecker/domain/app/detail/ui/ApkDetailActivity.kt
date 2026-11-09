@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.ui
 
-import android.app.ComponentCaller
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.net.Uri
@@ -42,8 +41,9 @@ class ApkDetailActivity :
     resolveIntent(intent)
   }
 
-  override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
-    super.onNewIntent(intent, caller)
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
     Timber.d("onNewIntent: $intent")
     resolveIntent(intent)
   }

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.app.detail.ui
 
-import android.app.ComponentCaller
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -50,8 +49,9 @@ class AppDetailActivity :
     initPackage(intent)
   }
 
-  override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
-    super.onNewIntent(intent, caller)
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
     recordVisit = true
     initPackage(intent)
   }
