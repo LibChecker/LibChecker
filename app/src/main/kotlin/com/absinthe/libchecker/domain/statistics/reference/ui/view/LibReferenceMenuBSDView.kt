@@ -93,6 +93,7 @@ class LibReferenceMenuBSDView(
 
   private val demoAdapter = LibReferenceAdapter(
     allowDetailAction = false,
+    diffUpdates = true,
     onAction = {},
     onItemBound = ::preparePendingDemoInsertion
   )

@@ -205,6 +205,18 @@ class ComputeLibReferenceUseCaseTest {
     assertTrue(index.snapshotReferences().isEmpty())
   }
 
+  @Test
+  fun equalCountsHaveStableNameOrderAcrossInputChanges() = runBlocking {
+    val names = (0 until 80).map { "permission.$it" }
+    for (input in listOf(names, names.reversed(), names.take(40))) {
+      val target = target("app.one").apply { requestedPermissions = input.toTypedArray() }
+      val useCase = ComputeLibReferenceUseCase(FakeInstalledAppRepository(listOf(target), loadBatch = { listOf(target) }))
+      val index = useCase.buildIndex(config(LibReferenceOptions.PERMISSIONS)) {}!!
+      val result = useCase.matchRules(index, ComputeLibReferenceUseCase.MatchConfig(1, false)) {}!!
+      assertEquals(input.sorted(), result.map { it.libName })
+    }
+  }
+
   private fun target(name: String, system: Boolean = false) = PackageInfo().apply {
     packageName = name
     applicationInfo = ApplicationInfo().apply { flags = if (system) ApplicationInfo.FLAG_SYSTEM else 0 }
