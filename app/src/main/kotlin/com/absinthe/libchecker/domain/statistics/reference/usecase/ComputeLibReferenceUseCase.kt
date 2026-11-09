@@ -206,7 +206,7 @@ class ComputeLibReferenceUseCase(
       updateProgress()
     }
 
-    refList.sortWith { a, b -> b.referredList.size.compareTo(a.referredList.size) }
+    refList.sortWith(compareByDescending<LibReferenceItem> { it.referredList.size }.thenBy { it.type }.thenBy { it.libName })
     refList
   }
 

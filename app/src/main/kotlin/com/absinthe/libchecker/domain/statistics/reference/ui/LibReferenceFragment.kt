@@ -287,11 +287,11 @@ class LibReferenceFragment :
               updateListRenderState { it.copy(highlightText = searchResult.query) }
               beginFirstListLayoutTrace()
               val submittedViewLifecycle = viewLifecycleOwner.lifecycle
-              refAdapter.setDiffNewData(searchResult.references) {
+              refAdapter.submitList(searchResult.references) {
                 if (submittedViewLifecycle.currentState == Lifecycle.State.DESTROYED ||
                   libReferenceViewModel.libReference.value !== references
                 ) {
-                  return@setDiffNewData
+                  return@submitList
                 }
                 displayedSearchQuery = searchResult.query
                 displayedReferences = searchResult.references

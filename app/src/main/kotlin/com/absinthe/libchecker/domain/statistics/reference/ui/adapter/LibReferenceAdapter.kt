@@ -25,8 +25,10 @@ const val MULTIPLE_APPS_ICON_PROVIDER = 1
 class LibReferenceAdapter(
   private val allowDetailAction: Boolean = true,
   private val onItemBound: (LibReference, View) -> Unit = { _, _ -> },
+  // Full statistics replacements avoid quadratic move processing; only the small menu demo uses diffs.
+  diffUpdates: Boolean = false,
   private val onAction: (LibReferenceAction) -> Unit
-) : BaseQuickAdapter<LibReference, BaseViewHolder>(diffCallback = RefListDiffUtil()) {
+) : BaseQuickAdapter<LibReference, BaseViewHolder>(diffCallback = if (diffUpdates) RefListDiffUtil() else null) {
 
   private var renderState = LibReferenceListRenderState()
   private val integerFormat by lazy { NumberFormat.getIntegerInstance() }

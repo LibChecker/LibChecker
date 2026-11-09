@@ -1,8 +1,9 @@
 package com.absinthe.libchecker.domain.statistics.reference.ui
 
+import android.content.Context
 import android.os.SystemClock
 import androidx.fragment.app.FragmentManager
-import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.viewpager2.widget.ViewPager2
@@ -13,7 +14,6 @@ import com.absinthe.libchecker.domain.statistics.reference.model.LibReference
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.domain.statistics.reference.ui.adapter.LibReferenceAdapter
 import com.google.android.material.navigation.NavigationBarView
-import java.util.concurrent.Executor
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Job
@@ -56,8 +56,9 @@ class LibReferenceCommitLifecycleInstrumentedTest {
   }
 
   @Test
-  fun pendingDiffDoesNotAccessDestroyedView() {
+  fun pendingLayoutSubmissionDoesNotAccessDestroyedView() {
     val commits = LinkedBlockingQueue<Runnable>()
+    lateinit var layoutHost: DeferredLayoutRecyclerView
     lateinit var fragment: LibReferenceFragment
     lateinit var adapter: LibReferenceAdapter
     lateinit var model: LibReferenceViewModel
@@ -83,11 +84,8 @@ class LibReferenceCommitLifecycleInstrumentedTest {
         adapter = (field(fragment, "refAdapter\$delegate") as Lazy<*>).value as LibReferenceAdapter
         adapter.setList(emptyList())
         adapter.setList(listOf(reference("old")))
-        val differ = field(adapter, "mDiffer") as AsyncListDiffer<*>
-        differ.javaClass.getDeclaredField("mMainThreadExecutor").apply {
-          isAccessible = true
-          set(differ, Executor { commits.add(it) })
-        }
+        layoutHost = DeferredLayoutRecyclerView(it, commits)
+        adapter.onAttachedToRecyclerView(layoutHost)
         @Suppress("UNCHECKED_CAST")
         val references = field(controller, "_libReference") as MutableStateFlow<List<LibReference>?>
         references.value = updatedReferences
@@ -100,6 +98,8 @@ class LibReferenceCommitLifecycleInstrumentedTest {
       }
       var failure: Throwable? = null
       scenario.onActivity {
+        assertFalse("Submission must be deferred during layout", commits.isEmpty())
+        layoutHost.computingLayout = false
         fragment.parentFragmentManager.beginTransaction().remove(fragment).commitNow()
         assertFalse(fragment.isBindingInitialized())
         assertFalse(fragment.isDetached)
@@ -114,12 +114,20 @@ class LibReferenceCommitLifecycleInstrumentedTest {
           applied = adapter.data == updatedReferences
         }
       }
-      assertEquals("The new diff must actually apply, rather than be discarded as stale", updatedReferences, adapter.data)
-      assertNull("A completed diff must not render a destroyed view: $failure", failure)
+      assertEquals("The deferred result must actually apply, rather than be discarded as stale", updatedReferences, adapter.data)
+      assertNull("A completed submission must not render a destroyed view: $failure", failure)
     }
   }
 
   private fun reference(name: String) = LibReference(name, null, setOf("com.tencent.mm"), NATIVE)
+
+  private class DeferredLayoutRecyclerView(context: Context, private val commits: LinkedBlockingQueue<Runnable>) : RecyclerView(context) {
+    var computingLayout = true
+
+    override fun isComputingLayout() = computingLayout
+
+    override fun post(action: Runnable): Boolean = commits.add(action)
+  }
 
   private fun findReference(manager: FragmentManager): LibReferenceFragment? {
     manager.fragments.forEach {
