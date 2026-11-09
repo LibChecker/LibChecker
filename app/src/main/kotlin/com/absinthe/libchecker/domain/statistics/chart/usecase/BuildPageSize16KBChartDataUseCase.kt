@@ -5,7 +5,6 @@ import android.os.Trace
 import com.absinthe.libchecker.compat.IZipFile
 import com.absinthe.libchecker.compat.ZipFileCompat
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
-import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.entity.LCItem
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.utils.PackageUtils
@@ -89,9 +88,6 @@ class BuildPageSize16KBChartDataUseCase(
   )
 
   private fun is16KBAligned(packageInfo: PackageInfo, abi: Int, checkCancellation: () -> Unit): Boolean {
-    if (GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT.not()) {
-      return false
-    }
     val sourceDir = packageInfo.applicationInfo?.sourceDir ?: return false
     val sourceFile = File(sourceDir)
     if (sourceFile.exists().not()) {

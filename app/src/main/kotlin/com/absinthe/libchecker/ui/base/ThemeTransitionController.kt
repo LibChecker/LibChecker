@@ -3,7 +3,6 @@ package com.absinthe.libchecker.ui.base
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.PixelCopy
@@ -207,26 +206,21 @@ object ThemeTransitionController {
       onFrameReady(null)
       return
     }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      runCatching {
-        PixelCopy.request(
-          activity.window,
-          bitmap,
-          { result ->
-            if (result == PixelCopy.SUCCESS) {
-              onFrameReady(bitmap)
-            } else {
-              bitmap.recycle()
-              onFrameReady(captureDecorFrame(decorView))
-            }
-          },
-          Handler(Looper.getMainLooper())
-        )
-      }.onFailure {
-        bitmap.recycle()
-        onFrameReady(captureDecorFrame(decorView))
-      }
-    } else {
+    runCatching {
+      PixelCopy.request(
+        activity.window,
+        bitmap,
+        { result ->
+          if (result == PixelCopy.SUCCESS) {
+            onFrameReady(bitmap)
+          } else {
+            bitmap.recycle()
+            onFrameReady(captureDecorFrame(decorView))
+          }
+        },
+        Handler(Looper.getMainLooper())
+      )
+    }.onFailure {
       bitmap.recycle()
       onFrameReady(captureDecorFrame(decorView))
     }

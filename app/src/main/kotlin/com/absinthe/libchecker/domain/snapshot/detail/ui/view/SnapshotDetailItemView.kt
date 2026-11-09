@@ -18,10 +18,8 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.core.widget.ImageViewCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailRuleChipDisplayData
@@ -193,7 +191,7 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       )
     )
     statusRail.setBackgroundColor(colors.status)
-    ImageViewCompat.setImageTintList(statusIcon, ColorStateList.valueOf(colors.status))
+    statusIcon.imageTintList = ColorStateList.valueOf(colors.status)
     statusLabel.setTextColor(colors.status)
     title.setTextColor(colors.title)
     previousPackagePath.setTextColor(colors.supportingText)
@@ -243,10 +241,10 @@ class SnapshotDetailItemView(context: Context) : AViewGroup(context) {
       val icon = requireNotNull(state.iconRes.getDrawable(context)).mutate().apply {
         setBounds(0, 0, RULE_CHIP_ICON_SIZE, RULE_CHIP_ICON_SIZE)
         clearColorFilter()
-        DrawableCompat.setTintList(this, null)
+        this.setTintList(null)
       }
       when {
-        state.isSimpleColorIcon -> DrawableCompat.setTint(icon, colors.chipText)
+        state.isSimpleColorIcon -> icon.setTint(colors.chipText)
 
         !state.useColorfulIcon -> {
           icon.colorFilter = ColorMatrixColorFilter(

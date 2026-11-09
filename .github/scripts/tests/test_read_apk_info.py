@@ -40,7 +40,7 @@ class ReadApkInfoTest(unittest.TestCase):
       projects = root / "Projects.kt"
       projects.write_text("""
         const val baseVersionName = "2.5.5"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 37
         compileSdk = 37
       """)
@@ -51,7 +51,7 @@ class ReadApkInfoTest(unittest.TestCase):
           "version-name": "2.5.5.dev.test",
           "version-code": 2703,
           "base-version-name": "2.5.5",
-          "min-sdk-version": "24",
+          "min-sdk-version": "26",
           "target-sdk-version": "37",
           "compile-sdk-version": "37",
           "file-size": 3,

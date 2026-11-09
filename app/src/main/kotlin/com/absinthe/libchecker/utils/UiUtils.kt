@@ -16,9 +16,7 @@ import android.view.ContextThemeWrapper
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.createBitmap
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.graphics.withClip
 import com.absinthe.libchecker.R
@@ -90,10 +88,10 @@ object UiUtils {
   }
 
   fun changeDrawableColor(context: Context, drawableResId: Int, color: Int): Drawable {
-    val drawable = ContextCompat.getDrawable(context, drawableResId)?.mutate()
+    val drawable = context.getDrawable(drawableResId)?.mutate()
       ?: throw IllegalArgumentException("Drawable is null")
-    DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_ATOP)
-    DrawableCompat.setTint(drawable, color)
+    drawable.setTintMode(PorterDuff.Mode.SRC_ATOP)
+    drawable.setTint(color)
     return drawable
   }
 

@@ -1,7 +1,7 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.model
 
-import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotTimeNodeListData
+import java.time.Instant
 import java.time.LocalDate
 import java.util.TimeZone
 import org.junit.Assert.assertEquals
@@ -10,6 +10,23 @@ import org.junit.Assert.assertSame
 import org.junit.Test
 
 class TimeNodeBottomSheetStateTest {
+
+  @Test
+  fun `selection uses the requested zone across midnight DST and leap days`() {
+    val state = TimeNodeBottomSheetState("Snapshots", TimeNodeHeaderState.AutoRemove(-1))
+    val cases = listOf(
+      Triple("2024-03-01T00:30:00Z", "America/Los_Angeles", LocalDate.of(2024, 2, 29)),
+      Triple("2024-03-01T00:30:00Z", "Asia/Shanghai", LocalDate.of(2024, 3, 1)),
+      Triple("2024-03-10T07:59:59Z", "America/Los_Angeles", LocalDate.of(2024, 3, 9)),
+      Triple("2024-03-10T10:00:00Z", "America/Los_Angeles", LocalDate.of(2024, 3, 10)),
+      Triple("2024-11-03T08:30:00Z", "America/Los_Angeles", LocalDate.of(2024, 11, 3)),
+      Triple("2024-11-03T09:30:00Z", "America/Los_Angeles", LocalDate.of(2024, 11, 3))
+    )
+    cases.forEach { (instant, zone, expected) ->
+      val result = state.withSelectedTimestamp(Instant.parse(instant).toEpochMilli(), TimeZone.getTimeZone(zone))
+      assertEquals("$instant / $zone", expected, result.selectedDate)
+    }
+  }
 
   @Test
   fun `list and auto remove updates preserve the rest of the sheet state`() {
@@ -78,31 +95,31 @@ class TimeNodeBottomSheetStateTest {
         packageIconSources = emptyMap()
       ),
       selectedTimestamp = 500L,
-      selectedDate = LocalDateCompat(LocalDate.of(2026, 9, 1).toEpochDay())
+      selectedDate = LocalDate.of(2026, 9, 1)
     )
 
     val nonSnapshotDayTile = DayContribution(
-      date = LocalDateCompat(LocalDate.of(2026, 9, 5).toEpochDay()),
+      date = LocalDate.of(2026, 9, 5),
       updateCount = 3,
       snapshotTimestamp = 1000L,
       isSnapshotDay = false
     )
 
     val tileSelected = initial.withSelectedTile(nonSnapshotDayTile)
-    assertEquals(LocalDateCompat(LocalDate.of(2026, 9, 5).toEpochDay()), tileSelected.selectedDate)
+    assertEquals(LocalDate.of(2026, 9, 5), tileSelected.selectedDate)
     assertEquals(500L, tileSelected.selectedTimestamp)
     assertEquals(true, tileSelected.listData.items[0].isSelected)
     assertEquals(false, tileSelected.listData.items[1].isSelected)
 
     val unassociatedTile = DayContribution(
-      date = LocalDateCompat(LocalDate.of(2026, 8, 1).toEpochDay()),
+      date = LocalDate.of(2026, 8, 1),
       updateCount = 0,
       snapshotTimestamp = null,
       isSnapshotDay = false
     )
 
     val unassociatedSelected = tileSelected.withSelectedTile(unassociatedTile)
-    assertEquals(LocalDateCompat(LocalDate.of(2026, 8, 1).toEpochDay()), unassociatedSelected.selectedDate)
+    assertEquals(LocalDate.of(2026, 8, 1), unassociatedSelected.selectedDate)
     assertEquals(500L, unassociatedSelected.selectedTimestamp)
     assertEquals(true, unassociatedSelected.listData.items[0].isSelected)
     assertEquals(false, unassociatedSelected.listData.items[1].isSelected)
@@ -129,13 +146,13 @@ class TimeNodeBottomSheetStateTest {
 
     val updated = state.withSelectedTimestamp(1725148800000L, zone)
     assertEquals(1725148800000L, updated.selectedTimestamp)
-    assertEquals(LocalDateCompat(LocalDate.of(2024, 9, 1).toEpochDay()), updated.selectedDate)
+    assertEquals(LocalDate.of(2024, 9, 1), updated.selectedDate)
     assertEquals(true, updated.listData.items.first().isSelected)
   }
 
   @Test
   fun `removing a snapshot clears stale contributions and selects a remaining snapshot`() {
-    val date = LocalDateCompat.now()
+    val date = LocalDate.now()
     val state = TimeNodeBottomSheetState(
       title = "Snapshots",
       header = TimeNodeHeaderState.AutoRemove(-1),

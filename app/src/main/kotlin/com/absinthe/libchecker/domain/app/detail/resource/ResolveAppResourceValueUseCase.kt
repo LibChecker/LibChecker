@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.app.detail.resource
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
-import androidx.core.content.res.ResourcesCompat
 import com.absinthe.libchecker.utils.manifest.ResourceParser
 
 class ResolveAppResourceValueUseCase(
@@ -35,7 +34,7 @@ class ResolveAppResourceValueUseCase(
         )
 
         "drawable", "mipmap" -> AppResourceValue.DrawablePreview(
-          requireNotNull(ResourcesCompat.getDrawable(resources, resourceId, null))
+          requireNotNull(resources.getDrawable(resourceId, null))
         )
 
         "color" -> AppResourceValue.ColorPreview(resources.getColor(resourceId, null))

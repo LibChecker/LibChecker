@@ -55,13 +55,13 @@ fun View.applySystemBarsMargin(
 
 private fun View.requestApplyInsetsWhenAttached() {
   if (isAttachedToWindow) {
-    ViewCompat.requestApplyInsets(this)
+    requestApplyInsets()
   } else {
     addOnAttachStateChangeListener(
       object : View.OnAttachStateChangeListener {
         override fun onViewAttachedToWindow(view: View) {
           view.removeOnAttachStateChangeListener(this)
-          ViewCompat.requestApplyInsets(view)
+          view.requestApplyInsets()
         }
 
         override fun onViewDetachedFromWindow(view: View) = Unit

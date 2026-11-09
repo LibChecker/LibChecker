@@ -14,9 +14,6 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.TooltipCompat
-import androidx.core.view.ViewCompat
-import androidx.core.widget.ImageViewCompat
 import androidx.core.widget.TextViewCompat
 import com.absinthe.libchecker.ui.preference.model.PreferenceInlineControl
 import com.absinthe.libchecker.utils.extensions.dp
@@ -106,7 +103,7 @@ class DraggableSegmentedControlView private constructor(
       background = pillDrawable(
         fillColor = context.getColorByAttr(MaterialR.attr.colorSecondaryContainer)
       )
-      ViewCompat.setElevation(this, THUMB_ELEVATION_DP.dp.toFloat())
+      this.elevation = THUMB_ELEVATION_DP.dp.toFloat()
       alpha = if (hasValidSelectedValue) 1f else 0f
     }
     addView(
@@ -120,7 +117,7 @@ class DraggableSegmentedControlView private constructor(
       gravity = Gravity.CENTER_VERTICAL
       orientation = LinearLayout.HORIZONTAL
       setPadding(groupInset, 0, groupInset, 0)
-      ViewCompat.setElevation(this, CONTENT_LAYER_ELEVATION_DP.dp.toFloat())
+      this.elevation = CONTENT_LAYER_ELEVATION_DP.dp.toFloat()
     }
     addView(
       buttonContainer,
@@ -392,7 +389,7 @@ class DraggableSegmentedControlView private constructor(
       val color = if (selected) selectedColor else unselectedColor
       when (button) {
         is AppCompatImageButton -> {
-          ImageViewCompat.setImageTintList(button, ColorStateList.valueOf(color))
+          button.imageTintList = ColorStateList.valueOf(color)
         }
 
         is AppCompatTextView -> button.setTextColor(color)
@@ -408,7 +405,7 @@ class DraggableSegmentedControlView private constructor(
         contentDescription = accessibilityLabel
         setImageResource(iconResId)
         setPadding(ICON_PADDING_DP.dp, ICON_PADDING_DP.dp, ICON_PADDING_DP.dp, ICON_PADDING_DP.dp)
-        TooltipCompat.setTooltipText(this, accessibilityLabel)
+        this.tooltipText = accessibilityLabel
       }
     }
 
@@ -421,7 +418,7 @@ class DraggableSegmentedControlView private constructor(
       text = this@buildView.text
       setTextAppearance(MaterialR.style.TextAppearance_Material3_LabelLarge)
       contentDescription = accessibilityLabel
-      TooltipCompat.setTooltipText(this, accessibilityLabel)
+      this.tooltipText = accessibilityLabel
       TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(
         this,
         TEXT_MIN_SIZE_SP,

@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.compat
 
-import androidx.annotation.Keep
 import java.io.File
 import java.io.InputStream
 import java.util.Enumeration
@@ -8,7 +7,6 @@ import java.util.zip.ZipEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 
-@Keep
 internal class ApacheZipFileDelegate(file: File) : IZipFile {
   private val zipFile = ZipFile.Builder().setFile(file).get()
 

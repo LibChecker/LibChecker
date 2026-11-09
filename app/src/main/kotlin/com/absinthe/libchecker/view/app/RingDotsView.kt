@@ -12,7 +12,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.createBitmap
 import com.absinthe.libchecker.R
@@ -392,7 +391,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
       val drawable = if (IconResMap.isSingleColorIcon(index)) {
         null
       } else {
-        ContextCompat.getDrawable(context, IconResMap.getIconRes(index))
+        context.getDrawable(IconResMap.getIconRes(index))
       }
       if (drawable == null) {
         misses = delayAfterMisses(misses)
@@ -402,7 +401,7 @@ class RingDotsView(context: Context, attrs: AttributeSet? = null) : View(context
         UiUtils.addCircleBackground(
           context,
           drawable,
-          ContextCompat.getColor(context, circleBackgroundColorRes)
+          context.getColor(circleBackgroundColorRes)
         )
       } else {
         drawable

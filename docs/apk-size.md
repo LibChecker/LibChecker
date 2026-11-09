@@ -26,14 +26,14 @@ the generated Crashlytics mapping ID.
 `ResoptPlugin` removes concrete-density PNG alternatives only when an otherwise
 unqualified `anydpi` XML resource covers the app's minimum API level. For example,
 the Rules AAR contains PNG fallbacks for API 21–23 alongside `anydpi-v24` vectors;
-the app's minSdk 24 always selects those vectors. Keep density-specific resources
+the app's minSdk 26 always selects those vectors. Keep density-specific resources
 with other qualifiers and resources required below a vector's API level. The
 verifier checks this independently from AAPT's resource dump and compares the
 manifest and every surviving XML file byte-for-byte.
 
 Test the API 23/24 boundary with resources actually linked for minSdk 23. AAPT
-can remove redundant version qualifiers when linking for minSdk 24, so passing
-23 to the filter on an already-linked API 24 table is not a valid fallback test.
+can remove redundant version qualifiers when linking for minSdk >= 24, so passing
+23 to the filter on an already-linked API 26 table is not a valid fallback test.
 
 The resource-table conversion must preserve the original manifest and binary XML
 entries. A binary/proto/binary conversion can reinterpret XML string escaping.
@@ -63,8 +63,11 @@ dependencies track AGP; they are not packaged into the application.
   the class-wide `@Keep` on MPAndroidChart classes. Resync it when upgrading
   AndroidX annotation. Other annotation behavior is unchanged.
 - Market's `play-services-basement.keep` similarly scopes its duplicate chart
-  retention. Dependency filters match exact versions so an upgraded dependency
-  retains its new consumer rules until the local copy is reviewed.
+  retention. Dependency filters use exact versions from the version catalog.
+  Updating a shared catalog version also advances its `ignoreFrom` filter, so
+  review and resync the local consumer rules as part of every such upgrade.
+  Upstream rules are restored automatically only when the resolved version no
+  longer matches the filter.
 - `xml-inflation.keep` replaces the broad Behavior rule from
   Material 1.14.0 and CoordinatorLayout 1.1.0. Keep the named behaviors used by
   app layouts and BottomSheetDialog; other behaviors are constructed directly.

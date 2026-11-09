@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.appcompat.widget.TooltipCompat
 import androidx.core.view.isVisible
 import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
@@ -207,7 +206,7 @@ class XposedInfoBottomSheetView(context: Context) : BottomSheetScaffoldView(cont
           "${app.label}\n${app.packageName}"
         }
         contentDescription = tooltip
-        TooltipCompat.setTooltipText(this, tooltip)
+        this.tooltipText = tooltip
         val packageInfo = app.packageInfo
         if (packageInfo == null) {
           setImageResource(AppIconPlaceholder.resourceId)

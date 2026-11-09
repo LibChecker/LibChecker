@@ -1,8 +1,6 @@
 package com.absinthe.libchecker.domain.statistics.chart.presentation
 
-import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.domain.statistics.chart.model.LOADING_PROGRESS_MAX
-import com.absinthe.libchecker.domain.statistics.chart.model.StatisticAvailability
 import com.absinthe.libchecker.domain.statistics.chart.model.StatisticDefinition
 
 class ChartUiStatePlanner {
@@ -13,7 +11,6 @@ class ChartUiStatePlanner {
     featureChartsAvailable: Boolean
   ): StatisticSelectorPlan {
     val visibleStatistics = definitions
-      .filter { definition -> definition.isAvailable() }
       .filter { definition -> featureChartsAvailable || !definition.requiresFeatureInitialization }
     return StatisticSelectorPlan(
       visibleStatistics = visibleStatistics,
@@ -37,13 +34,6 @@ class ChartUiStatePlanner {
         isIndeterminate = false,
         progress = LOADING_PROGRESS_MAX
       )
-    }
-  }
-
-  private fun StatisticDefinition.isAvailable(): Boolean {
-    return when (availability) {
-      StatisticAvailability.ALWAYS -> true
-      StatisticAvailability.PAGE_SIZE_16_KB -> GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT
     }
   }
 }

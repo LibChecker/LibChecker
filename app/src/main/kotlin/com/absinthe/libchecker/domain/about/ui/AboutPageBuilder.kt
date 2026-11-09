@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.about.ui
 
 import android.content.Context
 import android.graphics.Color
+import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.TypedValue
 import android.view.ContextThemeWrapper
@@ -11,7 +12,6 @@ import android.widget.LinearLayout.LayoutParams
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.findFragment
@@ -204,9 +204,9 @@ object AboutPageBuilder {
               highlightColor = Color.TRANSPARENT
               gravity = Gravity.TOP or Gravity.START
               setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
-              text = HtmlCompat.fromHtml(
+              text = Html.fromHtml(
                 content.toString(),
-                HtmlCompat.FROM_HTML_MODE_LEGACY
+                Html.FROM_HTML_MODE_LEGACY
               )
             }
           )

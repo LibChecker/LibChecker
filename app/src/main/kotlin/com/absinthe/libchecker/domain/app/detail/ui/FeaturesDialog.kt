@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.text.Html
 import android.text.style.ImageSpan
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +15,6 @@ import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.core.text.HtmlCompat
 import androidx.core.text.bold
 import androidx.core.text.buildSpannedString
 import androidx.core.text.inSpans
@@ -75,7 +75,7 @@ object FeaturesDialog {
       }
       spec.messageRes?.let { messageRes ->
         if (isNotEmpty()) append("\n\n")
-        append(HtmlCompat.fromHtml(context.getString(messageRes), HtmlCompat.FROM_HTML_MODE_COMPACT))
+        append(Html.fromHtml(context.getString(messageRes), Html.FROM_HTML_MODE_COMPACT))
       }
       spec.items?.forEach { item ->
         if (isNotEmpty()) append("\n\n")
@@ -96,7 +96,7 @@ object FeaturesDialog {
       val title = entries.joinToString(", ") { entry ->
         "${entry.label.resolve(context)} <b>${entry.value.orEmpty()}</b>"
       }
-      dialog.setTitle(HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_COMPACT))
+      dialog.setTitle(Html.fromHtml(title, Html.FROM_HTML_MODE_COMPACT))
     }
 
     spec.sourceUrl?.let { link ->

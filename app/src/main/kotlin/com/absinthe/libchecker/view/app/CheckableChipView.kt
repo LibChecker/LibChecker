@@ -27,7 +27,6 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.Parcel
 import android.os.Parcelable
 import android.text.Layout
@@ -196,11 +195,7 @@ class CheckableChipView @JvmOverloads constructor(
 
       val resolvedClearDrawable =
         getDrawableOrThrow(R.styleable.CheckableChipView_ccv_clearIcon)
-      clearDrawable = if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-        resolvedClearDrawable.mutate()
-      } else {
-        resolvedClearDrawable
-      }.apply {
+      clearDrawable = resolvedClearDrawable.apply {
         setBounds(
           -intrinsicWidth / 2,
           -intrinsicHeight / 2,

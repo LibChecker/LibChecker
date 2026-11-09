@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -38,7 +37,7 @@ class LibReferenceActionBarIconInstrumentedTest {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
     val rule = requireNotNull(runBlocking { RulesRepository.getRule("libAGFX.so", NATIVE, true) })
     assertNotEquals(R.drawable.ic_question, rule.iconRes)
-    val expectedIcon = requireNotNull(ContextCompat.getDrawable(context, rule.iconRes)).boundedReferenceIcon(24.dp)
+    val expectedIcon = requireNotNull(context.getDrawable(rule.iconRes)).boundedReferenceIcon(24.dp)
     val intent = Intent(context, LibReferenceActivity::class.java)
       .putExtra(EXTRA_REF_NAME, "libAGFX.so")
       .putExtra(EXTRA_REF_LABEL, "BytePlus RTC")

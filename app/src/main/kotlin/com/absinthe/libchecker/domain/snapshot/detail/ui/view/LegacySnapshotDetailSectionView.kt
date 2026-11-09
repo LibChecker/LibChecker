@@ -8,7 +8,6 @@ import android.view.Gravity
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailSection
 import com.absinthe.libchecker.domain.snapshot.model.ADDED
@@ -70,7 +69,7 @@ class LegacySnapshotDetailSectionView(context: Context) : LinearLayout(context) 
     section.statusCounts.forEachIndexed { index, count ->
       val badge = (labels.getChildAt(index + 1) as? AppCompatTextView) ?: AppCompatTextView(context).apply {
         textSize = 12f
-        setTextColor(ContextCompat.getColor(context, R.color.material_grey_800))
+        setTextColor(context.getColor(R.color.material_grey_800))
         setPadding(8.dp, 2.dp, 8.dp, 2.dp)
         importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_NO
         labels.addView(
@@ -88,7 +87,7 @@ class LegacySnapshotDetailSectionView(context: Context) : LinearLayout(context) 
         MOVED -> R.color.material_blue_200
         else -> error("Unknown snapshot diff type: ${count.diffType}")
       }
-      badge.background = G2PillDrawable(fillColor = ContextCompat.getColor(context, color))
+      badge.background = G2PillDrawable(fillColor = context.getColor(color))
     }
     val rotation = if (isExpanded) 90f else 0f
     arrow.animate().cancel()

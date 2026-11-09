@@ -4,7 +4,6 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -56,9 +55,9 @@ class SnapshotDetailItemViewInstrumentedTest {
         val actual = chip.compoundDrawablesRelative[0]
         val expected = requireNotNull(R.drawable.ic_add.getDrawable(context)).mutate().apply {
           clearColorFilter()
-          DrawableCompat.setTintList(this, null)
+          this.setTintList(null)
           if (simple) {
-            DrawableCompat.setTint(this, chip.currentTextColor)
+            this.setTint(chip.currentTextColor)
           } else if (!colorful) {
             colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
           }

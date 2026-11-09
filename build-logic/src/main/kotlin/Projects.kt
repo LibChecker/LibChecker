@@ -18,7 +18,7 @@ fun Project.setupAppModule(block: ApplicationExtension.() -> Unit = {}) {
     defaultConfig {
       versionCode = projectVersion.code
       versionName = projectVersion.name
-      minSdk = 24
+      minSdk = 26
       targetSdk = 37
 
       androidResources {

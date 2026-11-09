@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.utils.OsUtils
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -24,9 +23,7 @@ class GitHubTokenTextFieldView(context: Context) : LinearLayout(context) {
     )
     hint = context.getString(R.string.settings_github_token_dialog_hint)
     isSaveEnabled = false
-    if (OsUtils.atLeastO()) {
-      importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
-    }
+    importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
   }
 
   private val input = TextInputEditText(textInputLayout.context).apply {
@@ -40,9 +37,7 @@ class GitHubTokenTextFieldView(context: Context) : LinearLayout(context) {
       InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
     imeOptions = EditorInfo.IME_ACTION_DONE
     isSaveEnabled = false
-    if (OsUtils.atLeastO()) {
-      importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
-    }
+    importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO
   }
 
   var token: String

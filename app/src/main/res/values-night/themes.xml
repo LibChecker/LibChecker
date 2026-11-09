@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-  <style name="Platform.V23.Theme.LibChecker" parent="Theme.Material3Expressive.Dark.LibChecker" />
+  <style name="Platform.V26.Theme.LibChecker" parent="Theme.Material3Expressive.Dark.LibChecker">
+    <item name="android:windowSplashscreenContent">@drawable/splash_drawable</item>
+  </style>
 
 </resources>

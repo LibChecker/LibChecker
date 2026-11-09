@@ -45,7 +45,9 @@ processing, and it can open app information exported by LibChecker.
 
 ## Supported Versions
 
-- Android 7.0 ～ 17
+- Android 8.0 ～ 17
+- Android 7 Nougat users can use the
+  [nougat branch](https://github.com/LibChecker/LibChecker/tree/nougat)
 - Android 6 Marshmallow users can use the
   [marshmallow branch](https://github.com/LibChecker/LibChecker/tree/marshmallow)
 

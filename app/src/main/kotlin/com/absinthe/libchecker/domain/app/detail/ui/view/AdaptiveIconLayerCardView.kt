@@ -21,7 +21,6 @@ import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
-import android.os.Build
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.View
@@ -29,7 +28,6 @@ import android.view.ViewGroup
 import android.view.ViewOutlineProvider
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.animation.doOnEnd
@@ -46,7 +44,6 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-@RequiresApi(Build.VERSION_CODES.O)
 class AdaptiveIconLayerCardView(
   context: Context,
   icon: AdaptiveIconDrawable,
@@ -361,7 +358,6 @@ class AdaptiveIconLayerCardView(
   }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 private fun createMaskedBackgroundDrawable(icon: AdaptiveIconDrawable): MaskedBackgroundDrawable {
   return MaskedBackgroundDrawable(
     background = icon.background.copyDrawable(),
@@ -369,7 +365,6 @@ private fun createMaskedBackgroundDrawable(icon: AdaptiveIconDrawable): MaskedBa
   )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 private class MaskedBackgroundDrawable(
   private val background: Drawable,
   private val mask: Path

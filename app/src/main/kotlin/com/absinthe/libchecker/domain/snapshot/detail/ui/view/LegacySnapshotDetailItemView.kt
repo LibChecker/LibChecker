@@ -14,9 +14,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotDetailItemDisplayData
@@ -75,7 +73,7 @@ class LegacySnapshotDetailItemView(context: Context) : LinearLayout(context) {
     val dark = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
     val color = ColorUtils.blendARGB(
       context.getColorByAttr(MaterialR.attr.colorSurface),
-      ContextCompat.getColor(context, legacySnapshotStatusColor(data.item.diffType)),
+      context.getColor(legacySnapshotStatusColor(data.item.diffType)),
       if (dark) 0.75f else 0.95f
     )
     card.background = G2PillDrawable(
@@ -89,11 +87,11 @@ class LegacySnapshotDetailItemView(context: Context) : LinearLayout(context) {
       chip.text = rule.label
       chip.chipBackgroundColor = ColorStateList.valueOf(color)
       chip.chipIconTint = null
-      chip.chipIcon = ContextCompat.getDrawable(context, rule.iconRes)?.mutate()?.apply {
+      chip.chipIcon = context.getDrawable(rule.iconRes)?.mutate()?.apply {
         clearColorFilter()
-        DrawableCompat.setTintList(this, null)
+        this.setTintList(null)
         when {
-          rule.isSimpleColorIcon -> DrawableCompat.setTint(this, Color.BLACK)
+          rule.isSimpleColorIcon -> this.setTint(Color.BLACK)
           !rule.useColorfulIcon -> colorFilter = ColorMatrixColorFilter(ColorMatrix().apply { setSaturation(0f) })
         }
       }

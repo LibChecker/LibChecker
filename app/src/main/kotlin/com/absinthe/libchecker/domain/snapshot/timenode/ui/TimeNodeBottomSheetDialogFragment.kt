@@ -9,7 +9,6 @@ import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.snapshot.detail.ui.launchSnapshotDetail
@@ -32,6 +31,8 @@ import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.putArguments
+import java.time.Instant
+import java.time.ZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -67,7 +68,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
         title = customTitle ?: getString(R.string.dialog_title_change_timestamp),
         selectedTimestamp = initialSelected,
         selectedDate = initialSelected?.let {
-          LocalDateCompat.fromTimestamp(it)
+          Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
         },
         header = if (isCompareMode) {
           TimeNodeHeaderState.AddApk(isLeftMode)

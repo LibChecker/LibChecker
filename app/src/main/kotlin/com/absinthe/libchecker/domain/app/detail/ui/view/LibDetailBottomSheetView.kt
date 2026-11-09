@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -20,10 +21,8 @@ import android.widget.TableLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.ColorUtils
-import androidx.core.text.HtmlCompat
 import androidx.core.view.isGone
 import androidx.core.view.marginTop
-import androidx.core.widget.TextViewCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import coil.load
 import com.absinthe.libchecker.R
@@ -436,15 +435,13 @@ class LibDetailBottomSheetView(
       gravity = Gravity.CENTER_VERTICAL
       setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_github, 0, 0, 0)
       compoundDrawablePadding = 4.dp
-      TextViewCompat.setCompoundDrawableTintList(
-        this,
+      compoundDrawableTintList =
         ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlNormal))
-      )
       isClickable = true
       movementMethod = LinkMovementMethod.getInstance()
-      text = HtmlCompat.fromHtml(
+      text = Html.fromHtml(
         "<a href='${ApiManager.GITHUB_NEW_ISSUE_URL}'> ${resources.getText(R.string.create_an_issue)} </a>",
-        HtmlCompat.FROM_HTML_MODE_LEGACY
+        Html.FROM_HTML_MODE_LEGACY
       )
     }
 
