@@ -2,7 +2,6 @@ package com.absinthe.libchecker.domain.home.presentation
 
 import android.content.Context
 import android.graphics.drawable.BitmapDrawable
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -81,7 +80,7 @@ class RecentVisitsViewModel(
           val type = requireNotNull(visit.type)
           val rule = RulesRepository.getRule(visit.name, type, true)
           val iconRes = resolveReferenceIcon(visit.name, type, rule)
-          val icon = ContextCompat.getDrawable(context, iconRes) ?: continue
+          val icon = context.getDrawable(iconRes) ?: continue
           val permissionLabel = if (type == PERMISSION) permissionLabels.resolve(visit.name) else null
           result += RecentVisitItem(
             visit,

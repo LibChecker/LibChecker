@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnNextLayout
@@ -172,7 +171,7 @@ class LibReferenceFragment :
           val item = refAdapter.data.getOrNull(position) ?: return@installRecentVisitDrag false
           val label = item.rule?.label?.takeIf(String::isNotBlank) ?: item.resolvedLabel ?: item.libName
           val iconRes = resolveReferenceIcon(item.libName, item.type, item.rule)
-          val icon = ContextCompat.getDrawable(context, iconRes) ?: return@installRecentVisitDrag false
+          val icon = context.getDrawable(iconRes) ?: return@installRecentVisitDrag false
           val visit = RecentVisit(item.libName, item.type, label, item.referredList.toList())
           (activity as? MainActivity)?.pinListItem(
             row,

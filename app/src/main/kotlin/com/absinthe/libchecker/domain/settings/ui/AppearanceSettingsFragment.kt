@@ -1,9 +1,9 @@
 package com.absinthe.libchecker.domain.settings.ui
 
 import android.os.Bundle
+import android.text.Html
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.text.HtmlCompat
 import androidx.preference.ListPreference
 import androidx.preference.TwoStatePreference
 import com.absinthe.libchecker.R
@@ -146,7 +146,7 @@ class AppearanceSettingsFragment : BaseSettingsFragment() {
       languagePreference.entries[entry.index] = if (entry.selected) {
         entry.label
       } else {
-        HtmlCompat.fromHtml(entry.label, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        Html.fromHtml(entry.label, Html.FROM_HTML_MODE_LEGACY)
       }
     }
     when (val summary = displayData.summary) {

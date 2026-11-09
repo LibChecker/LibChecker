@@ -7,7 +7,7 @@ setupLibraryModule {
   namespace = "com.absinthe.libchecker.compat"
 
   defaultConfig {
-    minSdk = 24
+    minSdk = 26
   }
 
   flavorDimensions += "channel"

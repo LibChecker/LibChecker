@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.usecase
 
 import com.absinthe.libchecker.app.SystemServices
-import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.database.entity.TimeStampItem
 import com.absinthe.libchecker.domain.app.repository.InstalledAppRepository
 import com.absinthe.libchecker.domain.snapshot.SnapshotRepository
@@ -10,6 +9,8 @@ import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotContributi
 import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotPalette
 import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotUpdatedAppItem
 import com.absinthe.libchecker.utils.extensions.getAppName
+import java.time.Instant
+import java.time.LocalDate
 import java.util.TimeZone
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ class ComputeSnapshotContributionsUseCase(
 ) {
 
   private data class MutableDayContribution(
-    val date: LocalDateCompat,
+    val date: LocalDate,
     var updateCount: Int = 0,
     var snapshotTimestamp: Long? = null,
     var snapshotColor: Int? = null,
@@ -36,14 +37,15 @@ class ComputeSnapshotContributionsUseCase(
     timeStamps: List<TimeStampItem>,
     timeZone: TimeZone = TimeZone.getDefault()
   ): SnapshotContributionData = withContext(Dispatchers.Default) {
-    val today = LocalDateCompat.now(timeZone)
+    val zoneId = timeZone.toZoneId()
+    val today = LocalDate.now(zoneId)
     val rawStartDate = today.minusDays(RECENT_DAYS_COUNT - 1L)
-    val startDayOfWeek = rawStartDate.dayOfWeek
+    val startDayOfWeek = rawStartDate.dayOfWeek.value
     val startDate = rawStartDate.minusDays((startDayOfWeek - 1).toLong())
     val endDate = today
 
     if (timeStamps.isEmpty()) {
-      val emptyDays = mutableMapOf<LocalDateCompat, DayContribution>()
+      val emptyDays = mutableMapOf<LocalDate, DayContribution>()
       var curr = startDate
       while (!curr.isAfter(endDate)) {
         emptyDays[curr] = DayContribution(curr, 0, null, null, false)
@@ -63,7 +65,7 @@ class ComputeSnapshotContributionsUseCase(
       item.timestamp to SnapshotPalette.getColor(index)
     }.toMap()
 
-    val dayContributions = mutableMapOf<LocalDateCompat, MutableDayContribution>()
+    val dayContributions = mutableMapOf<LocalDate, MutableDayContribution>()
 
     // Initialize all dates in range
     var iterDate = startDate
@@ -74,7 +76,7 @@ class ComputeSnapshotContributionsUseCase(
 
     // Mark snapshot creation days
     sortedTimeStamps.forEach { item ->
-      val date = LocalDateCompat.fromTimestamp(item.timestamp, timeZone)
+      val date = Instant.ofEpochMilli(item.timestamp).atZone(zoneId).toLocalDate()
       dayContributions[date]?.let { day ->
         day.isSnapshotDay = true
         day.snapshotTimestamp = item.timestamp
@@ -89,10 +91,10 @@ class ComputeSnapshotContributionsUseCase(
       val currentTimestamp = current.timestamp
       val color = snapshotColors[currentTimestamp]
 
-      val intervalStartDate = LocalDateCompat.fromTimestamp(currentTimestamp, timeZone)
+      val intervalStartDate = Instant.ofEpochMilli(currentTimestamp).atZone(zoneId).toLocalDate()
       val intervalEndDate = if (i < sortedTimeStamps.size - 1) {
         val nextTimestamp = sortedTimeStamps[i + 1].timestamp
-        val nextDate = LocalDateCompat.fromTimestamp(nextTimestamp, timeZone)
+        val nextDate = Instant.ofEpochMilli(nextTimestamp).atZone(zoneId).toLocalDate()
         if (nextDate.isAfter(intervalStartDate)) {
           nextDate.minusDays(1)
         } else {
@@ -123,7 +125,7 @@ class ComputeSnapshotContributionsUseCase(
 
       if (i < sortedTimeStamps.size - 1) {
         val nextTimestamp = sortedTimeStamps[i + 1].timestamp
-        val nextDate = LocalDateCompat.fromTimestamp(nextTimestamp, timeZone)
+        val nextDate = Instant.ofEpochMilli(nextTimestamp).atZone(zoneId).toLocalDate()
         if (nextDate.isBefore(startDate) || intervalStartDate.isAfter(endDate)) continue
         val updatedApps = runCatching {
           snapshotRepository.getSnapshotUpdatedApps(nextTimestamp)
@@ -131,7 +133,7 @@ class ComputeSnapshotContributionsUseCase(
 
         for (app in updatedApps) {
           if (app.lastUpdatedTime in (currentTimestamp + 1)..nextTimestamp) {
-            val updateDate = LocalDateCompat.fromTimestamp(app.lastUpdatedTime, timeZone)
+            val updateDate = Instant.ofEpochMilli(app.lastUpdatedTime).atZone(zoneId).toLocalDate()
             dayContributions[updateDate]?.let { day ->
               if (day.updatedApps.none { it.packageName == app.packageName }) {
                 day.updatedApps.add(
@@ -154,7 +156,7 @@ class ComputeSnapshotContributionsUseCase(
 
         for (pkg in installedApps) {
           if (pkg.lastUpdateTime > currentTimestamp) {
-            val updateDate = LocalDateCompat.fromTimestamp(pkg.lastUpdateTime, timeZone)
+            val updateDate = Instant.ofEpochMilli(pkg.lastUpdateTime).atZone(zoneId).toLocalDate()
             dayContributions[updateDate]?.let { day ->
               if (day.updatedApps.none { it.packageName == pkg.packageName }) {
                 val label = pkg.getAppName(SystemServices.packageManager) ?: pkg.packageName
@@ -176,7 +178,7 @@ class ComputeSnapshotContributionsUseCase(
 
     // Also include updates recorded on the first snapshot's creation day
     val firstTimestamp = sortedTimeStamps.first().timestamp
-    val firstDate = LocalDateCompat.fromTimestamp(firstTimestamp, timeZone)
+    val firstDate = Instant.ofEpochMilli(firstTimestamp).atZone(zoneId).toLocalDate()
     val firstSnapshotUpdates = if (firstDate in startDate..endDate) {
       runCatching {
         snapshotRepository.getSnapshotUpdatedApps(firstTimestamp)
@@ -185,7 +187,7 @@ class ComputeSnapshotContributionsUseCase(
       emptyList()
     }
     for (app in firstSnapshotUpdates) {
-      val updateDate = LocalDateCompat.fromTimestamp(app.lastUpdatedTime, timeZone)
+      val updateDate = Instant.ofEpochMilli(app.lastUpdatedTime).atZone(zoneId).toLocalDate()
       if (updateDate == firstDate) {
         dayContributions[updateDate]?.let { day ->
           if (day.updatedApps.none { it.packageName == app.packageName }) {

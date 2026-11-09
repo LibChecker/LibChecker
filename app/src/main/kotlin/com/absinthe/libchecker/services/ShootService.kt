@@ -14,8 +14,6 @@ import android.os.Process
 import android.os.RemoteCallbackList
 import android.os.RemoteException
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.LifecycleService
@@ -46,7 +44,7 @@ class ShootService : LifecycleService() {
   private val notificationIdShoot = Process.myPid()
   private val notificationIdShootSuccess = notificationIdShoot + 1
   private val builder by lazy { NotificationCompat.Builder(this, SHOOT_CHANNEL_ID) }
-  private val notificationManager by lazy { NotificationManagerCompat.from(this) }
+  private val notificationManager by lazy { getSystemService(NotificationManager::class.java) }
   private val installedAppRepository: InstalledAppRepository by inject()
   private val captureInstalledSnapshot: CaptureInstalledSnapshotUseCase by inject()
   private val formatSnapshotTimestamp: FormatSnapshotTimestampUseCase by inject()
@@ -77,19 +75,19 @@ class ShootService : LifecycleService() {
   override fun onDestroy() {
     super.onDestroy()
     Timber.d("onDestroy")
-    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+    stopForeground(STOP_FOREGROUND_REMOVE)
   }
 
   override fun onTimeout(startId: Int) {
     super.onTimeout(startId)
-    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+    stopForeground(STOP_FOREGROUND_REMOVE)
     stopSelf()
   }
 
   override fun onTimeout(startId: Int, fgsType: Int) {
     super.onTimeout(startId, fgsType)
     // https://developer.android.com/about/versions/15/behavior-changes-15?hl=zh-cn#datasync-timeout
-    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+    stopForeground(STOP_FOREGROUND_REMOVE)
     stopSelf()
   }
 
@@ -97,12 +95,10 @@ class ShootService : LifecycleService() {
     initBuilder()
 
     return runCatching {
-      if (OsUtils.atLeastO()) {
-        val name = getString(R.string.channel_shoot)
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
-        notificationManager.createNotificationChannel(channel)
-      }
+      val name = getString(R.string.channel_shoot)
+      val importance = NotificationManager.IMPORTANCE_DEFAULT
+      val channel = NotificationChannel(SHOOT_CHANNEL_ID, name, importance)
+      notificationManager.createNotificationChannel(channel)
       if (OsUtils.atLeastU()) {
         startForeground(
           notificationIdShoot,
@@ -228,7 +224,7 @@ class ShootService : LifecycleService() {
   @Synchronized
   private fun finishShooting(timestamp: Long?, stopWhenFinish: Boolean) {
     try {
-      ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+      stopForeground(STOP_FOREGROUND_REMOVE)
       notificationManager.cancel(notificationIdShoot)
       if (areNotificationsEnabled) {
         val title = if (timestamp == null) R.string.package_list_load_failed else R.string.noti_shoot_title_saved
@@ -258,8 +254,7 @@ class ShootService : LifecycleService() {
     )
     builder.setContentTitle(getString(R.string.noti_shoot_title))
       .setSmallIcon(R.drawable.ic_logo)
-      .setLargeIcon(ContextCompat.getDrawable(this, R.mipmap.ic_launcher)?.toBitmap())
-      .setPriority(NotificationCompat.PRIORITY_LOW)
+      .setLargeIcon(this.getDrawable(R.mipmap.ic_launcher)?.toBitmap())
       .setContentIntent(pi)
       .setProgress(0, 0, true)
       .setSilent(true)
@@ -276,7 +271,7 @@ class ShootService : LifecycleService() {
       getColorByAttr(androidx.appcompat.R.attr.colorPrimary)
     }.getOrElse {
       Timber.w(it, "Failed to resolve notification color")
-      ContextCompat.getColor(this, R.color.md_theme_libchecker_light_primary)
+      this.getColor(R.color.md_theme_libchecker_light_primary)
     }
   }
 

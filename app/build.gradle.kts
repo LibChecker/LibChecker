@@ -57,13 +57,15 @@ setupAppModule {
     release {
       optimization {
         enable = true
-        // Scope broad consumer rules locally; exact versions restore upstream rules on upgrade.
+        // Review local consumer rules whenever these catalog versions change.
         keepRules {
           includeDefault = false
-          ignoreFrom("androidx.annotation:annotation-jvm:1.11.0")
-          ignoreFrom("androidx.coordinatorlayout:coordinatorlayout:1.3.0")
-          ignoreFrom("androidx.recyclerview:recyclerview:1.4.0")
-          ignoreFrom("com.google.android.material:material:1.14.0")
+          ignoreFrom(
+            libs.androidX.annotation.jvm.get().toString(),
+            libs.androidX.coordinatorLayout.get().toString(),
+            libs.androidX.recyclerView.get().toString(),
+            libs.google.material.get().toString()
+          )
         }
       }
     }
@@ -89,8 +91,10 @@ setupAppModule {
     }
     create("market") {
       dimension = flavorDimensions[0]
+      // AGP 9.5 exposes no non-deprecated flavor/variant keepRules API.
+      @Suppress("DEPRECATION")
       optimization {
-        keepRules { ignoreFrom("com.google.android.gms:play-services-basement:18.12.0") }
+        keepRules { ignoreFrom(libs.google.playServices.basement.get().toString()) }
       }
       buildConfigField("Boolean", "IS_FOSS", "false")
     }

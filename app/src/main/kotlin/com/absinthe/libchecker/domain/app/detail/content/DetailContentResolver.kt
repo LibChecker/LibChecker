@@ -22,7 +22,6 @@ import com.absinthe.libchecker.constant.Constants.ERROR
 import com.absinthe.libchecker.constant.Constants.MULTI_ARCH
 import com.absinthe.libchecker.constant.Constants.NO_LIBS
 import com.absinthe.libchecker.constant.Constants.OVERLAY
-import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.database.RulesRepository
 import com.absinthe.libchecker.domain.app.detail.model.DISABLED
 import com.absinthe.libchecker.domain.app.detail.model.EXPORTED
@@ -91,7 +90,7 @@ class DetailContentResolver(
     abi: Int
   ): AppDetailNativeLibraries = traceDetailSection(TRACE_DETAIL_NATIVE_LIBS) {
     val specifiedAbi = if (abi == ERROR || abi == NO_LIBS || abi == OVERLAY) abi else null
-    val parseElf = GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT && !isApkPreview
+    val parseElf = !isApkPreview
     val selectedAbiTab = ABI_STRING_MAP[abi % MULTI_ARCH]
     val parseElfForAbi = abi.takeIf {
       parseElf && specifiedAbi == null && selectedAbiTab != null
@@ -195,7 +194,6 @@ class DetailContentResolver(
     if (
       isApkPreview ||
       apkPreviewInfo != null ||
-      GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT.not() ||
       items.none { it.elfInfo.elfType == ET_NOT_SET }
     ) {
       return items

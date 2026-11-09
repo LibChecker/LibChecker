@@ -19,7 +19,6 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.TextViewCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.app.detail.insight.LibraryInsightContent
@@ -159,10 +158,8 @@ class LibraryExtraInfoCardView(
     statusText.text = context.getString(R.string.library_insight_unavailable)
     statusText.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_refresh, 0, 0, 0)
     statusText.compoundDrawablePadding = 8.dp
-    TextViewCompat.setCompoundDrawableTintList(
-      statusText,
+    statusText.compoundDrawableTintList =
       ColorStateList.valueOf(context.getColorByAttr(android.R.attr.colorControlNormal))
-    )
     summaryContainer.removeAllViews()
     detailsContainer.removeAllViews()
     detailsContainer.isVisible = false

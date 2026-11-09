@@ -77,7 +77,7 @@ only for new changes, failures, or unresolved concerns.
 
 - Java toolchain: 25.
 - SDK levels are configured in `build-logic/src/main/kotlin/Projects.kt`
-  (`compileSdk = 37`, `targetSdk = 37`, `minSdk = 24`).
+  (`compileSdk = 37`, `targetSdk = 37`, `minSdk = 26`).
 - `foss` is the default flavor. `market` adds Google/Firebase integrations.
 - Put JVM tests under `app/src/test` and device tests under
   `app/src/androidTest`. CI does not currently run either suite.

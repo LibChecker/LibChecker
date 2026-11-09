@@ -5,6 +5,11 @@ import com.google.android.material.shape.ShapePath
 
 /** Material adapter for the same three-cubic corners used by [setG2Shape]. */
 internal class G2CornerTreatment : CornerTreatment() {
+  fun getStartOffsetY(radius: Float): Float {
+    val points = ContinuousCurvatureRoundedRectangleCornerBuilder.Default.getCornerBezierPoints()
+    return radius * (1f - points[0].toFloat())
+  }
+
   override fun getCornerPath(shapePath: ShapePath, angle: Float, interpolation: Float, radius: Float) {
     val r = radius * interpolation
     val points = ContinuousCurvatureRoundedRectangleCornerBuilder.Default.getCornerBezierPoints()

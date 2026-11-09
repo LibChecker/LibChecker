@@ -7,8 +7,6 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -119,13 +117,10 @@ class RuleLoadingView @JvmOverloads constructor(
       IconResMap.isSingleColorIcon(IconResMap.getResIndex(iconRes))
     }.getOrDefault(false)
   ): Drawable? {
-    val drawable = ContextCompat.getDrawable(this, iconRes)?.mutate() ?: return null
-    return DrawableCompat.wrap(drawable).mutate().also {
+    val drawable = this.getDrawable(iconRes)?.mutate() ?: return null
+    return drawable.also {
       if (isSingleColorIcon) {
-        DrawableCompat.setTint(
-          it,
-          getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
-        )
+        it.setTint(getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
       }
     }
   }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.Html
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -27,7 +28,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.text.HtmlCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.lifecycle.lifecycleScope
@@ -518,11 +518,11 @@ class SnapshotFragment :
     val linkText = context.getString(R.string.url)
     val hintColor =
       context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant)
-    val tip = HtmlCompat.fromHtml(
+    val tip = Html.fromHtml(
       getString(R.string.snapshot_scheme_tip, linkText)
         .replace("<br>", " ")
         .replaceFirst(SNAPSHOT_SCHEME_TIP_PREFIX, ""),
-      HtmlCompat.FROM_HTML_MODE_COMPACT
+      Html.FROM_HTML_MODE_COMPACT
     )
     return SpannableStringBuilder()
       .append(context.getString(R.string.dialog_message_keep_previous_snapshot))

@@ -21,7 +21,6 @@ import android.view.animation.PathInterpolator
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.utils.extensions.dpToDimension
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -178,7 +177,7 @@ internal class RecentVisitRow(context: Context, item: RecentVisitItem) : LinearL
   private class RemovalIconView(context: Context) : AppCompatImageView(context) {
     private val removalColor = context.getColorByAttr(androidx.appcompat.R.attr.colorError)
     private val removalIcon by lazy {
-      ContextCompat.getDrawable(context, R.drawable.ic_delete_outline)?.mutate()?.apply { setTint(removalColor) }
+      context.getDrawable(R.drawable.ic_delete_outline)?.mutate()?.apply { setTint(removalColor) }
     }
     private val ring = RectF()
     private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

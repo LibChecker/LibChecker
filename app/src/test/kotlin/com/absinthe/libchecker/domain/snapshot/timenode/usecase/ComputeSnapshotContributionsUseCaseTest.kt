@@ -1,6 +1,5 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.usecase
 
-import com.absinthe.libchecker.compat.LocalDateCompat
 import com.absinthe.libchecker.database.entity.SnapshotDiffStoringItem
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.database.entity.SnapshotUpdatedApp
@@ -94,12 +93,12 @@ class ComputeSnapshotContributionsUseCaseTest {
     assertEquals(expectedColor1, result.snapshotColors[t1])
     assertEquals(expectedColor2, result.snapshotColors[t2])
 
-    val first = result.days[LocalDateCompat(firstDay.toEpochDay())]
+    val first = result.days[firstDay]
     assertNotNull(first)
     assertTrue(first!!.isSnapshotDay)
     assertEquals(t1, first.snapshotTimestamp)
 
-    val middle = result.days[LocalDateCompat(middleDay.toEpochDay())]
+    val middle = result.days[middleDay]
     assertNotNull(middle)
     assertEquals(2, middle!!.updateCount)
     assertEquals(t1, middle.snapshotTimestamp)
@@ -112,7 +111,7 @@ class ComputeSnapshotContributionsUseCaseTest {
     assertEquals(t1, middle.updatedApps[1].previousSnapshotTimestamp)
     assertEquals(t2, middle.updatedApps[1].currentSnapshotTimestamp)
 
-    val next = result.days[LocalDateCompat(nextDay.toEpochDay())]
+    val next = result.days[nextDay]
     assertNotNull(next)
     assertTrue(next!!.isSnapshotDay)
     assertEquals(1, next.updateCount)
@@ -160,7 +159,7 @@ class ComputeSnapshotContributionsUseCaseTest {
       listOf(TimeStampItem(snapshot, null, null)),
       TimeZone.getTimeZone(testZoneId)
     )
-    val app = result.days.getValue(LocalDateCompat(day.toEpochDay())).updatedApps.single()
+    val app = result.days.getValue(day).updatedApps.single()
     assertEquals(null, app.previousSnapshotTimestamp)
     assertEquals(snapshot, app.currentSnapshotTimestamp)
   }

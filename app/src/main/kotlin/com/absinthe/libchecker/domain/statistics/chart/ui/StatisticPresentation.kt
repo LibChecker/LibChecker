@@ -6,9 +6,6 @@ import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.widget.ImageViewCompat
 import coil.Coil
 import coil.load
 import coil.request.ImageRequest
@@ -35,7 +32,7 @@ internal fun StatisticTitleSpec.resolve(context: Context): String {
 }
 
 internal suspend fun StatisticIconSpec.resolveDrawable(context: Context): Drawable? {
-  val resolvedDrawable = drawable?.let { ContextCompat.getDrawable(context, it.drawableRes) }
+  val resolvedDrawable = drawable?.let { context.getDrawable(it.drawableRes) }
     ?: localPath?.let(::File)?.let { data ->
       withContext(Dispatchers.IO) {
         val request = ImageRequest.Builder(context).data(data).build()
@@ -47,8 +44,8 @@ internal suspend fun StatisticIconSpec.resolveDrawable(context: Context): Drawab
     }
     ?: return null
   return monochromeTintRole?.let { tintRole ->
-    DrawableCompat.wrap(resolvedDrawable.mutate()).also { tintedDrawable ->
-      DrawableCompat.setTint(tintedDrawable, context.getColorByAttr(tintRole.colorAttr))
+    resolvedDrawable.mutate().also { tintedDrawable ->
+      tintedDrawable.setTint(context.getColorByAttr(tintRole.colorAttr))
     }
   } ?: resolvedDrawable
 }
@@ -105,7 +102,7 @@ internal fun ImageView.loadStatisticIcon(
   icon.drawable?.let { drawable ->
     setPadding(0, 0, 0, 0)
     setImageResource(drawable.drawableRes)
-    ImageViewCompat.setImageTintList(this, tint)
+    this.imageTintList = tint
     return
   }
   val imageData = icon.localPath?.let(::File)
@@ -113,7 +110,7 @@ internal fun ImageView.loadStatisticIcon(
     ?: return
   val remoteIconInset = REMOTE_ICON_INSET_DP.dp
   setPadding(remoteIconInset, remoteIconInset, remoteIconInset, remoteIconInset)
-  ImageViewCompat.setImageTintList(this, tint)
+  this.imageTintList = tint
   load(imageData) {
     crossfade(false)
     fallback(R.drawable.ic_chart)

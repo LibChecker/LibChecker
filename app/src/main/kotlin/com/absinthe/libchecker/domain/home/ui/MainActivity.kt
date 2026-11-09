@@ -24,7 +24,6 @@ import android.view.ViewTreeObserver
 import android.view.animation.PathInterpolator
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
-import androidx.appcompat.widget.TooltipCompat
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
@@ -930,7 +929,7 @@ class MainActivity :
       val id = navView.menu.getItem(index).itemId
       val tab = navView.findViewById<View>(id) ?: continue
       if (boundRecentVisitTabs.put(tab, Unit) != null) continue
-      TooltipCompat.setTooltipText(tab, null)
+      tab.tooltipText = null
       if (id == R.id.navigation_app_list || id == R.id.navigation_classify) {
         val libraries = id == R.id.navigation_classify
         tab.setOnLongClickListener {
@@ -1143,7 +1142,7 @@ class MainActivity :
       applyFloatingNavProgress(view, floatingNavProgress)
       windowInsets
     }
-    ViewCompat.requestApplyInsets(view)
+    view.requestApplyInsets()
   }
 
   private fun applyNavigationRailPadding(

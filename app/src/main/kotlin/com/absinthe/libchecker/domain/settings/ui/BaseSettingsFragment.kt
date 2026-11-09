@@ -429,7 +429,7 @@ abstract class BaseSettingsFragment :
     navigationLayoutChangeListener = listener
 
     doOnAttach {
-      ViewCompat.requestApplyInsets(it)
+      it.requestApplyInsets()
       updateBottomPadding()
     }
   }

@@ -12,7 +12,6 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.absinthe.libchecker.R
@@ -89,8 +88,7 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
           contentText?.let(::setContentText)
         }
         .setSmallIcon(R.drawable.ic_logo)
-        .setLargeIcon(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)?.toBitmap())
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setLargeIcon(context.getDrawable(R.mipmap.ic_launcher)?.toBitmap())
         .setContentIntent(pendingIntent)
         .setAutoCancel(true)
         .build()
@@ -101,7 +99,7 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
       context: Context,
       contentText: String?
     ) {
-      val notificationManager = NotificationManagerCompat.from(context)
+      val notificationManager = context.getSystemService(NotificationManager::class.java)
       ensureInstallSuccessNotificationChannel(context, notificationManager)
       if (!canPostNotifications(context, notificationManager)) {
         return
@@ -117,12 +115,8 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
 
     private fun ensureInstallSuccessNotificationChannel(
       context: Context,
-      notificationManager: NotificationManagerCompat
+      notificationManager: NotificationManager
     ) {
-      if (!OsUtils.atLeastO()) {
-        return
-      }
-
       val channel = NotificationChannel(
         APP_UPDATE_CHANNEL_ID,
         context.getString(R.string.settings_get_updates),
@@ -133,7 +127,7 @@ class AppUpdateInstallResultReceiver : BroadcastReceiver() {
 
     private fun canPostNotifications(
       context: Context,
-      notificationManager: NotificationManagerCompat
+      notificationManager: NotificationManager
     ): Boolean {
       val permissionGranted = !OsUtils.atLeastT() ||
         ContextCompat.checkSelfPermission(

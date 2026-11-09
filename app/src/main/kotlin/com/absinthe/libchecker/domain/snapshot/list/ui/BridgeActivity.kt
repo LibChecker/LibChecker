@@ -3,7 +3,6 @@ package com.absinthe.libchecker.domain.snapshot.list.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.LCUris
 import com.absinthe.libchecker.services.ACTION_SHOOT_AND_STOP_AUTO
@@ -27,8 +26,7 @@ class BridgeActivity : Activity() {
         if (authority == GlobalValues.generateAuthKey()) {
           val dropPrevious = uri.getQueryParameter(LCUris.Bridge.PARAM_DROP_PREVIOUS)?.toBoolean() == true
 
-          ContextCompat.startForegroundService(
-            this,
+          this.startForegroundService(
             Intent(this, ShootService::class.java).also {
               it.action = ACTION_SHOOT_AND_STOP_AUTO
               it.putExtra(EXTRA_DROP_PREVIOUS, dropPrevious)

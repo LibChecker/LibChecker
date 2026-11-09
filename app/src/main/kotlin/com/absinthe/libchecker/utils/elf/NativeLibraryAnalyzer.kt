@@ -33,7 +33,6 @@ import com.absinthe.libchecker.constant.Constants.X86
 import com.absinthe.libchecker.constant.Constants.X86_64
 import com.absinthe.libchecker.constant.Constants.X86_64_STRING
 import com.absinthe.libchecker.constant.Constants.X86_STRING
-import com.absinthe.libchecker.constant.GlobalFeatures
 import com.absinthe.libchecker.domain.app.detail.model.LibStringItem
 import com.absinthe.libchecker.utils.FileUtils
 import com.absinthe.libchecker.utils.PackageUtils
@@ -733,7 +732,6 @@ object NativeLibraryAnalyzer {
    *
    */
   fun PackageInfo.is16KBAligned(libs: List<LibStringItem>? = null, isApk: Boolean = false): Boolean {
-    if (GlobalFeatures.ENABLE_DETECTING_16KB_PAGE_ALIGNMENT.not()) return false
     val sourceDir = applicationInfo?.sourceDir ?: return false
 
     val file = File(sourceDir)

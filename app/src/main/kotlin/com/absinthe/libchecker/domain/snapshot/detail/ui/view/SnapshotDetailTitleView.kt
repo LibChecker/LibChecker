@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.inSpans
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -210,7 +209,7 @@ internal fun buildSnapshotDetailCountText(
         if (count.diffType == MOVED) {
           val icon = requireNotNull(count.status.iconRes.getDrawable(context)).mutate().also {
             it.setBounds(0, 0, COUNT_ICON_SIZE, COUNT_ICON_SIZE)
-            DrawableCompat.setTint(it, count.status.colorRes.getColor(context))
+            it.setTint(count.status.colorRes.getColor(context))
           }
           inSpans(VerticallyCenteredDrawableSpan(icon, COUNT_ICON_END_GAP)) {
             append(OBJECT_REPLACEMENT_CHARACTER)

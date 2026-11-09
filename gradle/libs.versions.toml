@@ -1,6 +1,7 @@
 [versions]
 agp = "9.5.1"
 aboutlibraries = "14.2.1"
+androidX-annotation = "1.11.0"
 androidX-lifecycle = "2.11.0"
 androidX-room3 = "3.0.3"
 androidX-benchmark = "1.5.0"
@@ -46,13 +47,15 @@ koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-android = { module = "io.insert-koin:koin-android" }
 
 androidX-activity = "androidx.activity:activity-ktx:1.13.0"
-androidX-annotation = "androidx.annotation:annotation:1.11.0"
+androidX-annotation = { module = "androidx.annotation:annotation", version.ref = "androidX-annotation" }
+androidX-annotation-jvm = { module = "androidx.annotation:annotation-jvm", version.ref = "androidX-annotation" }
 androidX-appfunctions = { module = "androidx.appfunctions:appfunctions", version.ref = "androidX-appfunctions" }
 androidX-appfunctions-compiler = { module = "androidx.appfunctions:appfunctions-compiler", version.ref = "androidX-appfunctions" }
 androidX-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidX-benchmark" }
 androidX-browser = "androidx.browser:browser:1.10.0"
 androidX-collection = { module = "androidx.collection:collection", version.ref = "androidX-collection" }
 androidX-constraintLayout = "androidx.constraintlayout:constraintlayout:2.2.2"
+androidX-coordinatorLayout = "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
 androidX-core = "androidx.core:core-ktx:1.19.1"
 androidX-fragment = "androidx.fragment:fragment-ktx:1.9.1"
 androidX-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "androidX-lifecycle" }
@@ -75,6 +78,7 @@ square-retrofit-moshi = { module = "com.squareup.retrofit2:converter-moshi", ver
 
 google-dexlib2 = "com.android.tools.smali:smali-dexlib2:3.0.10"
 google-material = "com.google.android.material:material:1.14.0"
+google-playServices-basement = "com.google.android.gms:play-services-basement:18.9.0"
 google-protobuf-javaLite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protoc" }
 google-protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protoc" }
 

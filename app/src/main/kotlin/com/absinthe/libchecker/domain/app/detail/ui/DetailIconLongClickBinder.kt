@@ -35,10 +35,6 @@ fun ImageView.setDetailIconLongClick(applicationInfo: ApplicationInfo?, blurView
     post(ProgressiveBlurShaderCache::prewarm)
   }
   setOnLongClickListener {
-    if (!OsUtils.atLeastO()) {
-      copyToClipboard()
-      return@setOnLongClickListener true
-    }
     val adaptiveIcon = applicationInfo?.loadIcon(context.packageManager) as? AdaptiveIconDrawable
     if (adaptiveIcon == null) {
       copyToClipboard()
@@ -49,7 +45,6 @@ fun ImageView.setDetailIconLongClick(applicationInfo: ApplicationInfo?, blurView
   }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 private fun ImageView.showAdaptiveIconLayerOverlay(icon: AdaptiveIconDrawable, blurView: View) {
   val activity = context.findActivity()
   if (activity == null || !icon.hasCompleteLayers()) {
@@ -59,7 +54,6 @@ private fun ImageView.showAdaptiveIconLayerOverlay(icon: AdaptiveIconDrawable, b
   AdaptiveIconLayerOverlay(activity, icon, this, blurView).show()
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 internal fun AdaptiveIconDrawable.hasCompleteLayers(): Boolean {
   return background != null && foreground != null
 }
@@ -72,7 +66,6 @@ private tailrec fun Context.findActivity(): Activity? {
   }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 private class AdaptiveIconLayerOverlay(
   private val activity: Activity,
   private val icon: AdaptiveIconDrawable,

@@ -435,9 +435,7 @@ class RecentVisitsInstrumentedTest {
         val nav = activity.findViewById<NavigationBarView>(R.id.nav_view)
         selectedItemId = nav.selectedItemId
         for (index in 0 until nav.menu.size()) {
-          if (OsUtils.atLeastO()) {
-            assertNull(nav.findViewById<View>(nav.menu.getItem(index).itemId).tooltipText)
-          }
+          assertNull(nav.findViewById<View>(nav.menu.getItem(index).itemId).tooltipText)
         }
         assertTrue(activity.findViewById<View>(R.id.navigation_classify).performLongClick())
         popup = activity.popup()

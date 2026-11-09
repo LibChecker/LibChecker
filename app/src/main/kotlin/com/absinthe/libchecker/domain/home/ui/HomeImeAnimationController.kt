@@ -82,7 +82,7 @@ internal class HomeImeAnimationController(
       }
       insets
     }
-    ViewCompat.requestApplyInsets(root)
+    root.requestApplyInsets()
   }
 
   fun registerList(view: View, owner: LifecycleOwner) {
@@ -106,7 +106,7 @@ internal class HomeImeAnimationController(
       currentInsets?.let { updateList(view, it) }
     }
     currentInsets?.let { updateList(view, it) }
-    ViewCompat.requestApplyInsets(view)
+    view.requestApplyInsets()
   }
 
   fun observe(owner: LifecycleOwner, frame: (WindowInsetsCompat) -> Unit, end: () -> Unit) {

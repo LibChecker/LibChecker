@@ -37,7 +37,7 @@ class StaticLibItemView(context: Context) : RuleChipItemView(context) {
       setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
       if (OsUtils.atLeastQ()) {
         breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
-      } else if (OsUtils.atLeastO()) {
+      } else {
         // noinspection WrongConstant
         breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
       }

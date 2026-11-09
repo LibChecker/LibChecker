@@ -8,7 +8,6 @@ import android.graphics.Shader
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -395,16 +394,8 @@ class IconCarouselView @JvmOverloads constructor(
 }
 
 private fun createTileBackground(context: Context, tileColor: Int): Drawable {
-  return if (OsUtils.atLeastO()) {
-    AdaptiveIconDrawable(
-      ColorDrawable(tileColor),
-      ColorDrawable(Color.TRANSPARENT)
-    )
-  } else {
-    GradientDrawable().apply {
-      shape = GradientDrawable.RECTANGLE
-      cornerRadius = context.dpToDimension(14)
-      setColor(tileColor)
-    }
-  }
+  return AdaptiveIconDrawable(
+    ColorDrawable(tileColor),
+    ColorDrawable(Color.TRANSPARENT)
+  )
 }
