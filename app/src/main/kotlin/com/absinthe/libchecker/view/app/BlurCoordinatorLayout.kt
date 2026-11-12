@@ -87,7 +87,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private val surfaceColor by lazy(LazyThreadSafetyMode.NONE) {
     resolveThemeColor(androidx.appcompat.R.attr.colorBackgroundFloating) ?: contentBackgroundColor
   }
-  private val floatingSurfaceColor by lazy(LazyThreadSafetyMode.NONE) {
+  private val blurSurfaceColor by lazy(LazyThreadSafetyMode.NONE) {
     resolveThemeColor(com.google.android.material.R.attr.colorSurfaceContainer) ?: surfaceColor
   }
   private val isNightMode by lazy(LazyThreadSafetyMode.NONE) {
@@ -490,13 +490,14 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         drawRenderNode(effectNode)
       }
       drawAppbarSurfaceTint(this, top, bottom)
-      drawAppbarDarkMask(this, top, bottom)
+      // Avoid pushing dark surfaces toward near-black with a second black overlay.
+      if (!isNightMode) drawAppbarDarkMask(this, top, bottom)
     }
   }
 
   private fun drawAppbarSurfaceTint(canvas: Canvas, top: Float, bottom: Float) {
     if (bottom <= top || appbarMaskProgress <= 0f) return
-    val tintColor = if (isNightMode) Color.BLACK else surfaceColor
+    val tintColor = if (isNightMode) blurSurfaceColor else surfaceColor
     val paint = appbarTintPaint ?: Paint(Paint.ANTI_ALIAS_FLAG).also { appbarTintPaint = it }
     if (
       appbarTintTop != top ||
@@ -727,7 +728,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     paint.shader = null
     paint.blendMode = BlendMode.SRC_OVER
     paint.color = if (isNightMode) {
-      darkNavigationTintColor(floatingSurfaceColor, floatingNavProgress)
+      darkNavigationTintColor(blurSurfaceColor, floatingNavProgress)
     } else {
       (surfaceColor and 0x00FFFFFF) or (NAV_TINT_ALPHA shl 24)
     }
@@ -891,7 +892,7 @@ internal fun blurBackgroundAlpha(progress: Float): Int = ((1f - progress.coerceI
 internal fun fadingNavDividerAlpha(baseAlpha: Int, floatingProgress: Float): Int = (baseAlpha.coerceIn(0, 255) * (1f - floatingProgress.coerceIn(0f, 1f))).roundToInt()
 
 internal fun darkNavigationTintColor(surfaceColor: Int, floatingProgress: Float): Int = ColorUtils.blendARGB(
-  0xCC000000.toInt(),
+  (surfaceColor and 0x00FFFFFF) or 0xCC000000.toInt(),
   (surfaceColor and 0x00FFFFFF) or 0x8C000000.toInt(),
   floatingProgress.coerceIn(0f, 1f)
 )

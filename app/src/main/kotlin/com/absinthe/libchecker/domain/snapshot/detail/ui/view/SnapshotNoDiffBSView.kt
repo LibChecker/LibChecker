@@ -49,28 +49,22 @@ class SnapshotNoDiffBSView(context: Context) : BottomSheetScaffoldView(context) 
         (it.parent as ViewGroup).removeView(it)
       }
     }
-    when (mode) {
-      SnapshotNoDiffMode.New -> {
-        stubView = SnapshotPackageChangeView(context, R.drawable.ic_yes, R.string.snapshot_detail_new_install_title).apply {
-          layoutParams =
-            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        }
-      }
+    stubView = when (mode) {
+      SnapshotNoDiffMode.New -> SnapshotPackageChangeView(
+        context,
+        R.drawable.ic_yes,
+        R.string.snapshot_detail_new_install_title
+      )
 
-      SnapshotNoDiffMode.Deleted -> {
-        stubView = SnapshotPackageChangeView(context, R.drawable.ic_no, R.string.snapshot_detail_deleted_title).apply {
-          layoutParams =
-            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        }
-      }
+      SnapshotNoDiffMode.Deleted -> SnapshotPackageChangeView(
+        context,
+        R.drawable.ic_no,
+        R.string.snapshot_detail_deleted_title
+      )
 
-      SnapshotNoDiffMode.NothingChanged -> {
-        stubView = SnapshotEmptyView(context).apply {
-          layoutParams =
-            LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        }
-      }
-    }
-    stubView?.let(::addView)
+      SnapshotNoDiffMode.NothingChanged -> SnapshotEmptyView(context)
+    }.apply {
+      layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+    }.also(::addView)
   }
 }

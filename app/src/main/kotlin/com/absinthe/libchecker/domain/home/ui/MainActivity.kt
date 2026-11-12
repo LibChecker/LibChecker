@@ -4,9 +4,7 @@ import android.animation.ValueAnimator
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.graphics.Outline
 import android.graphics.Path
 import android.graphics.PointF
@@ -103,7 +101,6 @@ import timber.log.Timber
 private const val PAGE_EXIT_DURATION = 90L
 private const val PAGE_ENTER_DURATION = 160L
 private const val PAGE_TRANSITION_OFFSET_DP = 20f
-private const val SDR_HDR_HEADROOM = 1f
 private val PAGE_EXIT_INTERPOLATOR = PathInterpolator(0.4f, 0f, 1f, 1f)
 private val PAGE_ENTER_INTERPOLATOR = PathInterpolator(0f, 0f, 0.2f, 1f)
 
@@ -163,11 +160,7 @@ class MainActivity :
   private var floatingNavEnabled = GlobalValues.isFloatingNavBar
   private var systemBarBottomInset: Int = 0
   private var originalLabelVisibilityMode: Int = NavigationBarView.LABEL_VISIBILITY_AUTO
-  private val toolbarTitleView by lazy {
-    HomeToolbarTitleView(this).apply {
-      setHdrHeadroomChangedListener(::updateWindowHdrHeadroom)
-    }
-  }
+  private val toolbarTitleView by lazy { HomeToolbarTitleView(this) }
   private lateinit var toolbarTitleState: HomeToolbarTitleState
   private val workerServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
@@ -184,7 +177,6 @@ class MainActivity :
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    configureHdrWindow()
 
     if (intent.getBooleanExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, false)) {
       Timber.w("Reinitializing updated rule database")
@@ -345,13 +337,11 @@ class MainActivity :
           val density = resources.displayMetrics.density
           navView.elevation = (3f - 2f * floatingNavProgress) * density
         }
-        updateToolbarHdrHighlight(contentUnderlaps, animate = false)
         finishLayoutTransition(false)
       }
       return
     }
     container?.setBlurEnabled(enabled)
-    updateToolbarHdrHighlight(contentUnderlaps, animate = enabled)
     finishLayoutTransition(container?.blurEnabled == true)
   }
 
@@ -611,23 +601,6 @@ class MainActivity :
     if (blurContainer?.blurEnabled != true) {
       binding.appbar.isLifted = contentUnderlaps
     }
-    updateToolbarHdrHighlight(contentUnderlaps)
-  }
-
-  private fun updateToolbarHdrHighlight(
-    contentUnderlaps: Boolean,
-    animate: Boolean = true
-  ) {
-    toolbarTitleView.setHdrHighlightEnabled(
-      enabled = shouldEnableToolbarHdrHighlight(
-        blurEnabled = blurContainer?.blurEnabled == true,
-        contentUnderlaps = contentUnderlaps,
-        darkModeEnabled = resources.configuration.uiMode and
-          Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES,
-        pageTransitionRunning = isPageTransitionRunning
-      ),
-      animate = animate
-    )
   }
 
   private fun captureAppbarScrollAnchor(): RecyclerViewScreenAnchor? {
@@ -1099,28 +1072,6 @@ class MainActivity :
   }
 
   /**
-   * Opt the window into HDR while starting at SDR headroom. The title's
-   * transition updates the requested headroom only while its HDR highlight is
-   * active, so an otherwise SDR page does not keep an HDR layer alive.
-   * `Window.setDesiredHdrHeadroom` only exists on API 35+, so below that the
-   * title falls back to plain SDR rendering.
-   */
-  private fun configureHdrWindow() {
-    if (!OsUtils.atLeastV()) {
-      return
-    }
-    window.colorMode = ActivityInfo.COLOR_MODE_HDR
-    window.desiredHdrHeadroom = SDR_HDR_HEADROOM
-  }
-
-  private fun updateWindowHdrHeadroom(headroom: Float) {
-    if (!OsUtils.atLeastV()) {
-      return
-    }
-    window.desiredHdrHeadroom = headroom
-  }
-
-  /**
    * 覆盖掉 BottomNavigationView 内部的 OnApplyWindowInsetsListener 并避免其被软键盘顶起来
    * @see BottomNavigationView.applyWindowInsets
    */
@@ -1317,13 +1268,6 @@ internal fun resolveHomeListAppbarInset(
 internal fun isListItemUnderAppbar(appbarBottom: Int, firstListItemTop: Int?): Boolean {
   return appbarBottom > 0 && firstListItemTop != null && firstListItemTop < appbarBottom
 }
-
-internal fun shouldEnableToolbarHdrHighlight(
-  blurEnabled: Boolean,
-  contentUnderlaps: Boolean,
-  darkModeEnabled: Boolean,
-  pageTransitionRunning: Boolean = false
-): Boolean = blurEnabled && contentUnderlaps && darkModeEnabled && !pageTransitionRunning
 
 internal fun recyclerAnchorScrollCorrection(
   previousScreenTop: Int,
