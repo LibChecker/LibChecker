@@ -5,6 +5,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isGone
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import com.absinthe.libchecker.domain.home.model.HomeToolbarTitleState
@@ -21,7 +22,7 @@ class HomeToolbarTitleView @JvmOverloads constructor(
 
   private val loadingGap = 6.dp
 
-  private val titleView = HdrTitleHighlightView(context).apply {
+  private val titleView = AppCompatTextView(context).apply {
     layoutParams = LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT
@@ -60,14 +61,6 @@ class HomeToolbarTitleView @JvmOverloads constructor(
       renderLoading(state.isLoading)
     }
     renderedState = state
-  }
-
-  fun setHdrHighlightEnabled(enabled: Boolean, animate: Boolean = true) {
-    titleView.setHdrHighlightEnabled(enabled, animate)
-  }
-
-  fun setHdrHeadroomChangedListener(listener: ((Float) -> Unit)?) {
-    titleView.setHdrHeadroomChangedListener(listener)
   }
 
   private fun renderLoading(loading: Boolean) {

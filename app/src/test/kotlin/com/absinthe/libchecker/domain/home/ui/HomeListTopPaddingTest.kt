@@ -54,63 +54,6 @@ class HomeListTopPaddingTest {
   }
 
   @Test
-  fun hdrRequiresEveryRenderingPrerequisite() {
-    assertEquals(
-      false,
-      shouldEnableToolbarHdrHighlight(
-        blurEnabled = false,
-        contentUnderlaps = false,
-        darkModeEnabled = true
-      )
-    )
-    assertEquals(
-      false,
-      shouldEnableToolbarHdrHighlight(
-        blurEnabled = false,
-        contentUnderlaps = true,
-        darkModeEnabled = true
-      )
-    )
-    assertEquals(
-      false,
-      shouldEnableToolbarHdrHighlight(
-        blurEnabled = true,
-        contentUnderlaps = false,
-        darkModeEnabled = true
-      )
-    )
-    assertEquals(
-      true,
-      shouldEnableToolbarHdrHighlight(
-        blurEnabled = true,
-        contentUnderlaps = true,
-        darkModeEnabled = true
-      )
-    )
-    assertEquals(
-      false,
-      shouldEnableToolbarHdrHighlight(
-        blurEnabled = true,
-        contentUnderlaps = true,
-        darkModeEnabled = false
-      )
-    )
-  }
-
-  @Test
-  fun hdrStaysDisabledWhileSwitchingHomePages() {
-    assertEquals(
-      false,
-      shouldEnableToolbarHdrHighlight(
-        blurEnabled = true,
-        contentUnderlaps = true,
-        darkModeEnabled = true,
-        pageTransitionRunning = true
-      )
-    )
-  }
-
-  @Test
   fun blurToggleKeepsTheVisibleListAnchorAtTheSameScreenPosition() {
     assertEquals(
       320,

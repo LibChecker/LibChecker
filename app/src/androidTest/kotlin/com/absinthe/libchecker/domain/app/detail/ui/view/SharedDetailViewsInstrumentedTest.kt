@@ -3,6 +3,7 @@ package com.absinthe.libchecker.domain.app.detail.ui.view
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.view.children
@@ -18,6 +19,7 @@ import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitleDisplay
 import com.absinthe.libchecker.domain.snapshot.detail.model.SnapshotTitlePackageSizeData
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffMode
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.SnapshotNoDiffRenderState
+import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotEmptyView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotNoDiffBSView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotPackageChangeView
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTitleView
@@ -59,6 +61,14 @@ class SharedDetailViewsInstrumentedTest {
         assertEquals(text.bottom + state.paddingBottom, state.height)
       }
     }
+    sheet.render(SnapshotNoDiffRenderState(title, SnapshotNoDiffMode.NothingChanged))
+    sheet.measureAndLayout()
+    val empty = sheet.children.filterIsInstance<SnapshotEmptyView>().single()
+    val content = empty.getChildAt(0) as LinearLayout
+    val emptyImage = content.getChildAt(0)
+    assertEquals(sheet.width - sheet.paddingStart - sheet.paddingEnd, empty.width)
+    assertEquals(sheet.width / 2f, empty.left + content.left + emptyImage.left + emptyImage.width / 2f, 0.5f)
+    assertEquals(sheet.width / 2f, empty.left + content.left + empty.text.left + empty.text.width / 2f, 0.5f)
   }
 
   @Test
