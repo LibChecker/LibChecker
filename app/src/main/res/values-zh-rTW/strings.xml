@@ -137,7 +137,7 @@
   <string name="export_apps_webui_tip">匯出的應用程式可在 WebUI 上檢視</string>
   <string name="export_apps_start">開始</string>
   <string name="export_apps_success">已匯出 %1$d 個應用程式</string>
-  <string name="export_apps_failed">匯出應用程式失敗：%1$s</string>
+  <string name="export_apps_failed">無法匯出應用程式：%1$s</string>
   <string name="help_docs_summary">學習如何使用 LibChecker</string>
   <string name="join_telegram_group_summary">一起來閒聊</string>
   <string name="anonymous_statistics_summary">我們使用 Google Firebase 來匿名傳送最常被人們使用的標示庫和一些使用習慣資料以使得 LibChecker 變得更加實用</string>
@@ -264,7 +264,7 @@
   <string name="feature_live_update_notification_summary">系統會推廣即時更新通知。推廣的通知會在系統介面上更顯眼地顯示，包括顯示於通知抽屜頂端和鎖定畫面，並以狀態列中的晶片形式呈現。</string>
   <!--  Toast  -->
   <string name="toast_copied_to_clipboard">已複製到剪貼簿</string>
-  <string name="snapshot_report_share_failed">分享快照報告失敗</string>
+  <string name="snapshot_report_share_failed">無法分享快照報告</string>
   <string name="toast_use_another_file_manager">請使用其它檔案管理員開啟此 APK</string>
   <string name="toast_document_picker_unavailable">找不到系統檔案選擇器，請啟用文件提供者後再試一次。</string>
   <string name="toast_cant_open_app">無法啟動此應用程式</string>
@@ -274,7 +274,7 @@
   <string name="toast_app_update_installed">更新完成</string>
   <string name="toast_app_update_unsupported">此裝置不支援應用程式內更新</string>
   <string name="toast_app_update_pending_user_action">此裝置需要確認後才能安裝更新</string>
-  <string name="toast_app_update_failed">更新失敗：%s</string>
+  <string name="toast_app_update_failed">無法更新：%s</string>
   <string name="toast_long_tap_share_button_tip">長按「分享」按鈕選擇存檔位置</string>
   <!--  Snapshot  -->
   <string name="snapshot_btn_save_current">儲存目前快照</string>
@@ -289,7 +289,7 @@
   <string name="snapshot_detail_size_label">大小</string>
   <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
   <plurals name="snapshot_detail_changes_count">
-    <item quantity="other">%d 項變更</item>
+    <item quantity="other">%d 項變動</item>
   </plurals>
   <string name="snapshot_empty_list_title">沒有元件變更</string>
   <string name="snapshot_no_snapshot">沒有快照</string>
