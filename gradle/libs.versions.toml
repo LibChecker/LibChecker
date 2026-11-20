@@ -1,5 +1,5 @@
 [versions]
-agp = "9.5.1"
+agp = "9.5.2"
 aboutlibraries = "14.2.1"
 androidX-annotation = "1.11.0"
 androidX-lifecycle = "2.11.0"
