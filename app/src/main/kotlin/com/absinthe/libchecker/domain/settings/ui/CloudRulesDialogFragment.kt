@@ -1,12 +1,13 @@
 package com.absinthe.libchecker.domain.settings.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.absinthe.libchecker.R
-import com.absinthe.libchecker.app.SystemServices
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.rules.CloudRulesVersionInfo
 import com.absinthe.libchecker.domain.settings.model.CloudRulesDialogAction
@@ -87,31 +88,16 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
     val remoteVersion = versionInfo?.remoteVersion ?: return showUpdateErrorToast()
     downloading = true
     val downloadRequest = viewModel.getCloudRulesDownloadRequest()
+    val appContext = requireContext().applicationContext
+    val mainExecutor = ContextCompat.getMainExecutor(appContext)
     DownloadUtils.download(
       downloadRequest.url,
       downloadRequest.destination,
       object : DownloadUtils.OnDownloadListener {
         override fun onDownloadSuccess() {
           if (viewModel.installDownloadedCloudRules(downloadRequest, remoteVersion)) {
-            lifecycleScope.launch {
-              root.bind(
-                CloudRulesDialogState.Content(
-                  localVersion = remoteVersion,
-                  remoteVersion = remoteVersion,
-                  updateAvailable = false
-                ),
-                ::handleAction
-              )
-              runCatching {
-                context?.let {
-                  val intent = SystemServices.packageManager.getLaunchIntentForPackage(
-                    it.packageName
-                  )!!.apply {
-                    putExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, true)
-                  }
-                  ProcessPhoenix.triggerRebirth(it, intent)
-                }
-              }
+            mainExecutor.execute {
+              onRulesInstalled(appContext, remoteVersion)
             }
           } else {
             showUpdateErrorToast()
@@ -125,9 +111,25 @@ class CloudRulesDialogFragment : BaseBottomSheetViewDialogFragment<CloudRulesDia
     )
   }
 
+  internal fun onRulesInstalled(appContext: Context, remoteVersion: Int) {
+    (view as? CloudRulesDialogView)?.bind(
+      CloudRulesDialogState.Content(
+        localVersion = remoteVersion,
+        remoteVersion = remoteVersion,
+        updateAvailable = false
+      ),
+      ::handleAction
+    )
+    val intent = appContext.packageManager.getLaunchIntentForPackage(appContext.packageName)
+    if (intent != null) {
+      intent.putExtra(Constants.PP_FROM_CLOUD_RULES_UPDATE, true)
+      runCatching { ProcessPhoenix.triggerRebirth(appContext, intent) }.onFailure { Timber.w(it) }
+    }
+  }
+
   private fun showUpdateErrorToast() {
-    downloading = false
     lifecycleScope.launch {
+      downloading = false
       context?.showToast(R.string.toast_cloud_rules_update_error)
     }
   }
