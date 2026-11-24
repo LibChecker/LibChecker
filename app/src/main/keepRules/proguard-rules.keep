@@ -56,3 +56,15 @@
 -keepclassmembers class androidx.appcompat.widget.Toolbar {
     java.util.ArrayList mHiddenViews;
 }
+
+# Android 8.1 finalizes Path via its native handle. Keep these writes so R8
+# retains the Path constructors alongside their allocations (#2275).
+-keepclassmembers,allowobfuscation class com.github.mikephil.charting.renderer.XAxisRenderer {
+    android.graphics.Path limitLinePath;
+}
+-keepclassmembers,allowobfuscation class com.github.mikephil.charting.renderer.YAxisRenderer {
+    android.graphics.Path drawZeroLinePath;
+}
+-keepclassmembers,allowobfuscation class com.github.mikephil.charting.renderer.YAxisRendererHorizontalBarChart {
+    android.graphics.Path drawZeroLinePathBuffer;
+}
