@@ -158,10 +158,7 @@ abstract class BaseListControllerFragment<T : ViewBinding> :
   protected fun createListScreenLayoutManager(configuration: Configuration): RecyclerView.LayoutManager {
     return when (configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(requireContext())
-
-      Configuration.ORIENTATION_LANDSCAPE ->
-        StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-
+      Configuration.ORIENTATION_LANDSCAPE -> LandscapeListLayoutManager()
       else -> error("Wrong orientation at ${javaClass.simpleName}.")
     }
   }
