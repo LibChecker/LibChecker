@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewbinding.ViewBinding
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.isComponentType
 import com.absinthe.libchecker.domain.app.detail.action.DetailItemDialogRequest
@@ -393,6 +394,9 @@ abstract class BaseDetailFragment<T : ViewBinding> : BaseFragment<T>() {
 
   private fun openLibDetailDialog(position: Int) {
     if (position < 0 || position >= adapter.itemCount) {
+      return
+    }
+    if (type == METADATA && adapter.getItem(position).rule == null) {
       return
     }
     when (val request = viewModel.buildDetailItemDialogRequest(adapter.getItem(position), type)) {

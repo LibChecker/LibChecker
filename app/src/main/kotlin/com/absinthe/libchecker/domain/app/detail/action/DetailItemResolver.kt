@@ -9,6 +9,7 @@ import com.absinthe.libchecker.annotation.ACTION
 import com.absinthe.libchecker.annotation.ACTIVITY
 import com.absinthe.libchecker.annotation.DEX
 import com.absinthe.libchecker.annotation.LibType
+import com.absinthe.libchecker.annotation.METADATA
 import com.absinthe.libchecker.annotation.NATIVE
 import com.absinthe.libchecker.annotation.PROVIDER
 import com.absinthe.libchecker.annotation.RECEIVER
@@ -146,6 +147,7 @@ class DetailItemResolver(
       DEX -> "dex-libs"
       STATIC -> "static-libs"
       ACTION -> "actions-libs"
+      METADATA -> "metadata-libs"
       else -> throw IllegalArgumentException("Illegal LibType: $this.")
     }
     if (isRegex) {
