@@ -1,12 +1,12 @@
 [versions]
-agp = "9.5.1"
+agp = "9.5.2"
 aboutlibraries = "14.2.1"
 androidX-annotation = "1.11.0"
-androidX-lifecycle = "2.11.0"
+androidX-lifecycle = "2.11.1"
 androidX-room3 = "3.0.3"
 androidX-benchmark = "1.5.0"
 androidX-collection = "1.7.0"
-androidX-appfunctions = "1.0.0-rc01"
+androidX-appfunctions = "1.0.0"
 appIconLoader = "1.5.0"
 coil = "2.7.0"
 firebase-bom = "35.2.0"
@@ -16,7 +16,7 @@ ktlint = "1.8.0"
 koin-bom = "4.2.2"
 protoc = "4.36.2"
 shizuku = "13.1.5"
-spotless = "8.11.0"
+spotless = "8.12.0"
 square-retrofit = "3.0.0"
 zhaobozhen = "1.1.8"
 
@@ -28,7 +28,7 @@ firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.
 gms = { id = "com.google.gms.google-services", version = "4.6.0" }
 hiddenApiRefine = { id = "dev.rikka.tools.refine", version.ref = "hiddenApiRefine" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "2.3.13" }
+ksp = { id = "com.google.devtools.ksp", version = "2.3.14" }
 androidX-room3 = { id = "androidx.room3", version.ref = "androidX-room3" }
 protobuf = { id = "com.google.protobuf", version = "0.10.1" }
 moshiX = "dev.zacsweers.moshix:0.38.0"
@@ -36,7 +36,7 @@ aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin.android", version.re
 
 [libraries]
 gradlePlugin-android = { module = "com.android.tools.build:gradle", version.ref = "agp" }
-gradlePlugin-aapt2Proto = "com.android.tools.build:aapt2-proto:9.5.1-16666295"
+gradlePlugin-aapt2Proto = "com.android.tools.build:aapt2-proto:9.5.2-16666295"
 gradlePlugin-protobuf = "com.google.protobuf:protobuf-java:4.36.2"
 gradlePlugin-kotlin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 gradlePlugin-spotless = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
