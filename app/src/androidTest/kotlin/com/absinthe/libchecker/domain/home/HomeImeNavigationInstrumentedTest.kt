@@ -2,6 +2,7 @@ package com.absinthe.libchecker.domain.home
 
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.os.Looper
 import android.os.SystemClock
 import android.view.View
 import android.view.ViewGroup
@@ -22,9 +23,13 @@ import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.domain.home.ui.HomeImeAnimationController
 import com.absinthe.libchecker.domain.home.ui.MainActivity
+import com.absinthe.libchecker.utils.extensions.addBackStateHandler
+import com.absinthe.libchecker.utils.extensions.isKeyboardShowing
 import com.absinthe.libchecker.view.app.FloatingBottomNavigationView
 import com.absinthe.libchecker.view.app.InvalidatingHideBottomViewOnScrollBehavior
 import com.google.android.material.navigation.NavigationBarView
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -33,6 +38,24 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class HomeImeNavigationInstrumentedTest {
+  @Test
+  fun backStateReadsWindowOnMainThread() {
+    ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+      val mainThreadChecks = LinkedBlockingQueue<Boolean>()
+      scenario.onActivity { activity ->
+        activity.onBackPressedDispatcher.addBackStateHandler(
+          lifecycleOwner = activity,
+          enabledState = {
+            mainThreadChecks.offer(Looper.myLooper() == Looper.getMainLooper())
+            false
+          },
+          handler = {}
+        )
+      }
+      assertEquals(true, mainThreadChecks.poll(5, TimeUnit.SECONDS))
+    }
+  }
+
   @Test
   fun selectionAnimationFollowsResizedNavigationInBothLayoutDirections() {
     val instrumentation = InstrumentationRegistry.getInstrumentation()
@@ -208,6 +231,7 @@ class HomeImeNavigationInstrumentedTest {
             assertEquals(4, nav.menu.size())
             val position = IntArray(2)
             nav.getLocationOnScreen(position)
+            assertTrue("Search keyboard is visible", it.isKeyboardShowing())
             val root = it.window.decorView
             val imeBottom = ViewCompat.getRootWindowInsets(root)!!.getInsets(WindowInsetsCompat.Type.ime()).bottom
             assertTrue("Navigation remains above IME", position[1] + nav.height <= root.height - imeBottom + 2)
@@ -227,6 +251,7 @@ class HomeImeNavigationInstrumentedTest {
           scenario.onActivity {
             val nav = it.findViewById<FloatingBottomNavigationView>(R.id.nav_view)
             val pager = it.findViewById<androidx.viewpager2.widget.ViewPager2>(R.id.viewpager)
+            assertFalse("Search keyboard is hidden", it.isKeyboardShowing())
             pager.viewTreeObserver.removeOnPreDrawListener(animationObserver)
             assertTrue("Page and keyboard transitions must overlap", overlappingAnimations)
             assertEquals(normalWidth, nav.width)

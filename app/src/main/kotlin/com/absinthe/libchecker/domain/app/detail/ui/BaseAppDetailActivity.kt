@@ -248,7 +248,7 @@ abstract class BaseAppDetailActivity :
     }
     onBackPressedDispatcher.addBackStateHandler(
       lifecycleOwner = this,
-      enabledState = { !isKeyboardShowing() && menuController.hasExpandedActionView() },
+      enabledState = { menuController.hasExpandedActionView() && !isKeyboardShowing() },
       handler = { menuController.collapseActionView() }
     )
     stateObserverController.observe()

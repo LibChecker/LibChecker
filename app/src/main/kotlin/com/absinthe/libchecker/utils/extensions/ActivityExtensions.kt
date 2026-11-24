@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.WindowInsets
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -25,6 +26,7 @@ import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_LIST
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_NAME
 import com.absinthe.libchecker.domain.statistics.reference.ui.EXTRA_REF_TYPE
 import com.absinthe.libchecker.domain.statistics.reference.ui.LibReferenceActivity
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.Toasty
 import timber.log.Timber
 
@@ -95,7 +97,10 @@ fun Activity.launchLibReferencePage(
 }
 
 fun Activity.isKeyboardShowing(): Boolean {
-  val imeInsets = ViewCompat.getRootWindowInsets(window.decorView.rootView)
-    ?.getInsets(WindowInsetsCompat.Type.ime())
-  return (imeInsets?.bottom ?: 0) > 0
+  val decor = window.decorView
+  return if (OsUtils.atLeastR()) {
+    decor.rootWindowInsets?.isVisible(WindowInsets.Type.ime()) == true
+  } else {
+    ViewCompat.getRootWindowInsets(decor)?.isVisible(WindowInsetsCompat.Type.ime()) == true
+  }
 }

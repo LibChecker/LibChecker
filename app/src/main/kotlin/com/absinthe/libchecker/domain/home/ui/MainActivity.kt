@@ -879,7 +879,7 @@ class MainActivity :
 
     onBackPressedDispatcher.addBackStateHandler(
       lifecycleOwner = this,
-      enabledState = { !isKeyboardShowing() && binding.toolbar.hasExpandedActionView() },
+      enabledState = { binding.toolbar.hasExpandedActionView() && !isKeyboardShowing() },
       handler = { binding.toolbar.collapseActionView() }
     )
     // Apply floating nav bar config before blur design replaces the background with transparency.
