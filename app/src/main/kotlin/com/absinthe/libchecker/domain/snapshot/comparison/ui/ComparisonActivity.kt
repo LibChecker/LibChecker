@@ -22,7 +22,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
@@ -46,6 +45,7 @@ import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDi
 import com.absinthe.libchecker.ui.adapter.addSpacingDecoration
 import com.absinthe.libchecker.ui.base.BaseActivity
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
+import com.absinthe.libchecker.ui.base.LandscapeListLayoutManager
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
@@ -410,12 +410,7 @@ class ComparisonActivity :
   private fun getSuitableLayoutManager(): RecyclerView.LayoutManager {
     return when (resources.configuration.orientation) {
       Configuration.ORIENTATION_PORTRAIT -> LinearLayoutManager(this)
-
-      Configuration.ORIENTATION_LANDSCAPE -> StaggeredGridLayoutManager(
-        2,
-        StaggeredGridLayoutManager.VERTICAL
-      )
-
+      Configuration.ORIENTATION_LANDSCAPE -> LandscapeListLayoutManager()
       else -> throw IllegalStateException("Wrong orientation at AppListFragment.")
     }
   }
