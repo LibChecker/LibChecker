@@ -10,6 +10,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageInfoHidden
 import android.content.pm.PackageItemInfo
 import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.provider.Settings
@@ -49,7 +50,8 @@ class DetailAppInfoResolver(
   private val ownPackageName: String,
   private val installedAppRepository: InstalledAppRepository,
   private val appListRepository: AppListRepository,
-  private val allowFileUriExposure: AllowFileUriExposureUseCase
+  private val allowFileUriExposure: AllowFileUriExposureUseCase,
+  private val queryActivities: (Intent, Int) -> List<ResolveInfo> = PackageManagerCompat::queryIntentActivities
 ) {
   private val packageManager = context.packageManager
 
@@ -124,7 +126,7 @@ class DetailAppInfoResolver(
     val intent = Intent(Intent.ACTION_MAIN)
       .addCategory(Intent.CATEGORY_LAUNCHER)
       .setPackage(packageName)
-    val launcherActivity = PackageManagerCompat.queryIntentActivities(intent, 0)
+    val launcherActivity = queryActivities(intent, 0)
       .firstOrNull()
       ?.activityInfo
       ?.name
@@ -198,10 +200,18 @@ class DetailAppInfoResolver(
     }.getOrDefault(name)
   }
 
+  private fun queryDefaultActivities(intent: Intent): List<ResolveInfo> {
+    return try {
+      queryActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+    } catch (_: SecurityException) {
+      // Some profiles restrict queries for otherwise visible activity handlers.
+      emptyList()
+    }
+  }
+
   private fun getShowAppInfoList(packageName: String): List<AppInfoActionItem> {
-    return PackageManagerCompat.queryIntentActivities(
-      Intent(Intent.ACTION_SHOW_APP_INFO),
-      PackageManager.MATCH_DEFAULT_ONLY
+    return queryDefaultActivities(
+      Intent(Intent.ACTION_SHOW_APP_INFO)
     ).filter { it.activityInfo.packageName != ownPackageName }
       .map {
         toActionItem(
@@ -222,11 +232,10 @@ class DetailAppInfoResolver(
     allowFileUriExposure()
     val sourcePath = runCatching { File(source) }.getOrNull() ?: return emptyList()
 
-    return PackageManagerCompat.queryIntentActivities(
+    return queryDefaultActivities(
       Intent(Intent.ACTION_VIEW).also {
         it.setDataAndType(sourcePath.toUri(), MIMETYPE_APK)
-      },
-      PackageManager.MATCH_DEFAULT_ONLY
+      }
     )
       .filter { isFileManager(it.activityInfo.packageName) }
       .map {
@@ -241,11 +250,10 @@ class DetailAppInfoResolver(
   }
 
   private fun getShowMarketList(packageName: String): List<AppInfoActionItem> {
-    return PackageManagerCompat.queryIntentActivities(
+    return queryDefaultActivities(
       Intent(Intent.ACTION_VIEW).also {
         it.data = "market://details?id=$packageName".toUri()
-      },
-      PackageManager.MATCH_DEFAULT_ONLY
+      }
     ).filter { it.activityInfo.packageName != ownPackageName }
       .map {
         toActionItem(
@@ -263,10 +271,7 @@ class DetailAppInfoResolver(
       setDataAndType("file:///".toUri(), "*/*")
       setPackage(packageName)
     }
-    val canHandleFiles = PackageManagerCompat.queryIntentActivities(
-      viewIntent,
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).any { it.activityInfo.packageName == packageName }
+    val canHandleFiles = queryDefaultActivities(viewIntent).any { it.activityInfo.packageName == packageName }
 
     val permissions = installedAppRepository.getPermissions(packageName)
     val hasStoragePermission = permissions.any {
@@ -279,18 +284,12 @@ class DetailAppInfoResolver(
       type = "*/*"
       setPackage(packageName)
     }
-    val canPickFiles = PackageManagerCompat.queryIntentActivities(
-      getContentIntent,
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).any { it.activityInfo.packageName == packageName }
+    val canPickFiles = queryDefaultActivities(getContentIntent).any { it.activityInfo.packageName == packageName }
 
     val openTreeIntent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
       setPackage(packageName)
     }
-    val canManageDirectories = PackageManagerCompat.queryIntentActivities(
-      openTreeIntent,
-      PackageManager.MATCH_DEFAULT_ONLY
-    ).any { it.activityInfo.packageName == packageName }
+    val canManageDirectories = queryDefaultActivities(openTreeIntent).any { it.activityInfo.packageName == packageName }
 
     return (canHandleFiles || canPickFiles || canManageDirectories) && hasStoragePermission
   }
@@ -337,7 +336,7 @@ class DetailAppInfoResolver(
       it.`package` = packageName
       it.addCategory(CATEGORY_XPOSED_SETTINGS)
     }
-    val resolveInfo = PackageManagerCompat.queryIntentActivities(intent, 0).firstOrNull()
+    val resolveInfo = queryActivities(intent, 0).firstOrNull()
       ?: return null
 
     return Intent(intent).also {
