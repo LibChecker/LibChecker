@@ -6,11 +6,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.flowWithLifecycle
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -27,7 +25,6 @@ inline fun OnBackPressedDispatcher.addBackStateHandler(
     }
   }
   this.addCallback(lifecycleOwner, backCallback)
-  // update callback enabled state every 1s in the background
   val expandStateFlow = flow {
     while (true) {
       emit(enabledState())
@@ -39,8 +36,6 @@ inline fun OnBackPressedDispatcher.addBackStateHandler(
     .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
     .distinctUntilChanged()
     .onEach { enabled -> backCallback.isEnabled = enabled }
-    .flowOn(Dispatchers.Default)
     .onEach { enabled -> Timber.d("BackStateHandler/enabled:$enabled") }
-    .flowOn(Dispatchers.Main)
     .launchIn(lifecycle.coroutineScope)
 }
