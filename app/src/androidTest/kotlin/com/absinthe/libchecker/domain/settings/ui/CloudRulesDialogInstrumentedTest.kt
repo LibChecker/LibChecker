@@ -1,5 +1,7 @@
 package com.absinthe.libchecker.domain.settings.ui
 
+import android.content.ContextWrapper
+import android.content.Intent
 import android.view.View
 import android.widget.TextView
 import android.widget.ViewFlipper
@@ -104,6 +106,25 @@ class CloudRulesDialogInstrumentedTest {
       scenario.onActivity { dialog.dismissNow() }
       scenario.await { repository.cancellations.get() == 1 }
       assertEquals(1, repository.calls.get())
+    }
+  }
+
+  @Test
+  fun installedRulesRequestRestartAfterDismiss() = withRepository {
+    ActivityScenario.launch(TrackActivity::class.java).use { scenario ->
+      val dialog = scenario.showCloudRules()
+      scenario.onActivity { activity ->
+        dialog.dismissNow()
+        assertNull(dialog.view)
+        var restart: Intent? = null
+        val context = object : ContextWrapper(activity.applicationContext) {
+          override fun startActivity(intent: Intent) {
+            restart = intent
+          }
+        }
+        dialog.onRulesInstalled(context, 49)
+        assertEquals("com.jakewharton.processphoenix.PhoenixActivity", restart?.component?.className)
+      }
     }
   }
 
