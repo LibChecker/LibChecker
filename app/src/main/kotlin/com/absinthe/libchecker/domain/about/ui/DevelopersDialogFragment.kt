@@ -21,6 +21,7 @@ import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
 import com.squareup.moshi.Types
 import java.util.Locale
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -86,6 +87,7 @@ class DevelopersDialogFragment : BaseBottomSheetViewDialogFragment<DevelopersDia
           render(DevelopersDialogState.Content(fallbackItems))
         }
       }.onFailure {
+        if (it is CancellationException) throw it
         it.logGitHubRequestFailure()
         if (!hasVisibleItems) {
           render(DevelopersDialogState.Content(fallbackItems))
