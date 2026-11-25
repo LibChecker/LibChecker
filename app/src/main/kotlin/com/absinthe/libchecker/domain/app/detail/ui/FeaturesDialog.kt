@@ -7,7 +7,6 @@ import android.os.Build
 import android.text.Html
 import android.text.style.ImageSpan
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout.LayoutParams
 import android.widget.ScrollView
@@ -35,10 +34,9 @@ import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.copyToClipboard
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.openUrlInBrowser
-import com.absinthe.libchecker.utils.extensions.paddingStartCompat
-import com.absinthe.libchecker.utils.extensions.paddingTopCompat
 import com.absinthe.libchecker.utils.extensions.putArguments
 import com.absinthe.libchecker.utils.toJson
+import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
@@ -144,13 +142,34 @@ object FeaturesDialog {
     val dialogDrawables = drawables.map { drawable ->
       drawable.constantState?.newDrawable(context.resources)?.mutate() ?: drawable
     }
-    val flexLayout = FlexboxLayout(context).apply {
+    val preferredIconSize = 48.dp
+    val spacing = 24.dp
+    val flexLayout = object : FlexboxLayout(context) {
+      override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val available = MeasureSpec.getSize(widthMeasureSpec) - paddingStart - paddingEnd
+        val columns = ((available + spacing) / (preferredIconSize + spacing)).coerceAtLeast(1)
+        val iconPixels = (available - spacing * (columns - 1)).coerceAtLeast(0)
+        val size = iconPixels / columns
+        val extraPixels = iconPixels % columns
+        for (index in 0 until childCount) {
+          val column = index % columns
+          val params = getChildAt(index).layoutParams as FlexboxLayout.LayoutParams
+          // Distribute rounding pixels across columns so the end inset stays exact.
+          params.width = size + if (column < extraPixels) 1 else 0
+          params.height = params.width
+          params.marginStart = if (column == 0) 0 else spacing
+          params.topMargin = if (index < columns) 0 else spacing
+          params.resolveLayoutDirection(layoutDirection)
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+      }
+    }.apply {
       layoutParams = LayoutParams(
         LayoutParams.MATCH_PARENT,
         LayoutParams.WRAP_CONTENT
       )
-      paddingStartCompat = 24.dp
-      paddingTopCompat = 16.dp
+      setPadding(spacing, spacing, spacing, spacing)
+      alignItems = AlignItems.FLEX_START
       flexWrap = FlexWrap.WRAP
       justifyContent = JustifyContent.FLEX_START
       flexDirection = FlexDirection.ROW
@@ -169,9 +188,7 @@ object FeaturesDialog {
     dialogDrawables.forEach { drawable ->
       flexLayout.addView(
         AppCompatImageView(context).apply {
-          layoutParams = ViewGroup.MarginLayoutParams(48.dp, 48.dp).apply {
-            setMargins(0, 8.dp, 16.dp, 8.dp)
-          }
+          layoutParams = FlexboxLayout.LayoutParams(preferredIconSize, preferredIconSize)
           scaleType = ImageView.ScaleType.FIT_XY
           setImageDrawable(drawable)
           contentDescription = context.getString(titleRes)
@@ -188,6 +205,7 @@ object FeaturesDialog {
       }
     }
     val scrollView = ScrollView(context).apply {
+      isVerticalScrollBarEnabled = false
       layoutParams = LayoutParams(
         LayoutParams.MATCH_PARENT,
         LayoutParams.WRAP_CONTENT

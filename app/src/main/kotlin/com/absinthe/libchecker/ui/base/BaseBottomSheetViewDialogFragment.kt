@@ -147,6 +147,7 @@ abstract class BaseBottomSheetViewDialogFragment<T> :
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    installDialogScrollBlur(view)
     view.setOnApplyWindowInsetsListener { _, insets ->
       ((view.parent as? View)?.background as? BottomSheetBackgroundDrawable)
         ?.updateCorners(view.rootWindowInsets)

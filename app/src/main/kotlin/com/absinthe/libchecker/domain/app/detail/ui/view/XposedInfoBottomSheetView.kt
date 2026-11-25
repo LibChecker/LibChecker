@@ -69,7 +69,7 @@ class XposedInfoBottomSheetView(context: Context) : BottomSheetScaffoldView(cont
     )
     header.title.text = context.getString(R.string.xposed_module)
     addView(setting)
-    addView(xposedDetailContentView)
+    addFullWidthList(xposedDetailContentView)
   }
 
   fun bind(

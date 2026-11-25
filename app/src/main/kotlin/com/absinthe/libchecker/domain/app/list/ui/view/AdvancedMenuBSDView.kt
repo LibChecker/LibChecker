@@ -93,7 +93,7 @@ class AdvancedMenuBSDView(context: Context) : BottomSheetScaffoldView(context) {
     val padding = 16.dp
     setPadding(padding, padding, padding, 0)
     header.title.text = context.getString(R.string.advanced_menu)
-    addContentView(list)
+    addFullWidthList(list)
   }
 
   fun bind(

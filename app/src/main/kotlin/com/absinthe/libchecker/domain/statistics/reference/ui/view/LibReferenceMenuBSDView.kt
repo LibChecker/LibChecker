@@ -195,7 +195,7 @@ class LibReferenceMenuBSDView(
         }
       }
     )
-    addView(list)
+    addFullWidthList(list)
     optionsAdapter.setList(listOf(Unit))
   }
 

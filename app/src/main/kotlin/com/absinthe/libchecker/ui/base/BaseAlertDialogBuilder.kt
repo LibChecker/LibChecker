@@ -12,6 +12,7 @@ class BaseAlertDialogBuilder : MaterialAlertDialogBuilder {
 
   override fun create(): AlertDialog {
     return super.create().also { dialog ->
+      dialog.window?.decorView?.let(::installDialogScrollBlur)
       if (OsUtils.atLeastS()) {
         dialog.window?.let { window ->
           val blurController = WindowBlurCompatController(dialog.context, window)

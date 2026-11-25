@@ -26,11 +26,11 @@ import com.absinthe.libchecker.domain.snapshot.track.presentation.TrackViewModel
 import com.absinthe.libchecker.domain.snapshot.track.ui.adapter.TrackAdapter
 import com.absinthe.libchecker.domain.snapshot.track.ui.view.TrackItemView
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
 import com.absinthe.libchecker.view.app.DotLoadingView
 import com.absinthe.libchecker.view.app.EmptyListView
+import com.absinthe.libchecker.view.app.installAppbarBlur
 import kotlinx.coroutines.launch
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.koin.android.ext.android.inject
@@ -61,7 +61,7 @@ class TrackActivity :
   private fun initView() {
     addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(binding.toolbar)
-    installBlurContainer()
+    blurContainer = binding.container.installAppbarBlur(android.R.id.list, GlobalValues.isBlurDesign)
     binding.appbar.setLiftOnScrollTargetView(binding.list)
     (binding.appbar.parent as ViewGroup).bringChildToFront(binding.appbar)
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -107,25 +107,6 @@ class TrackActivity :
   override fun onStart() {
     super.onStart()
     blurContainer?.setBlurEnabled(GlobalValues.isBlurDesign)
-  }
-
-  private fun installBlurContainer() {
-    if (!OsUtils.atLeastT()) return
-    val original = binding.container
-    val parent = original.parent as ViewGroup
-    val index = parent.indexOfChild(original)
-    val container = BlurCoordinatorLayout(this, contentViewId = android.R.id.list)
-    container.id = original.id
-    container.layoutParams = original.layoutParams
-    while (original.childCount > 0) {
-      val child = original.getChildAt(0)
-      original.removeViewAt(0)
-      container.addView(child)
-    }
-    parent.removeViewAt(index)
-    parent.addView(container, index)
-    blurContainer = container
-    container.setBlurEnabled(GlobalValues.isBlurDesign)
   }
 
   private fun observeTrackList() {

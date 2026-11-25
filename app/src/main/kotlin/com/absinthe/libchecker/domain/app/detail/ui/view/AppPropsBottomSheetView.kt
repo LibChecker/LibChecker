@@ -67,7 +67,7 @@ class AppPropsBottomSheetView(
     setPadding(padding, padding, padding, 0)
     header.title.text = context.getString(R.string.lib_detail_app_props_title)
     addView(tipView)
-    addView(list)
+    addFullWidthList(list)
   }
 
   fun bind(items: List<AppPropItem>) {

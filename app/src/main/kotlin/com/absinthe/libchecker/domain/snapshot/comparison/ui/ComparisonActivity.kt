@@ -23,6 +23,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.database.entity.SnapshotItem
 import com.absinthe.libchecker.databinding.ActivityComparisonBinding
 import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
@@ -53,6 +54,8 @@ import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.launchDocument
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
+import com.absinthe.libchecker.view.app.installAppbarBlur
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
@@ -79,6 +82,7 @@ class ComparisonActivity :
   private val adapter by lazy(LazyThreadSafetyMode.NONE) {
     SnapshotAdapter(buildSnapshotItemDisplayData)
   }
+  private var blurContainer: BlurCoordinatorLayout? = null
   private var archiveChoosingSide = SnapshotComparisonSide.LEFT
 
   private lateinit var chooseApkResultLauncher: ActivityResultLauncher<Array<String>>
@@ -103,6 +107,11 @@ class ComparisonActivity :
     initView()
     registerCallbacks()
     parseIntent(intent)
+  }
+
+  override fun onStart() {
+    super.onStart()
+    blurContainer?.setBlurEnabled(GlobalValues.isBlurDesign)
   }
 
   override fun onDestroy() {
@@ -149,7 +158,9 @@ class ComparisonActivity :
   private fun initView() {
     addMenuProvider(this, this, Lifecycle.State.CREATED)
     setSupportActionBar(binding.toolbar)
-    (binding.root as ViewGroup).bringChildToFront(binding.appbar)
+    blurContainer = binding.container.installAppbarBlur(R.id.vf_container, GlobalValues.isBlurDesign)
+    binding.appbar.setLiftOnScrollTargetView(binding.recyclerview)
+    binding.appbar.bringToFront()
     supportActionBar?.setDisplayHomeAsUpEnabled(true)
     binding.toolbar.title = getString(R.string.album_item_comparison_title)
 
@@ -167,7 +178,7 @@ class ComparisonActivity :
         layoutManager = getSuitableLayoutManager()
         borderVisibilityChangedListener =
           BorderView.OnBorderVisibilityChangedListener { top: Boolean, _: Boolean, _: Boolean, _: Boolean ->
-            appbar.isLifted = !top
+            updateAppbarUnderlap(!top)
           }
 
         if (itemDecorationCount == 0) {
@@ -421,6 +432,13 @@ class ComparisonActivity :
     }
 
     binding.vfContainer.displayedChild = child
+    updateAppbarUnderlap(binding.recyclerview.canScrollVertically(-1))
+  }
+
+  private fun updateAppbarUnderlap(scrolled: Boolean) {
+    val underlaps = binding.vfContainer.displayedChild == VF_LIST && scrolled
+    blurContainer?.setAppbarContentUnderlap(underlaps)
+    if (blurContainer?.blurEnabled != true) binding.appbar.isLifted = underlaps
   }
 
   private fun getIconsCombo(leftIconOrigin: Bitmap, rightIconOrigin: Bitmap): Bitmap {
