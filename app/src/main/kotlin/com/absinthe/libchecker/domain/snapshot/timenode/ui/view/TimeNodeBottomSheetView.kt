@@ -31,7 +31,6 @@ class TimeNodeBottomSheetView(context: Context) : BottomSheetScaffoldView(contex
 
   private val contributionWallView = SnapshotContributionWallView(context).apply {
     layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
-    isVisible = false
   }
 
   private val list = BorderRecyclerView(context).apply {
@@ -96,12 +95,9 @@ class TimeNodeBottomSheetView(context: Context) : BottomSheetScaffoldView(contex
     packageIconSources = state.listData.packageIconSources
     adapter.setList(state.listData.items)
 
-    val contributionData = state.contributionData
-    if (state.header !is TimeNodeHeaderState.AddApk && contributionData != null && contributionData.days.isNotEmpty()) {
-      contributionWallView.isVisible = true
-      contributionWallView.bind(contributionData, state.selectedDate)
-    } else {
-      contributionWallView.isVisible = false
+    contributionWallView.isVisible = state.header !is TimeNodeHeaderState.AddApk
+    if (contributionWallView.isVisible) {
+      contributionWallView.bind(state.contributionData, state.selectedDate)
     }
   }
 

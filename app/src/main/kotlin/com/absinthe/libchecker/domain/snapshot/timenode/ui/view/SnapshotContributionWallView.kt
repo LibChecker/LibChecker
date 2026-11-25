@@ -24,6 +24,7 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.appcompat.R as AppCompatR
 import androidx.appcompat.widget.AppCompatTextView
@@ -31,7 +32,6 @@ import androidx.core.animation.doOnEnd
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
-import androidx.core.view.isVisible
 import androidx.customview.widget.ExploreByTouchHelper
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.timenode.model.DayContribution
@@ -68,9 +68,29 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
   }
 
   private val statsView = AppCompatTextView(context).apply {
-    layoutParams = LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+    layoutParams = LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
     setTextColor(context.getColorByAttr(android.R.attr.textColorSecondary))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+  }
+
+  // Reserve the localized count and caption at the current width and font scale.
+  // INVISIBLE labels participate in measurement without exposing placeholder text.
+  private val countSample = resources.getQuantityString(
+    R.plurals.snapshot_contribution_updates_count,
+    Int.MAX_VALUE,
+    Int.MAX_VALUE
+  )
+
+  private fun reservedLabel(label: AppCompatTextView, sample: String): FrameLayout = FrameLayout(context).apply {
+    layoutParams = label.layoutParams
+    val sizingLabel = AppCompatTextView(context).apply {
+      setTextSize(TypedValue.COMPLEX_UNIT_PX, label.textSize)
+      text = sample
+      hint = label.text
+      visibility = INVISIBLE
+    }
+    addView(sizingLabel, FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT))
+    addView(label, FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT))
   }
 
   private val headerLayout = LinearLayout(context).apply {
@@ -79,16 +99,14 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
     val padding = 12.dp
     setPadding(padding, 4.dp, padding, 4.dp)
     addView(titleView)
-    addView(statsView)
+    statsView.gravity = Gravity.END
+    addView(reservedLabel(statsView, countSample))
   }
 
   private val gridView = ContributionGridView(context)
 
   private val detailView = AppCompatTextView(context).apply {
-    layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).also {
-      val padding = 12.dp
-      setPadding(padding, 4.dp, padding, 8.dp)
-    }
+    layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     setTextColor(context.getColorByAttr(android.R.attr.textColorSecondary))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
     gravity = Gravity.CENTER
@@ -101,22 +119,24 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
     setPadding(cardPadding, 4.dp, cardPadding, 4.dp)
     addView(headerLayout)
     addView(gridView)
-    addView(detailView)
+    val caption = reservedLabel(
+      detailView,
+      context.getString(R.string.snapshot_contribution_tile_detail_with_snapshot, "2000-12-31", countSample)
+    )
+    caption.setPadding(12.dp, 4.dp, 12.dp, 8.dp)
+    addView(caption)
   }
 
   fun bind(
-    data: SnapshotContributionData,
+    data: SnapshotContributionData?,
     selectedDate: LocalDate? = null
   ) {
     contributionData = data
-    isVisible = data.days.isNotEmpty()
-    statsView.text = resources.getQuantityString(
-      R.plurals.snapshot_contribution_updates_count,
-      data.totalUpdates,
-      data.totalUpdates
-    )
+    statsView.text = data?.let {
+      resources.getQuantityString(R.plurals.snapshot_contribution_updates_count, it.totalUpdates, it.totalUpdates)
+    }
 
-    val targetTimestamp = selectedDate?.let { data.days[it]?.snapshotTimestamp }
+    val targetTimestamp = selectedDate?.let { data?.days?.get(it)?.snapshotTimestamp }
     if (currentSnapshotTimestamp != null && targetTimestamp != null && currentSnapshotTimestamp != targetTimestamp) {
       gridView.animateSnapshotHighlight(targetTimestamp)
     }
@@ -125,7 +145,8 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
     }
 
     gridView.setData(data, selectedDate)
-    updateDetailText(selectedDate?.let { data.days[it] })
+    detailView.visibility = if (data == null) INVISIBLE else VISIBLE
+    updateDetailText(selectedDate?.let { data?.days?.get(it) })
   }
 
   fun scrollToSnapshot(timestamp: Long) {
@@ -250,10 +271,16 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
       return currentData.days[date] ?: DayContribution(date)
     }
 
-    private fun tileSize(): Float {
-      val cols = (dayCount() + 6) / 7
+    // The recent 120 days span 18 columns even after alignment to the first Monday.
+    private fun columnCount(): Int {
+      val days = if (data == null) ComputeSnapshotContributionsUseCase.RECENT_DAYS_COUNT else dayCount()
+      return (days + 6) / 7
+    }
+
+    private fun tileSize(viewWidth: Int = width): Float {
+      val cols = columnCount()
       return if (cols > 0) {
-        ((width - paddingStart - paddingEnd - (cols - 1) * tileGap) / cols).coerceAtLeast(0f)
+        ((viewWidth - paddingStart - paddingEnd - (cols - 1) * tileGap) / cols).coerceAtLeast(0f)
       } else {
         0f
       }
@@ -300,11 +327,8 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
     }
 
     init {
-      isFocusable = true
-      isFocusableInTouchMode = true
-      isClickable = true
-      importantForAccessibility = IMPORTANT_FOR_ACCESSIBILITY_YES
       ViewCompat.setAccessibilityDelegate(this, accessibility)
+      setInteractive(false)
       val hPadding = 12.dp
       val vPadding = 12.dp
       setPadding(hPadding, vPadding, hPadding, vPadding)
@@ -318,11 +342,22 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
       }
     }
 
-    fun setData(data: SnapshotContributionData, selected: LocalDate?) {
+    private fun setInteractive(ready: Boolean) {
+      isEnabled = ready
+      isFocusableInTouchMode = ready
+      isFocusable = ready
+      isClickable = ready
+      importantForAccessibility = if (ready) IMPORTANT_FOR_ACCESSIBILITY_YES else IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
+    }
+
+    fun setData(data: SnapshotContributionData?, selected: LocalDate?) {
+      if (this.data === data && selectedDate == selected) return
+      val previousColumns = columnCount()
       this.data = data
+      setInteractive(data != null && dayCount() > 0)
       this.selectedDate = selected
       accessibility.invalidateRoot()
-      requestLayout()
+      if (previousColumns != columnCount()) requestLayout()
       invalidate()
     }
 
@@ -366,30 +401,17 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
       val width = MeasureSpec.getSize(widthMeasureSpec)
-      val contribData = data
-      if (contribData == null) {
-        setMeasuredDimension(width, paddingTop + paddingBottom)
-        return
-      }
-
-      val totalDays = ChronoUnit.DAYS.between(contribData.startDate, contribData.endDate).toInt() + 1
-      val cols = (totalDays + 6) / 7
-      val availableWidth = (width - paddingStart - paddingEnd).toFloat()
-      val tileSize = if (cols > 0) (availableWidth - (cols - 1) * tileGap) / cols else 0f
+      val tileSize = tileSize(width)
       val calculatedHeight = (paddingTop + paddingBottom + 7 * tileSize + 6 * tileGap).toInt()
       setMeasuredDimension(width, calculatedHeight)
     }
 
     override fun onDraw(canvas: Canvas) {
       super.onDraw(canvas)
-      val contribData = data ?: return
-
-      val totalDays = ChronoUnit.DAYS.between(contribData.startDate, contribData.endDate).toInt() + 1
-      val cols = (totalDays + 6) / 7
+      val contribData = data
+      val cols = columnCount()
       if (cols <= 0) return
-
-      val availableWidth = (width - paddingStart - paddingEnd).toFloat()
-      val tileSize = (availableWidth - (cols - 1) * tileGap) / cols
+      val tileSize = tileSize()
       val step = tileSize + tileGap
 
       val primaryColor = context.getColorByAttr(AppCompatR.attr.colorPrimary)
@@ -401,7 +423,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
       for (col in 0 until cols) {
         for (row in 0..6) {
           val dayOffset = col * 7 + row
-          val date = contribData.startDate.plusDays(dayOffset.toLong())
+          val date = contribData?.startDate?.plusDays(dayOffset.toLong())
 
           val left = paddingStart + col * step
           val top = paddingTop + row * step
@@ -427,8 +449,8 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
           tilePath.reset()
           tilePath.addRoundRect(tileRect, radiiArray, Path.Direction.CW)
 
-          if (date.isAfter(contribData.endDate)) {
-            // Future dates in the final week rendered as faint placeholder
+          if (contribData == null || date == null || date.isAfter(contribData.endDate)) {
+            // Loading cells and future dates use the neutral tile.
             tilePaint.color = emptyColor
             canvas.drawPath(tilePath, tilePaint)
             continue
@@ -492,6 +514,7 @@ class SnapshotContributionWallView(context: Context) : LinearLayout(context) {
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+      if (!isEnabled) return false
       val handled = gestureDetector.onTouchEvent(event)
       return handled || super.onTouchEvent(event)
     }

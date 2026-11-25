@@ -1,7 +1,6 @@
 package com.absinthe.libchecker.domain.snapshot.timenode.ui.view
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.util.TypedValue
@@ -23,25 +22,20 @@ import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.view.AViewGroup
+import com.absinthe.libchecker.view.drawable.G2PillDrawable
 import com.google.android.material.R as MaterialR
-import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.shape.ShapeAppearanceModel
-import com.google.android.material.shape.SuperEllipseCornerTreatment
 
 class TimeNodeItemView(context: Context) : AViewGroup(context) {
 
   private val defaultNameColor: Int
   private var packageIconSources: Map<String, SnapshotPackageIconSource> = emptyMap()
 
-  private val itemBackground = MaterialShapeDrawable(
-    ShapeAppearanceModel.builder()
-      .setAllCorners(SuperEllipseCornerTreatment(16.dp.toFloat()))
-      .build()
-  ).apply {
-    strokeWidth = 1.dp.toFloat()
-    strokeColor = ColorStateList.valueOf(context.getColorByAttr(MaterialR.attr.colorOutlineVariant))
-    fillColor = ColorStateList.valueOf(Color.TRANSPARENT)
-  }
+  private val itemBackground = G2PillDrawable(
+    fillColor = Color.TRANSPARENT,
+    strokeColor = context.getColorByAttr(MaterialR.attr.colorOutlineVariant),
+    strokeWidth = 1.dp.toFloat(),
+    cornerRadius = 16.dp.toFloat()
+  )
 
   private val tagIndicator = View(context).apply {
     layoutParams = LayoutParams(8.dp, 8.dp)
@@ -159,13 +153,11 @@ class TimeNodeItemView(context: Context) : AViewGroup(context) {
     val outlineVariant = context.getColorByAttr(MaterialR.attr.colorOutlineVariant)
     val surfaceHigh = context.getColorByAttr(MaterialR.attr.colorSurfaceContainerHigh)
     if (item.isSelected) {
-      itemBackground.strokeWidth = 2.dp.toFloat()
-      itemBackground.strokeColor = ColorStateList.valueOf(primaryColor)
-      itemBackground.fillColor = ColorStateList.valueOf(surfaceHigh)
+      itemBackground.setStroke(2.dp.toFloat(), primaryColor)
+      itemBackground.setFillColor(surfaceHigh)
     } else {
-      itemBackground.strokeWidth = 1.dp.toFloat()
-      itemBackground.strokeColor = ColorStateList.valueOf(outlineVariant)
-      itemBackground.fillColor = ColorStateList.valueOf(Color.TRANSPARENT)
+      itemBackground.setStroke(1.dp.toFloat(), outlineVariant)
+      itemBackground.setFillColor(Color.TRANSPARENT)
     }
 
     contentDescription = listOf(item.description, summary.text)
