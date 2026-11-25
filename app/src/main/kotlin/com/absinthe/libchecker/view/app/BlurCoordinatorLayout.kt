@@ -11,11 +11,11 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RenderEffect
 import android.graphics.RenderNode
-import android.graphics.RuntimeShader
 import android.graphics.Shader
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -28,6 +28,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.viewpager2.widget.ViewPager2
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.compat.BackdropBlurCompat
+import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.view.drawable.setG2Shape
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -37,6 +38,23 @@ import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
+
+internal fun CoordinatorLayout.installAppbarBlur(contentViewId: Int, enabled: Boolean): BlurCoordinatorLayout? {
+  if (!OsUtils.atLeastT()) return null
+  val host = parent as ViewGroup
+  val index = host.indexOfChild(this)
+  val container = BlurCoordinatorLayout(context, contentViewId = contentViewId)
+  container.id = id
+  while (childCount > 0) {
+    val child = getChildAt(0)
+    removeViewAt(0)
+    container.addView(child)
+  }
+  host.removeViewAt(index)
+  host.addView(container, index, layoutParams)
+  container.setBlurEnabled(enabled)
+  return container
+}
 
 /** Draws a progressive app bar blur and a uniform bottom navigation blur on Android 13+. */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -52,14 +70,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private var navDownsampleNode: RenderNode? = null
   private var appbarEffectNode: RenderNode? = null
   private var navEffectNode: RenderNode? = null
-  private var blurEffect: RenderEffect? = null
+  private var appbarBlur: ProgressiveBlurEffect? = null
   private var navBlurEffect: RenderEffect? = null
-  private var mediumBlurEffect: RenderEffect? = null
-  private var lightBlurEffect: RenderEffect? = null
-  private var progressiveBlurEffect: RenderEffect? = null
-  private var progressiveRampTop = Float.NaN
-  private var progressiveRampBottom = Float.NaN
-  private val progressiveMaskShaders = arrayOfNulls<RuntimeShader>(PROGRESSIVE_MASK_COUNT)
   private var scrimPaint: Paint? = null
   private var appbarTintPaint: Paint? = null
   private var appbarTintTop = Float.NaN
@@ -430,36 +442,6 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     node.endRecording()
   }
 
-  private fun obtainBlurEffect(): RenderEffect {
-    blurEffect?.let { return it }
-    return RenderEffect.createBlurEffect(
-      appbarBlurRadiusPx,
-      appbarBlurRadiusPx,
-      Shader.TileMode.CLAMP
-    )
-      .also { blurEffect = it }
-  }
-
-  private fun obtainMediumBlurEffect(): RenderEffect {
-    mediumBlurEffect?.let { return it }
-    return RenderEffect.createBlurEffect(
-      appbarBlurRadiusPx * MEDIUM_BLUR_RADIUS_FRACTION,
-      appbarBlurRadiusPx * MEDIUM_BLUR_RADIUS_FRACTION,
-      Shader.TileMode.CLAMP
-    )
-      .also { mediumBlurEffect = it }
-  }
-
-  private fun obtainLightBlurEffect(): RenderEffect {
-    lightBlurEffect?.let { return it }
-    return RenderEffect.createBlurEffect(
-      appbarBlurRadiusPx * LIGHT_BLUR_RADIUS_FRACTION,
-      appbarBlurRadiusPx * LIGHT_BLUR_RADIUS_FRACTION,
-      Shader.TileMode.CLAMP
-    )
-      .also { lightBlurEffect = it }
-  }
-
   private fun obtainNavBlurEffect(): RenderEffect {
     navBlurEffect?.let { return it }
     return RenderEffect.createBlurEffect(
@@ -483,7 +465,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     val nodeRampBottom = contentOffset + bottom / downsample
     val effectNode = obtainAppbarEffectNode(source)
 
-    effectNode.setRenderEffect(obtainProgressiveBlurEffect(nodeRampTop, nodeRampBottom))
+    val blur = appbarBlur ?: ProgressiveBlurEffect(appbarBlurRadiusPx).also { appbarBlur = it }
+    effectNode.setRenderEffect(blur.create(nodeRampTop, nodeRampBottom))
     canvas.withClip(0f, top, width.toFloat(), bottom) {
       withScale(downsample.toFloat(), downsample.toFloat()) {
         translate(0f, -contentOffset)
@@ -559,62 +542,6 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     paint.alpha = (appbarMaskProgress * 255f).roundToInt()
     paint.blendMode = BlendMode.SRC_OVER
     canvas.drawRect(0f, top, width.toFloat(), bottom, paint)
-  }
-
-  /** Stacks strong, medium and light blur masks, then fades to the captured sharp content. */
-  private fun obtainProgressiveBlurEffect(rampTop: Float, rampBottom: Float): RenderEffect {
-    progressiveBlurEffect?.let { cached ->
-      if (progressiveRampTop == rampTop && progressiveRampBottom == rampBottom) {
-        return cached
-      }
-    }
-
-    fun maskedEffect(
-      shaderIndex: Int,
-      level: Float,
-      slope: Float,
-      input: RenderEffect
-    ): RenderEffect {
-      val shader = progressiveMaskShaders[shaderIndex]
-        ?: RuntimeShader(PROGRESSIVE_LEVEL_MASK_SHADER).also {
-          progressiveMaskShaders[shaderIndex] = it
-        }
-      shader.setFloatUniform("in_gradBand", rampTop, rampBottom)
-      shader.setFloatUniform("in_curve", APPBAR_PROGRESSIVE_CURVE)
-      shader.setFloatUniform("in_level", level)
-      shader.setFloatUniform("in_slope", slope)
-      val mask = RenderEffect.createRuntimeShaderEffect(shader, "child")
-      return RenderEffect.createChainEffect(mask, input)
-    }
-
-    val light = maskedEffect(
-      shaderIndex = LIGHT_MASK_INDEX,
-      level = LIGHT_MASK_LEVEL,
-      slope = LEVEL_MASK_SLOPE,
-      input = obtainLightBlurEffect()
-    )
-    val medium = maskedEffect(
-      shaderIndex = MEDIUM_MASK_INDEX,
-      level = MEDIUM_MASK_LEVEL,
-      slope = LEVEL_MASK_SLOPE,
-      input = obtainMediumBlurEffect()
-    )
-    val strong = maskedEffect(
-      shaderIndex = STRONG_MASK_INDEX,
-      level = STRONG_MASK_LEVEL,
-      slope = LEVEL_MASK_SLOPE,
-      input = obtainBlurEffect()
-    )
-
-    val stack = RenderEffect.createBlendModeEffect(
-      RenderEffect.createBlendModeEffect(light, medium, BlendMode.SRC_OVER),
-      strong,
-      BlendMode.SRC_OVER
-    )
-
-    progressiveRampTop = rampTop
-    progressiveRampBottom = rampBottom
-    return stack.also { progressiveBlurEffect = it }
   }
 
   private fun drawNavBlur(
@@ -763,7 +690,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
   private val appbarBlurRadiusPx by lazy(LazyThreadSafetyMode.NONE) {
     calculateDownsampledBlurRadius(
-      blurRadiusDp = APPBAR_BLUR_RADIUS_DP,
+      blurRadiusDp = PROGRESSIVE_BLUR_RADIUS_DP,
       density = resources.displayMetrics.density,
       downsample = APPBAR_BACKDROP_DOWNSAMPLE
     )
@@ -825,12 +752,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     navDownsampleNode = null
     appbarEffectNode = null
     navEffectNode = null
-    blurEffect = null
-    mediumBlurEffect = null
-    lightBlurEffect = null
+    appbarBlur = null
     navBlurEffect = null
-    progressiveBlurEffect = null
-    progressiveMaskShaders.fill(null)
     scrimPaint = null
     navStrokeGradient = null
     appbarTintPaint = null
@@ -844,19 +767,8 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
 
   companion object {
     // Miuix's progressive app bar recipe uses a 10dp radius and a 30% surface blend.
-    private const val APPBAR_BLUR_RADIUS_DP = 10f
     private const val APPBAR_BLUR_OFFSET_DP = 24f
     private const val NAV_BLUR_RADIUS_PX = 10f
-    private const val MEDIUM_BLUR_RADIUS_FRACTION = 0.4f
-    private const val LIGHT_BLUR_RADIUS_FRACTION = 0.13f
-    private const val LEVEL_MASK_SLOPE = 3f
-    private const val STRONG_MASK_LEVEL = 1f
-    private const val MEDIUM_MASK_LEVEL = 2f
-    private const val LIGHT_MASK_LEVEL = 3f
-    private const val STRONG_MASK_INDEX = 0
-    private const val MEDIUM_MASK_INDEX = 1
-    private const val LIGHT_MASK_INDEX = 2
-    private const val PROGRESSIVE_MASK_COUNT = 3
     private const val APPBAR_TINT_STOP_COUNT = 9
     private const val NAV_TINT_ALPHA = 0x99
     private const val BASE_FILL_ALPHA_MASK = 0xE6FFFFFFL // 90% opaque base so empty areas still look like glass
@@ -899,8 +811,8 @@ internal fun darkNavigationTintColor(surfaceColor: Int, floatingProgress: Float)
 
 internal fun progressiveSurfaceTintAlpha(
   progress: Float,
-  maxAlpha: Float = APPBAR_SURFACE_TINT_ALPHA,
-  curve: Float = APPBAR_PROGRESSIVE_CURVE
+  maxAlpha: Float = PROGRESSIVE_SURFACE_TINT_ALPHA,
+  curve: Float = PROGRESSIVE_CURVE
 ): Float {
   val shapedProgress = smoothStep(progress).pow(curve.coerceAtLeast(0f))
   return maxAlpha.coerceIn(0f, 1f) * (1f - shapedProgress)
@@ -919,7 +831,7 @@ internal fun appbarMaskTransitionDuration(
 internal fun progressiveDarkMaskAlpha(
   progress: Float,
   maxAlpha: Float = APPBAR_DARK_MASK_ALPHA,
-  curve: Float = APPBAR_PROGRESSIVE_CURVE
+  curve: Float = PROGRESSIVE_CURVE
 ): Float {
   val shapedProgress = smoothStep(progress).pow(curve.coerceAtLeast(0f))
   return maxAlpha.coerceIn(0f, 1f) * (1f - shapedProgress)
@@ -934,22 +846,4 @@ private const val BLUR_KERNEL_SIGMA_OUTSET = 3f
 internal const val OPAQUE_LAYER_ALPHA = 255
 private const val APPBAR_MASK_TRANSITION_DURATION_MS = 100L
 private const val BLUR_TRANSITION_DURATION_MS = 500
-private const val APPBAR_SURFACE_TINT_ALPHA = 0.3f
 private const val APPBAR_DARK_MASK_ALPHA = 0.12f
-private const val APPBAR_PROGRESSIVE_CURVE = 2.4f
-
-private const val PROGRESSIVE_LEVEL_MASK_SHADER = """
-uniform shader child;
-uniform float2 in_gradBand;
-uniform float in_curve;
-uniform float in_level;
-uniform float in_slope;
-
-half4 main(float2 coord) {
-  float raw = clamp((coord.y - in_gradBand.x) / (in_gradBand.y - in_gradBand.x), 0.0, 1.0);
-  raw = pow(raw * raw * (3.0 - 2.0 * raw), in_curve);
-  float weight = clamp(in_level - raw * in_slope, 0.0, 1.0);
-  weight = weight * weight * (3.0 - 2.0 * weight);
-  return child.eval(coord) * half(weight);
-}
-"""

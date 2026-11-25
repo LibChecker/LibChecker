@@ -19,11 +19,11 @@ import com.absinthe.libchecker.domain.home.presentation.RecentVisitsViewModel
 import com.absinthe.libchecker.domain.home.recent.RecentVisit
 import com.absinthe.libchecker.domain.statistics.reference.presentation.LibReferenceViewModel
 import com.absinthe.libchecker.ui.base.BaseActivity
-import com.absinthe.libchecker.utils.OsUtils
 import com.absinthe.libchecker.utils.extensions.applySystemBarsPadding
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.launchDetailPage
 import com.absinthe.libchecker.view.app.BlurCoordinatorLayout
+import com.absinthe.libchecker.view.app.installAppbarBlur
 import com.absinthe.libraries.utils.utils.AntiShakeUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -110,7 +110,7 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
     updateActionBar()
     binding.apply {
       supportActionBar?.setDisplayHomeAsUpEnabled(true)
-      installBlurContainer()
+      blurContainer = binding.container.installAppbarBlur(R.id.vf_container, GlobalValues.isBlurDesign)
       appbar.setLiftOnScrollTargetView(list)
       (appbar.parent as ViewGroup).bringChildToFront(appbar)
 
@@ -174,25 +174,6 @@ class LibReferenceActivity : BaseActivity<ActivityLibReferenceBinding>() {
 
       launchDetailPage(item = item, refName = name, refType = type)
     }
-  }
-
-  private fun installBlurContainer() {
-    if (!OsUtils.atLeastT()) return
-    val original = binding.container
-    val parent = original.parent as ViewGroup
-    val index = parent.indexOfChild(original)
-    val container = BlurCoordinatorLayout(this, contentViewId = R.id.vf_container)
-    container.id = original.id
-    container.layoutParams = original.layoutParams
-    while (original.childCount > 0) {
-      val child = original.getChildAt(0)
-      original.removeViewAt(0)
-      container.addView(child)
-    }
-    parent.removeViewAt(index)
-    parent.addView(container, index)
-    blurContainer = container
-    container.setBlurEnabled(GlobalValues.isBlurDesign)
   }
 
   private fun initData() {

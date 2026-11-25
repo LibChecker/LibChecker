@@ -34,7 +34,7 @@ class AppBundleBottomSheetView(context: Context) : BottomSheetScaffoldView(conte
       (padding - SystemBarManager.navigationBarSize).coerceAtLeast(0)
     )
     header.title.text = context.getString(R.string.app_bundle)
-    addView(list)
+    addFullWidthList(list)
   }
 
   fun bind(items: List<AppBundleItem>) {

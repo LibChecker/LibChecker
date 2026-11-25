@@ -80,7 +80,7 @@ class AppInfoBottomSheetView(context: Context) : BottomSheetScaffoldView(context
     functionsContainer.addView(launch)
     functionsContainer.addView(setting)
     functionsContainer.addView(share)
-    addView(list)
+    addFullWidthList(list)
   }
 
   fun bind(

@@ -29,7 +29,7 @@ class AlternativeLaunchBSDView(context: Context) : BottomSheetScaffoldView(conte
     val padding = 16.dp
     setPadding(padding, padding, padding, 0)
     header.title.text = context.getString(R.string.alternative_launch_method)
-    addView(list)
+    addFullWidthList(list)
   }
 
   fun bind(

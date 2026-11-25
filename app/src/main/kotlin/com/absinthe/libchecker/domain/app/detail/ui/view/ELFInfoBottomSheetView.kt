@@ -68,7 +68,7 @@ class ELFInfoBottomSheetView(context: Context) : BottomSheetScaffoldView(context
     header.title.text = context.getString(R.string.lib_detail_elf_info)
     addView(icon)
     addView(title)
-    addView(contentView)
+    addFullWidthList(contentView)
   }
 
   fun bind(state: ElfDetailBottomSheetState) {
