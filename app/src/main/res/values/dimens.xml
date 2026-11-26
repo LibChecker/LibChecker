@@ -24,12 +24,6 @@
   <dimen name="main_card_padding">8dp</dimen>
   <dimen name="main_list_horizontal_padding">16dp</dimen>
 
-  <dimen name="album_item_margin_horizontal">8dp</dimen>
-  <dimen name="album_item_margin_vertical">4dp</dimen>
-  <dimen name="album_card_icon_size">45dp</dimen>
-  <dimen name="album_card_inset_horizontal">20dp</dimen>
-  <dimen name="album_card_inset_vertical">32dp</dimen>
-
   <dimen name="detail_toolbar_size">48dp</dimen>
   <dimen name="floating_nav_bar_margin_horizontal">16dp</dimen>
   <dimen name="floating_nav_rail_width">68dp</dimen>

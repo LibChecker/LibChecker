@@ -16,7 +16,6 @@
   <color name="md_theme_libchecker_light_onError">#FFFFFFFF</color>
   <color name="md_theme_libchecker_light_errorContainer">#FFFFDAD4</color>
   <color name="md_theme_libchecker_light_onErrorContainer">#FF410001</color>
-  <color name="md_theme_libchecker_light_background">#FFFFFBFE</color>
   <color name="md_theme_libchecker_light_onBackground">#FF1C1B1E</color>
   <color name="md_theme_libchecker_light_surface">#FFFFFBFE</color>
   <color name="md_theme_libchecker_light_onSurface">#FF1C1B1E</color>
@@ -50,7 +49,6 @@
   <color name="md_theme_libchecker_dark_onError">#FF680003</color>
   <color name="md_theme_libchecker_dark_errorContainer">#FF930006</color>
   <color name="md_theme_libchecker_dark_onErrorContainer">#FFFFDAD4</color>
-  <color name="md_theme_libchecker_dark_background">#FF1C1B1E</color>
   <color name="md_theme_libchecker_dark_onBackground">#FFE6E1E6</color>
   <color name="md_theme_libchecker_dark_surface">#FF1C1B1E</color>
   <color name="md_theme_libchecker_dark_onSurface">#FFCAC5CA</color>
@@ -68,84 +66,18 @@
   <color name="md_theme_libchecker_dark_inverseOnSurface">#FF605D62</color>
   <color name="md_theme_libchecker_dark_inverseSurface">#FFE6E1E6</color>
   <color name="md_theme_libchecker_dark_primaryInverse">#FF6D23F8</color>
-  <color name="md_theme_libchecker_palette_primary_0">#FF000000</color>
   <color name="md_theme_libchecker_palette_primary_10">#FF21005E</color>
-  <color name="md_theme_libchecker_palette_primary_20">#FF380094</color>
   <color name="md_theme_libchecker_palette_primary_30">#FF5200CE</color>
-  <color name="md_theme_libchecker_palette_primary_40">#FF6D23F8</color>
-  <color name="md_theme_libchecker_palette_primary_50">#FF8752FF</color>
-  <color name="md_theme_libchecker_palette_primary_60">#FF9F79FF</color>
-  <color name="md_theme_libchecker_palette_primary_70">#FFB79BFF</color>
   <color name="md_theme_libchecker_palette_primary_80">#FFD0BCFF</color>
   <color name="md_theme_libchecker_palette_primary_90">#FFEADDFF</color>
-  <color name="md_theme_libchecker_palette_primary_95">#FFF6EEFF</color>
-  <color name="md_theme_libchecker_palette_primary_99">#FFFFFBFE</color>
-  <color name="md_theme_libchecker_palette_primary_100">#FFFFFFFF</color>
-  <color name="md_theme_libchecker_palette_secondary_0">#FF000000</color>
   <color name="md_theme_libchecker_palette_secondary_10">#FF1E192B</color>
-  <color name="md_theme_libchecker_palette_secondary_20">#FF332D41</color>
   <color name="md_theme_libchecker_palette_secondary_30">#FF4A4458</color>
-  <color name="md_theme_libchecker_palette_secondary_40">#FF615B70</color>
-  <color name="md_theme_libchecker_palette_secondary_50">#FF7B748A</color>
-  <color name="md_theme_libchecker_palette_secondary_60">#FF958DA5</color>
-  <color name="md_theme_libchecker_palette_secondary_70">#FFAFA7BF</color>
   <color name="md_theme_libchecker_palette_secondary_80">#FFCBC2DC</color>
   <color name="md_theme_libchecker_palette_secondary_90">#FFE8DFF8</color>
-  <color name="md_theme_libchecker_palette_secondary_95">#FFF6EEFF</color>
-  <color name="md_theme_libchecker_palette_secondary_99">#FFFFFBFE</color>
-  <color name="md_theme_libchecker_palette_secondary_100">#FFFFFFFF</color>
-  <color name="md_theme_libchecker_palette_tertiary_0">#FF000000</color>
   <color name="md_theme_libchecker_palette_tertiary_10">#FF31101D</color>
-  <color name="md_theme_libchecker_palette_tertiary_20">#FF492532</color>
   <color name="md_theme_libchecker_palette_tertiary_30">#FF633B48</color>
-  <color name="md_theme_libchecker_palette_tertiary_40">#FF7D5260</color>
-  <color name="md_theme_libchecker_palette_tertiary_50">#FF996A79</color>
-  <color name="md_theme_libchecker_palette_tertiary_60">#FFB48392</color>
-  <color name="md_theme_libchecker_palette_tertiary_70">#FFD29DAD</color>
   <color name="md_theme_libchecker_palette_tertiary_80">#FFEFB7C8</color>
   <color name="md_theme_libchecker_palette_tertiary_90">#FFFFD8E4</color>
-  <color name="md_theme_libchecker_palette_tertiary_95">#FFFFECF1</color>
-  <color name="md_theme_libchecker_palette_tertiary_99">#FFFCFCFC</color>
-  <color name="md_theme_libchecker_palette_tertiary_100">#FFFFFFFF</color>
-  <color name="md_theme_libchecker_palette_error_0">#FF000000</color>
-  <color name="md_theme_libchecker_palette_error_10">#FF410001</color>
-  <color name="md_theme_libchecker_palette_error_20">#FF680003</color>
-  <color name="md_theme_libchecker_palette_error_30">#FF930006</color>
-  <color name="md_theme_libchecker_palette_error_40">#FFBA1B1B</color>
-  <color name="md_theme_libchecker_palette_error_50">#FFDD3730</color>
-  <color name="md_theme_libchecker_palette_error_60">#FFFF5449</color>
-  <color name="md_theme_libchecker_palette_error_70">#FFFF897A</color>
-  <color name="md_theme_libchecker_palette_error_80">#FFFFB4A9</color>
-  <color name="md_theme_libchecker_palette_error_90">#FFFFDAD4</color>
-  <color name="md_theme_libchecker_palette_error_95">#FFFFEDE9</color>
-  <color name="md_theme_libchecker_palette_error_99">#FFFCFCFC</color>
-  <color name="md_theme_libchecker_palette_error_100">#FFFFFFFF</color>
-  <color name="md_theme_libchecker_palette_neutral_0">#FF000000</color>
-  <color name="md_theme_libchecker_palette_neutral_10">#FF1C1B1E</color>
-  <color name="md_theme_libchecker_palette_neutral_20">#FF313033</color>
-  <color name="md_theme_libchecker_palette_neutral_30">#FF484649</color>
-  <color name="md_theme_libchecker_palette_neutral_40">#FF605D62</color>
-  <color name="md_theme_libchecker_palette_neutral_50">#FF79767A</color>
-  <color name="md_theme_libchecker_palette_neutral_60">#FF938F94</color>
-  <color name="md_theme_libchecker_palette_neutral_70">#FFAEAAAE</color>
-  <color name="md_theme_libchecker_palette_neutral_80">#FFCAC5CA</color>
-  <color name="md_theme_libchecker_palette_neutral_90">#FFE6E1E6</color>
-  <color name="md_theme_libchecker_palette_neutral_95">#FFF4EFF3</color>
-  <color name="md_theme_libchecker_palette_neutral_99">#FFFFFBFE</color>
-  <color name="md_theme_libchecker_palette_neutral_100">#FFFFFFFF</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_0">#FF000000</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_10">#FF1C1B1E</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_20">#FF313033</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_30">#FF484649</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_40">#FF605D62</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_50">#FF79767A</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_60">#FF938F94</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_70">#FFAEAAAE</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_80">#FFCAC5CA</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_90">#FFE6E1E6</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_95">#FFF4EFF3</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_99">#FFFFFBFE</color>
-  <color name="md_theme_libchecker_palette_neutral_variant_100">#FFFFFFFF</color>
   <style name="Theme.Material3Expressive.Light.LibChecker" parent="Theme.Material3Expressive.Light">
     <item name="android:statusBarColor">@android:color/transparent</item>
     <item name="android:windowLightStatusBar">true</item>
@@ -287,6 +219,4 @@
     <item name="colorOnTertiaryFixedVariant">@color/md_theme_libchecker_palette_tertiary_30</item>
   </style>
 
-  <style name="Theme.Material3.Light.LibChecker" parent="Theme.Material3Expressive.Light.LibChecker" />
-  <style name="Theme.Material3.Dark.LibChecker" parent="Theme.Material3Expressive.Dark.LibChecker" />
 </resources>

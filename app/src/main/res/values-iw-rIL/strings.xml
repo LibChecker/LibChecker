@@ -120,7 +120,6 @@
   <string name="play_app_signing_details">עם Play App Signing, גוגל מנהלת ומגנה עבורך על מפתח החתימה של האפליקציה שלך ומשתמשת בו כדי לחתום על חבילות APK מותאמות והפצה שנוצרות מחבילות האפליקציות שלך. Play App Signing מאחסן את מפתח חתימת האפליקציה שלך בתשתית המאובטחת של גוגל ומציע אפשרויות שדרוג להגברת האבטחה.</string>
   <string name="pwa_details">יישומי אינטרנט מתקדמים (PWA) בנויים ומשופרים עם ממשקי API מודרניים כדי לספק יכולות משופרות, מהימנות וניתנות להתקנה תוך הגעה לכל אחד, בכל מקום, בכל מכשיר עם בסיס קוד יחיד.</string>
   <string name="jetpack_compose_details">Jetpack Compose הוא ערכת הכלים המודרנית של אנדרואיד לבניית ממשק משתמש מקורי. זה מפשט ומאיץ את פיתוח ממשק המשתמש באנדרואיד. חיש מהר את האפליקציה שלך עם פחות קוד, כלים רבי עוצמה וממשקי API אינטואיטיביים של Kotlin.</string>
-  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform היא מסגרת ממשק משתמש הצהרתית ותגובתית מודרנית שפותחה על ידי JetBrains המספקת דרך פשוטה לבנות ממשקי משתמש עם כמות קטנה של קוד Kotlin. זה גם מאפשר לך לכתוב את ממשק המשתמש שלך פעם אחת ולהפעיל אותו בכל אחת מהפלטפורמות הנתמכות - iOS, Android, שולחן עבודה (Windows, macOS, Linux) ואינטרנט.</string>
   <string name="multi_arch_dialog_details"><![CDATA[אם אפליקציה חושפת ממשק API לאפליקציות אחרות שיכולות להיות 32 סיביות או 64 סיביות, האפליקציה חייבת להגדיר את המאפיין <b>android:multiarch</b> כ-true בתוך המניפסט שלה כדי למנוע שגיאות אפשריות.]]></string>
   <string name="xml_detail">פרטי XML</string>
   <string name="lib_detail_dialog_title_16kb_page_size">תמיכה בגודל עמוד של 16 KB</string>

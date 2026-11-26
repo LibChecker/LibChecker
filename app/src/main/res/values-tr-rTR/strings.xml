@@ -47,7 +47,6 @@
   <string name="shortcuts_pin">Kısayolu sabitle</string>
   <string name="shortcuts_drag_hint">Bir öğeyi basılı tutup buraya sürükleyin</string>
   <string name="shortcuts_drop_hint">Sabitlemek için bırakın</string>
-  <string name="shortcuts_pinned_feedback">%s sabitlendi</string>
   <string name="uncharted_territory">Bilinmeyen sular</string>
   <string name="get_app_list_denied_tip">Lütfen LibChecker\'a\n\"Yüklü uygulamaları görme\"\nizni verin</string>
   <string name="advanced_menu">Gelişmiş menü</string>
@@ -177,7 +176,6 @@
   <string name="play_app_signing_details">Play Uygulama İmzası sayesinde Google, uygulamanızın imzalama anahtarını sizin adınıza güvenli altyapısında saklar ve korur; uygulama paketlerinizden (App Bundle) en uygun dağıtım APK\'larını üreterek imzalar.</string>
   <string name="pwa_details">Progresif Web Uygulamaları (PWA); modern web teknolojileriyle geliştirilmiş, tek bir kod tabanıyla her cihazda yerel uygulama akıcılığı, güvenilirlik ve çevrim dışı çalışma hissi sunan yapılardır.</string>
   <string name="jetpack_compose_details">Jetpack Compose, Android için modern ve bildirimsel (declarative) bir yerel arayüz geliştirme kitidir. Daha az kod, güçlü araçlar ve sezgisel Kotlin mimarisiyle arayüz geliştirmeyi büyük ölçüde hızlandırır.</string>
-  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform, JetBrains tarafından geliştirilen modern bir arayüz çatısıdır. Tek bir Kotlin kod tabanıyla iOS, Android, masaüstü ve web platformlarında ortak kullanıcı deneyimleri tasarlamanızı sağlar.</string>
   <string name="multi_arch_dialog_details"><![CDATA[Bir uygulama, diğer uygulamalara hem 32 bit hem de 64 bit çalışabilen bir API sunuyorsa, beklenmedik hataların önüne geçmek için manifest dosyasında <b>android:multiarch</b> değerini mutlaka \"true\" yapmalıdır.]]></string>
   <string name="xml_detail">XML Ayrıntısı</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16 KB bellek sayfası desteği</string>
@@ -285,20 +283,14 @@
   <string name="snapshot_indicator_moved">Taşındı</string>
   <string name="snapshot_detail_size_label">Boyut</string>
   <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
-  <plurals name="snapshot_detail_changes_count">
-    <item quantity="one">%d değişiklik</item>
-    <item quantity="other">%d değişiklik</item>
-  </plurals>
   <string name="snapshot_empty_list_title">Bileşenlerde değişiklik yok</string>
   <string name="snapshot_no_snapshot">Kayıt bulunamadı</string>
   <string name="snapshot_detail_new_install_title">Bu uygulama yeni kuruldu</string>
   <string name="snapshot_detail_deleted_title">Bu uygulama kaldırılmış</string>
-  <string name="snapshot_time_node_current">Güncel</string>
   <plurals name="snapshot_time_node_apps_count">
     <item quantity="one">%d uygulama</item>
     <item quantity="other">%d uygulama</item>
   </plurals>
-  <string name="snapshot_time_node_current_apps">%1$s · %2$s</string>
   <string name="snapshot_preinstalled_app">Sistemle gelen uygulama</string>
   <string name="snapshot_generate_text_report">Metin raporu oluştur</string>
   <string name="snapshot_scheme_tip"><![CDATA[İpucu: Şu komutla arka planda dilediğiniz zaman durum kaydı alabilirsiniz:<br><b>%s</b>]]></string>

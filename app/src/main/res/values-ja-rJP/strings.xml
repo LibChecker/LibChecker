@@ -118,7 +118,6 @@
   <string name="play_app_signing_details">Playアプリの署名では、Googleがあなたのアプリの署名キーを管理し、保護し、それを使用して、あなたのアプリバンドルから生成された最適化された配布APKに署名します。Playアプリの署名は、あなたのアプリの署名キーをGoogleの安全なインフラストラクチャ上に保存し、セキュリティを向上させるためのアップグレードオプションを提供します。</string>
   <string name="pwa_details">プログレッシブWebアプリ（PWA）は、現代のAPIを使用して構築および強化され、高度な機能、信頼性、インストール可能性を提供しながら、単一のコードベースでどのデバイスでもどこでも誰にでもアクセスします。</string>
   <string name="jetpack_compose_details">Jetpack Composeは、AndroidのネイティブUIを構築するための現代的なツールキットです。これにより、AndroidでのUI開発が簡略化され、加速します。少ないコード、強力なツール、直感的なKotlin APIを使用して、すぐにアプリを実現します。</string>
-  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatformは、JetBrainsが開発した最新の宣言型・リアクティブUIフレームワークで、少量のKotlinコードでユーザーインターフェイスを簡単に構築できます。また、UIを一度記述すれば、対応するすべてのプラットフォーム（iOS、Android、デスクトップ（Windows、macOS、Linux）、Web）で動作させることができます。</string>
   <string name="multi_arch_dialog_details"><![CDATA[アプリが他のアプリに対して32ビットまたは64ビットのAPIを公開できる場合、潜在的なエラーを回避するため、マニフェスト内で<b>android:multiarch</b>プロパティをtrueに設定する必要があります。]]></string>
   <string name="xml_detail">XML詳細</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16KBページサイズのサポート</string>

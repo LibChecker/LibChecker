@@ -123,7 +123,6 @@
   <string name="play_app_signing_details">.</string>
   <string name="pwa_details">Progressive Web Apps (PWA) werden mit modernen APIs aufgebaut und erweitert, um verbesserte Funktionen, Zuverlässigkeit und Installierbarkeit zu bieten. Sie erreichen jeden, überall, auf jedem Gerät mit einer einzigen Codebasis.</string>
   <string name="jetpack_compose_details">Jetpack Compose ist das moderne Toolkit von Android zur Erstellung nativer Benutzeroberflächen. Es vereinfacht und beschleunigt die UI-Entwicklung unter Android. Bringen Sie Ihre App schnell zum Leben – mit weniger Code, leistungsstarken Tools und intuitiven Kotlin-APIs.</string>
-  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform ist ein modernes, deklaratives und reaktives UI-Framework, das von JetBrains entwickelt wurde und eine einfache Möglichkeit bietet, Benutzeroberflächen mit wenig Kotlin-Code zu erstellen. Es ermöglicht außerdem, die UI einmal zu schreiben und auf allen unterstützten Plattformen auszuführen – iOS, Android, Desktop (Windows, macOS, Linux) und Web.</string>
   <string name="multi_arch_dialog_details"><![CDATA[Wenn eine App eine API für andere Apps bereitstellt, die entweder 32- oder 64-Bit sein kann, muss im Manifest der App die Eigenschaft <b>android:multiarch</b> auf „true“ gesetzt werden, um mögliche Fehler zu vermeiden.]]></string>
   <string name="xml_detail">XML-Details</string>
   <string name="lib_detail_dialog_title_16kb_page_size">16-KB-Seitengrößen-Unterstützung</string>
