@@ -123,7 +123,7 @@ class DetailToolbarController(
 
       AppDetailToolbarAction.HARMONY_TOGGLE -> R.drawable.ic_harmonyos_logo to toolbarView.context.getString(R.string.ability)
 
-      AppDetailToolbarAction.COMPARE -> R.drawable.ic_compare to toolbarView.context.getString(R.string.compare_with_current)
+      AppDetailToolbarAction.COMPARE -> R.drawable.ic_difference_two_tone to toolbarView.context.getString(R.string.compare_with_current)
     }
     return AppDetailToolbarItem(
       action = action,

@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.domain.snapshot.detail.ui.view.SnapshotTypeIndicatorView
-import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardAction
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotDashboardDisplayData
 import com.absinthe.libchecker.domain.snapshot.list.model.SnapshotSystemPropDisplayData
 import com.absinthe.libchecker.ui.adapter.BindOnlyAdapter
+import com.absinthe.libchecker.utils.extensions.applyDiffuseElevation
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColor
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -30,6 +30,8 @@ import com.google.android.material.card.MaterialCardView
 
 class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, R.style.AlbumMaterialCard) {
 
+  private val cardRadius = 12.dp
+
   private val container = SnapshotDashboardContainerView(context).apply {
     val padding = context.getDimensionPixelSize(R.dimen.normal_padding)
     setPadding(padding, padding, padding, padding)
@@ -41,17 +43,19 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       LayoutParams.MATCH_PARENT,
       LayoutParams.WRAP_CONTENT
     )
-    setSmoothRoundCorner(12.dp)
+    setSmoothRoundCorner(cardRadius)
+    applyDiffuseElevation()
     setCardBackgroundColor(context.getColorStateListByAttr(com.google.android.material.R.attr.colorSurfaceContainerHigh))
     addView(container)
   }
 
   fun bind(
     data: SnapshotDashboardDisplayData,
-    onAction: (SnapshotDashboardAction) -> Unit
+    onOpenActions: () -> Unit,
+    onChangeTimestamp: () -> Unit
   ) {
-    setOnClickListener { onAction(SnapshotDashboardAction.OpenAlbum) }
-    container.bind(data, onAction)
+    setOnClickListener { onOpenActions() }
+    container.bind(data, onChangeTimestamp)
     contentDescription = data.contentDescription
   }
 
@@ -123,7 +127,9 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
         }
       )
 
-    private val propsRecyclerView = RecyclerView(context).apply {
+    private val propsRecyclerView = object : RecyclerView(context) {
+      override fun onTouchEvent(event: android.view.MotionEvent): Boolean = false
+    }.apply {
       layoutParams = LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.WRAP_CONTENT
@@ -139,7 +145,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
 
     fun bind(
       data: SnapshotDashboardDisplayData,
-      onAction: (SnapshotDashboardAction) -> Unit
+      onChangeTimestamp: () -> Unit
     ) {
       tvSnapshotTimestampText.text = data.timestampText
       tvSnapshotAppsCountText.text = data.appsCountText
@@ -147,7 +153,7 @@ class SnapshotDashboardView(context: Context) : MaterialCardView(context, null, 
       arrow.contentDescription = data.timestampContentDescription
       val timestampClickListener = View.OnClickListener {
         if (!AntiShakeUtils.isInvalidClick(it)) {
-          onAction(SnapshotDashboardAction.ChangeTimestamp)
+          onChangeTimestamp()
         }
       }
       tvSnapshotTimestampText.setOnClickListener(timestampClickListener)

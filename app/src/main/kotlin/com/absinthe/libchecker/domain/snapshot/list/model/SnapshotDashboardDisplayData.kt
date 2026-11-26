@@ -8,9 +8,11 @@ data class SnapshotDashboardDisplayData(
   val timestampContentDescription: String
 )
 
-sealed interface SnapshotDashboardAction {
-  data object OpenAlbum : SnapshotDashboardAction
-  data object ChangeTimestamp : SnapshotDashboardAction
+enum class SnapshotDashboardAction {
+  Comparison,
+  Management,
+  BackupRestore,
+  Track
 }
 
 fun buildSnapshotDashboardDescription(

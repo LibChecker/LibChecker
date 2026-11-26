@@ -51,6 +51,13 @@
         <action android:name="android.intent.action.APPLICATION_PREFERENCES" />
       </intent-filter>
 
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <data android:scheme="content"
+          tools:ignore="AppLinkUrlError" />
+        <data android:pathPattern=".*\\.lcss" />
+      </intent-filter>
       <meta-data
         android:name="android.app.shortcuts"
         android:resource="@xml/shortcuts" />
@@ -88,19 +95,6 @@
     <activity
       android:name=".domain.snapshot.detail.ui.SnapshotDetailActivity"
       android:configChanges="orientation" />
-    <activity
-      android:name=".domain.snapshot.album.ui.AlbumActivity"
-      android:configChanges="orientation"
-      android:exported="true"
-      android:label="@string/title_album">
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <data android:scheme="content"
-          tools:ignore="AppLinkUrlError" />
-        <data android:pathPattern=".*\\.lcss" />
-      </intent-filter>
-    </activity>
     <activity
       android:name=".domain.snapshot.comparison.ui.ComparisonActivity"
       android:exported="true"

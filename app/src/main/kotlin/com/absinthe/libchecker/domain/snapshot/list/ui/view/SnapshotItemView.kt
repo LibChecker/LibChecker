@@ -45,6 +45,7 @@ import com.absinthe.libchecker.utils.extensions.visibleHeight
 import com.absinthe.libchecker.view.AViewGroup
 import com.absinthe.libchecker.view.span.CenterAlignImageSpan
 import com.google.android.material.card.MaterialCardView
+import kotlin.math.roundToInt
 
 class SnapshotItemView(
   context: Context,
@@ -294,12 +295,16 @@ class SnapshotItemView(
       highlightText: String
     ) {
       val appNameLabel = buildSpannedString {
+        append(data.text)
         if (data.showTrackIcon) {
-          inSpans(ImageSpan(context, R.drawable.ic_track)) {
-            append(" ")
+          R.drawable.ic_track_two_tone.getDrawable(context)?.mutate()?.let { marker ->
+            val size = appName.textSize.roundToInt()
+            marker.setBounds(0, 0, size, size)
+            marker.setTint(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
+            append('\u00A0')
+            inSpans(CenterAlignImageSpan(marker)) { append('\uFFFC') }
           }
         }
-        append(data.text)
       }
       appName.setOrHighlightText(appNameLabel, highlightText)
       appendPackageStateLabel(data.packageStateLabel)

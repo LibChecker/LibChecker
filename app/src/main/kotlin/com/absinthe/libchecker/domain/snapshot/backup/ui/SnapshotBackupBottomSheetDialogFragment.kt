@@ -23,6 +23,7 @@ import com.absinthe.libchecker.domain.snapshot.backup.presentation.SnapshotBacku
 import com.absinthe.libchecker.domain.snapshot.backup.usecase.SnapshotArchiveBackupResult
 import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
+import com.absinthe.libchecker.ui.preference.model.PreferenceItemGroupPosition
 import com.absinthe.libchecker.utils.UiUtils
 import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
@@ -30,12 +31,13 @@ import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.utils.extensions.launchDocument
 import com.absinthe.libchecker.utils.extensions.requireAvailableCacheDir
 import com.absinthe.libchecker.utils.showToast
+import com.absinthe.libchecker.view.app.PreferenceActionSheetView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
-class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<SnapshotBackupBottomSheetView>() {
+class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<PreferenceActionSheetView>() {
 
   private val viewModel: SnapshotBackupViewModel by viewModel()
   private lateinit var roomBackup: RoomBackup
@@ -82,14 +84,33 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
       ?: error("${context::class.java.simpleName} must implement SnapshotRoomBackupOwner")
   }
 
-  override fun initRootView(): SnapshotBackupBottomSheetView {
-    return SnapshotBackupBottomSheetView(requireContext())
+  override fun initRootView(): PreferenceActionSheetView {
+    return PreferenceActionSheetView(requireContext(), R.string.album_item_backup_restore_title).apply {
+      addAction(
+        key = "snapshot_backup",
+        iconRes = R.drawable.ic_backup_two_tone,
+        titleRes = R.string.album_backup_summary,
+        summaryRes = R.string.album_backup_sheet_backup_description,
+        groupPosition = PreferenceItemGroupPosition.FIRST
+      ) {
+        requestBackup()
+      }
+
+      addAction(
+        key = "snapshot_restore",
+        iconRes = R.drawable.ic_restore,
+        titleRes = R.string.album_restore_from_file,
+        summaryRes = R.string.album_restore_auto_detect_summary,
+        groupPosition = PreferenceItemGroupPosition.LAST
+      ) {
+        launchRestorePicker()
+      }
+    }
   }
 
   override fun init() {
     maxPeekHeightPercentage = 0.82f
     isInitialLandscapeExpansionEnabled = false
-    root.bind(::handleAction)
     val runningRestoreUri = viewModel.getActiveRestoreUri()
     if (runningRestoreUri == null) {
       consumePendingRestoreUri()
@@ -136,13 +157,6 @@ class SnapshotBackupBottomSheetDialogFragment : BaseBottomSheetViewDialogFragmen
     loadingDialog?.dismiss()
     loadingDialog = null
     super.onDestroyView()
-  }
-
-  private fun handleAction(action: SnapshotBackupBottomSheetAction) {
-    when (action) {
-      SnapshotBackupBottomSheetAction.Backup -> requestBackup()
-      SnapshotBackupBottomSheetAction.Restore -> launchRestorePicker()
-    }
   }
 
   private fun requestBackup() {
