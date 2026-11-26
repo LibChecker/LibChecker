@@ -47,7 +47,6 @@
   <string name="shortcuts_pin">تثبيت اختصار</string>
   <string name="shortcuts_drag_hint">اضغط مطولًا على عنصر من القائمة، ثم اسحبه إلى هنا</string>
   <string name="shortcuts_drop_hint">أفلت للتثبيت</string>
-  <string name="shortcuts_pinned_feedback">تم تثبيت %s</string>
   <string name="uncharted_territory">منطقة مجهولة</string>
   <string name="get_app_list_denied_tip">الرجاء منح إذن \n \"الحصول على معلومات حول التطبيقات المثبتة\" \n  لـLibChecker</string>
   <string name="advanced_menu">قائمة متقدمة</string>
@@ -178,7 +177,6 @@
   <string name="play_app_signing_details">باستخدام ميزة \"توقيع تطبيقات Play\"، تدير Google مفتاح توقيع تطبيقك وتحميه نيابة عنك وتستخدمه لتوقيع ملفات APK المحسنة والموزعة التي يتم إنشاؤها من حزم تطبيقاتك. يخزن Play App Signing مفتاح توقيع التطبيق على البنية الأساسية الآمنة من Google ويوفر خيارات ترقية لزيادة الأمان.</string>
   <string name="pwa_details">تم إنشاء تطبيقات الويب التقدمية (PWA) وتحسينها باستخدام واجهات برمجة التطبيقات الحديثة لتوفير إمكانات محسنة وموثوقية وإمكانية تثبيت أثناء الوصول إلى أي شخص في أي مكان وعلى أي جهاز باستخدام قاعدة بيانات واحدة.</string>
   <string name="jetpack_compose_details">(Jetpack Compose) هي مجموعة أدوات Android الحديثة لبناء واجهة مستخدم أصلية. إنه يبسط ويسرع تطوير واجهة المستخدم على Android. اجعل تطبيقك ينبض بالحياة بسرعة باستخدام تعليمات برمجية أقل وأدوات قوية وواجهات برمجة تطبيقات Kotlin سهلة الاستخدام.</string>
-  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform هو إطار واجهة مستخدم حديث تفاعلي وتعبيري طورته شركة JetBrains، ويوفر طريقة بسيطة لإنشاء واجهات المستخدم بقليل من كود كوتلن. كما يسمح لك بكتابة واجهتك مرة واحدة وتشغيلها على أي من المنصات المدعومة – iOS وأندرويد وسطح المكتب (Windows, macOS, Linux) والويب.</string>
   <string name="compose_multiplatform_resources_details">توفر Compose Multiplatform Resources موارد مشتركة لنظام Android والمنصات الأخرى. قد تكون مضمنة عبر إحدى تبعيات التطبيق، ولا يعني ذلك بالضرورة أن التطبيق نفسه متعدد المنصات.</string>
   <string name="multi_arch_dialog_details"><![CDATA[إذا كان أحد التطبيقات يوفر واجهة برمجة تطبيقات (API) لتطبيقات أخرى يمكن أن تكون 32 بت أو 64 بت، يجب تعيين الخاصية <b>android:multiarch</b> إلى true داخل ملف Manifest لتجنب حدوث أخطاء محتملة.]]></string>
   <string name="xml_detail">تفاصيل XML</string>
@@ -288,19 +286,10 @@
   <string name="snapshot_indicator_moved">تم النقل</string>
   <string name="snapshot_detail_size_label">الحجم</string>
   <string name="snapshot_detail_metric_description">%1$s، %2$s</string>
-  <plurals name="snapshot_detail_changes_count">
-    <item quantity="zero">%d تغيير</item>
-    <item quantity="one">%d تغيير</item>
-    <item quantity="two">%d تغييران</item>
-    <item quantity="few">%d تغييرات</item>
-    <item quantity="many">%d تغييرًا</item>
-    <item quantity="other">%d تغيير</item>
-  </plurals>
   <string name="snapshot_empty_list_title">لا تغييرات في المكونات</string>
   <string name="snapshot_no_snapshot">نقطة استعادة أو Snapshot</string>
   <string name="snapshot_detail_new_install_title">تم تثبيت هذا التطبيق حديثا</string>
   <string name="snapshot_detail_deleted_title">تمت إزالة هذا التطبيق</string>
-  <string name="snapshot_time_node_current">الحالية</string>
   <plurals name="snapshot_time_node_apps_count">
     <item quantity="zero">%d تطبيق</item>
     <item quantity="one">%d تطبيق</item>

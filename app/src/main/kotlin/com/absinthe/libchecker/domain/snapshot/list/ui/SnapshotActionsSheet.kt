@@ -8,7 +8,7 @@ import com.absinthe.libchecker.ui.preference.model.PreferenceItemGroupPosition
 import com.absinthe.libchecker.view.app.PreferenceActionSheetView
 
 class SnapshotActionsSheet : BaseBottomSheetViewDialogFragment<PreferenceActionSheetView>() {
-  override fun initRootView() = PreferenceActionSheetView(requireContext(), R.string.title_snapshot).apply {
+  override fun initRootView() = PreferenceActionSheetView(requireContext(), R.string.title_album).apply {
     addAction(
       key = SnapshotDashboardAction.Comparison.name,
       iconRes = R.drawable.ic_difference_two_tone,

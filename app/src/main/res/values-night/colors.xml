@@ -12,7 +12,6 @@
   <color name="snapshot_status_moved">#64B5F6</color>
 
   <!-- Launcher adaptive icon -->
-  <color name="ic_launcher_foreground">#6200EE</color>
   <color name="ic_launcher_background">#E1F5FE</color>
 
   <!-- Third-party brand accents -->

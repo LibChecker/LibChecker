@@ -47,7 +47,6 @@
   <string name="shortcuts_pin">Pin shortcut</string>
   <string name="shortcuts_drag_hint">Hold a list item, then drag it here</string>
   <string name="shortcuts_drop_hint">Release to pin</string>
-  <string name="shortcuts_pinned_feedback">Pinned %s</string>
   <string name="uncharted_territory">Uncharted territory</string>
   <string name="get_app_list_denied_tip">Please grant\n"Get info about installed apps"\npermission to LibChecker</string>
   <string name="advanced_menu">Advanced menu</string>
@@ -189,7 +188,6 @@
   <string name="play_app_signing_details">With Play App Signing, Google manages and protects your app\'s signing key for you and uses it to sign optimized, distribution APKs that are generated from your app bundles. Play App Signing stores your app signing key on Google’s secure infrastructure and offers upgrade options to increase security.</string>
   <string name="pwa_details">Progressive Web Apps (PWA) are built and enhanced with modern APIs to deliver enhanced capabilities, reliability, and installability while reaching anyone, anywhere, on any device with a single codebase.</string>
   <string name="jetpack_compose_details">Jetpack Compose is Android’s modern toolkit for building native UI. It simplifies and accelerates UI development on Android. Quickly bring your app to life with less code, powerful tools, and intuitive Kotlin APIs.</string>
-  <string name="jetbrain_compose_multiplatform_details">Compose Multiplatform is a modern declarative and reactive UI framework developed by JetBrains that provides a simple way to build user interfaces with a small amount of Kotlin code. It also allows you to write your UI once and run it on any of the supported platforms – iOS, Android, desktop (Windows, macOS, Linux), and web.</string>
   <string name="compose_multiplatform_resources_details">Compose Multiplatform Resources provides shared resources for Android and other platforms. It can be included by an app dependency and does not necessarily mean the app itself is multiplatform.</string>
   <string name="multi_arch_dialog_details"><![CDATA[If an app exposes an API to other apps that can be either 32-bit or 64-bit, the app must have the <b>android:multiarch</b> property set to true within its manifest to avoid potential errors.]]></string>
   <string name="xml_detail">XML Detail</string>
@@ -300,20 +298,14 @@
   <string name="snapshot_indicator_moved">Moved</string>
   <string name="snapshot_detail_size_label">Size</string>
   <string name="snapshot_detail_metric_description">%1$s, %2$s</string>
-  <plurals name="snapshot_detail_changes_count">
-    <item quantity="one">%d change</item>
-    <item quantity="other">%d changes</item>
-  </plurals>
   <string name="snapshot_empty_list_title">No component changes</string>
   <string name="snapshot_no_snapshot">No Snapshot</string>
   <string name="snapshot_detail_new_install_title">This app has newly installed</string>
   <string name="snapshot_detail_deleted_title">This app has been removed</string>
-  <string name="snapshot_time_node_current">Current</string>
   <plurals name="snapshot_time_node_apps_count">
     <item quantity="one">%d app</item>
     <item quantity="other">%d apps</item>
   </plurals>
-  <string name="snapshot_time_node_current_apps">%1$s · %2$s</string>
   <string name="snapshot_preinstalled_app">Preinstalled app</string>
   <string name="snapshot_generate_text_report">Generate text report</string>
   <string name="snapshot_scheme_tip"><![CDATA[Tip: You can now generate snapshots in the background via:<br><b>%s</b>]]></string>
