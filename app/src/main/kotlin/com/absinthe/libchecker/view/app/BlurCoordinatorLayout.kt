@@ -71,6 +71,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
   private var appbarEffectNode: RenderNode? = null
   private var navEffectNode: RenderNode? = null
   private var appbarBlur: ProgressiveBlurEffect? = null
+  private var navBlurEffectRadius = 0f
   private var navBlurEffect: RenderEffect? = null
   private var scrimPaint: Paint? = null
   private var appbarTintPaint: Paint? = null
@@ -364,7 +365,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     val downsample = NAV_BACKDROP_DOWNSAMPLE
     val targetW = (source.width / downsample).coerceAtLeast(1)
     val sourceH = (source.height / downsample).coerceAtLeast(1)
-    val contentOffset = calculateBackdropContentOffset(NAV_BLUR_RADIUS_PX)
+    val contentOffset = calculateBackdropContentOffset(FLOATING_NAV_BLUR_RADIUS_PX)
     val targetH = calculateBackdropTextureHeight(sourceH, contentOffset)
     navDownsampleNode?.let { node ->
       if (node.width == targetW && node.height == targetH && node.hasDisplayList()) {
@@ -442,11 +443,16 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     node.endRecording()
   }
 
+  private val navBlurRadiusPx: Float
+    get() = NAV_BLUR_RADIUS_PX + (FLOATING_NAV_BLUR_RADIUS_PX - NAV_BLUR_RADIUS_PX) * floatingNavProgress
+
   private fun obtainNavBlurEffect(): RenderEffect {
-    navBlurEffect?.let { return it }
+    val radius = navBlurRadiusPx
+    if (navBlurEffectRadius == radius) navBlurEffect?.let { return it }
+    navBlurEffectRadius = radius
     return RenderEffect.createBlurEffect(
-      NAV_BLUR_RADIUS_PX,
-      NAV_BLUR_RADIUS_PX,
+      radius,
+      radius,
       Shader.TileMode.CLAMP
     )
       .also { navBlurEffect = it }
@@ -625,7 +631,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
         top,
         ceil(right - left).toInt(),
         ceil(bottom - top).toInt(),
-        NAV_BLUR_RADIUS_PX * NAV_BACKDROP_DOWNSAMPLE
+        navBlurRadiusPx * NAV_BACKDROP_DOWNSAMPLE
       )
     ) {
       val paint = obtainScrimPaint()
@@ -699,7 +705,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     calculateBackdropContentOffset(appbarBlurRadiusPx).toFloat()
   }
   private val navBackdropContentOffset by lazy(LazyThreadSafetyMode.NONE) {
-    calculateBackdropContentOffset(NAV_BLUR_RADIUS_PX).toFloat()
+    calculateBackdropContentOffset(FLOATING_NAV_BLUR_RADIUS_PX).toFloat()
   }
 
   private fun captureBarBackgrounds() {
@@ -769,6 +775,7 @@ class BlurCoordinatorLayout @JvmOverloads constructor(
     // Miuix's progressive app bar recipe uses a 10dp radius and a 30% surface blend.
     private const val APPBAR_BLUR_OFFSET_DP = 24f
     private const val NAV_BLUR_RADIUS_PX = 10f
+    private const val FLOATING_NAV_BLUR_RADIUS_PX = 12f
     private const val APPBAR_TINT_STOP_COUNT = 9
     private const val NAV_TINT_ALPHA = 0x99
     private const val BASE_FILL_ALPHA_MASK = 0xE6FFFFFFL // 90% opaque base so empty areas still look like glass

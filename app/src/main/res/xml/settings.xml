@@ -17,7 +17,7 @@
       app:defaultValue="notify"
       app:entries="@array/snapshot_keep"
       app:entryValues="@array/snapshot_keep_value"
-      app:icon="@drawable/ic_outline_save"
+      app:icon="@drawable/ic_save_two_tone"
       app:key="snapshotKeep"
       app:title="@string/snapshot_keep" />
 
@@ -96,7 +96,7 @@
       app:title="@string/settings_get_updates" />
 
     <androidx.preference.Preference
-      app:icon="@drawable/ic_logo"
+      app:icon="@drawable/ic_settings_about"
       app:key="about"
       app:summary="@string/settings_about_summary"
       app:title="@string/settings_about" />

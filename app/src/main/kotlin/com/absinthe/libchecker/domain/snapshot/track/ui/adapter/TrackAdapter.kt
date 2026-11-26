@@ -10,11 +10,7 @@ import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 
-class TrackAdapter : BaseQuickAdapter<TrackedAppListItem, BaseViewHolder>(0, TrackListDiff()) {
-
-  init {
-    addChildClickViewIds(android.R.id.toggle)
-  }
+class TrackAdapter(private val onTrackedChanged: (String, Boolean) -> Unit) : BaseQuickAdapter<TrackedAppListItem, BaseViewHolder>(0, TrackListDiff()) {
 
   override fun onCreateDefViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
     return createBaseViewHolder(
@@ -35,7 +31,12 @@ class TrackAdapter : BaseQuickAdapter<TrackedAppListItem, BaseViewHolder>(0, Tra
       icon.load(item.packageInfo)
       appName.text = item.label
       packageName.text = item.packageName
-      switch.isChecked = item.switchState
+      switch.setOnCheckedChangeListener(null)
+      if (switch.isChecked != item.switchState) {
+        switch.isChecked = item.switchState
+        switch.jumpDrawablesToCurrentState()
+      }
+      switch.setOnCheckedChangeListener { _, checked -> onTrackedChanged(item.packageName, checked) }
       switch.contentDescription = item.description
     }
   }

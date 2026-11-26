@@ -5,11 +5,12 @@ import android.util.TypedValue
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatImageView
 import com.absinthe.libchecker.R
+import com.absinthe.libchecker.utils.extensions.dp
 import com.absinthe.libchecker.utils.extensions.getColorByAttr
 import com.absinthe.libchecker.utils.extensions.getDimensionPixelSize
 import com.absinthe.libchecker.utils.extensions.getResourceIdByAttr
 import com.absinthe.libchecker.view.app.TextColumnRowView
-import com.google.android.material.checkbox.MaterialCheckBox
+import com.google.android.material.materialswitch.MaterialSwitch
 
 class TrackItemView(context: Context) : TextColumnRowView(context) {
 
@@ -26,10 +27,10 @@ class TrackItemView(context: Context) : TextColumnRowView(context) {
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
   }
   val packageName = addTextLine(R.style.TextView_SansSerif) {
-    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface))
+    setTextColor(context.getColorByAttr(com.google.android.material.R.attr.colorOnSurfaceVariant))
     setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
   }
-  val switch = MaterialCheckBox(context).apply {
+  val switch = MaterialSwitch(context).apply {
     id = android.R.id.toggle
     layoutParams = ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -39,10 +40,12 @@ class TrackItemView(context: Context) : TextColumnRowView(context) {
   }
 
   init {
-    val padding = context.getDimensionPixelSize(R.dimen.main_card_padding)
-    setPadding(padding, padding, padding, padding)
+    val horizontalPadding = context.getDimensionPixelSize(R.dimen.main_list_horizontal_padding)
+    val verticalPadding = context.getDimensionPixelSize(R.dimen.main_card_padding)
+    setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding)
     setBackgroundResource(context.getResourceIdByAttr(android.R.attr.selectableItemBackground))
-    setLeadingView(icon)
-    setTrailingView(switch, spacing = 0)
+    setLeadingView(icon, spacing = 12.dp)
+    centerTextColumn()
+    setTrailingView(switch)
   }
 }

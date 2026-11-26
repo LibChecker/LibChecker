@@ -4,8 +4,11 @@
   android:tint="?attr/colorOnSurface"
   android:viewportWidth="24"
   android:viewportHeight="24">
-
+  <path
+    android:fillAlpha="0.3"
+    android:fillColor="@android:color/white"
+    android:pathData="M8 7h11v14H8z" />
   <path
     android:fillColor="@android:color/white"
-    android:pathData="M19,21H8V7h11m0,-2H8a2,2 0,0 0,-2 2v14a2,2 0,0 0,2 2h11a2,2 0,0 0,2 -2V7a2,2 0,0 0,-2 -2m-3,-4H4a2,2 0,0 0,-2 2v14h2V3h12z" />
+    android:pathData="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
 </vector>
