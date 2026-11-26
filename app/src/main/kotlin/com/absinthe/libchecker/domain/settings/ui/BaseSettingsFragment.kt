@@ -19,6 +19,7 @@ import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.PreferenceScreen
 import androidx.preference.PreferenceViewHolder
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.domain.settings.presentation.SettingsViewModel
@@ -250,6 +251,7 @@ abstract class BaseSettingsFragment :
     val recyclerView =
       super.onCreateRecyclerView(inflater, parent, savedInstanceState) as BorderRecyclerView
     recyclerView.id = android.R.id.list
+    (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
     recyclerView.fixEdgeEffect()
     recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
     recyclerView.isVerticalScrollBarEnabled = false

@@ -190,4 +190,7 @@
   <style name="App.Widget.AdvancedMenuToggle" parent="">
     <item name="materialButtonStyle">@style/Widget.Material3Expressive.Button.OutlinedButton</item>
   </style>
+  <style name="Widget.LibChecker.MaterialSwitch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+    <item name="thumbIcon">@drawable/ic_switch_thumb</item>
+  </style>
 </resources>

@@ -168,7 +168,7 @@
     <item name="dialogCornerRadius">28dp</item>
     <item name="android:switchStyle">@style/Widget.Material3.CompoundButton.Switch</item>
     <item name="switchStyle">@style/Widget.Material3.CompoundButton.Switch</item>
-    <item name="materialSwitchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
+    <item name="materialSwitchStyle">@style/Widget.LibChecker.MaterialSwitch</item>
     <item name="colorPrimary">@color/md_theme_libchecker_light_primary</item>
     <item name="colorOnPrimary">@color/md_theme_libchecker_light_onPrimary</item>
     <item name="colorPrimaryContainer">@color/md_theme_libchecker_light_primaryContainer</item>
@@ -238,7 +238,7 @@
     <item name="dialogCornerRadius">28dp</item>
     <item name="android:switchStyle">@style/Widget.Material3.CompoundButton.Switch</item>
     <item name="switchStyle">@style/Widget.Material3.CompoundButton.Switch</item>
-    <item name="materialSwitchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
+    <item name="materialSwitchStyle">@style/Widget.LibChecker.MaterialSwitch</item>
     <item name="colorPrimary">@color/md_theme_libchecker_dark_primary</item>
     <item name="colorOnPrimary">@color/md_theme_libchecker_dark_onPrimary</item>
     <item name="colorPrimaryContainer">@color/md_theme_libchecker_dark_primaryContainer</item>

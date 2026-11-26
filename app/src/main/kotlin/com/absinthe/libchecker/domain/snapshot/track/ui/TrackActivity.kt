@@ -9,7 +9,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Checkable
 import android.widget.FrameLayout
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
@@ -17,6 +16,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.absinthe.libchecker.R
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.databinding.ActivityTrackBinding
@@ -46,7 +46,7 @@ class TrackActivity :
 
   private val viewModel: TrackViewModel by viewModel()
   private val getRandomAppIcon: GetRandomAppIconUseCase by inject()
-  private val adapter = TrackAdapter()
+  private val adapter = TrackAdapter { packageName, checked -> viewModel.setPackageTracked(packageName, checked) }
   private var menu: Menu? = null
   private var isEmptyStateViewReady = false
   private var blurContainer: BlurCoordinatorLayout? = null
@@ -68,6 +68,7 @@ class TrackActivity :
     binding.toolbar.title = getString(R.string.album_item_track_title)
 
     binding.list.apply {
+      (itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
       adapter = this@TrackActivity.adapter
       applySystemBarsPadding(top = true, bottom = true)
       layoutManager = LinearLayoutManager(this@TrackActivity)
@@ -81,21 +82,8 @@ class TrackActivity :
       FastScrollerBuilder(this).useMd2Style().build()
     }
     adapter.apply {
-      fun doSaveItemState(pos: Int, state: Boolean) {
-        val packageName = data[pos].packageName
-        viewModel.setPackageTracked(packageName, state)
-      }
-
-      setOnItemClickListener { _, view, position ->
-        (view as TrackItemView).container.switch.apply {
-          isChecked = !isChecked
-          doSaveItemState(position, isChecked)
-        }
-      }
-      setOnItemChildClickListener { _, view, position ->
-        if (view.id == android.R.id.toggle) {
-          doSaveItemState(position, (view as Checkable).isChecked)
-        }
+      setOnItemClickListener { _, view, _ ->
+        (view as TrackItemView).container.switch.toggle()
       }
       stateView = DotLoadingView(this@TrackActivity).apply {
         loadingView.setAppIconHighlightProvider { getRandomAppIcon() }
