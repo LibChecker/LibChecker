@@ -9,6 +9,7 @@ import android.graphics.Outline
 import android.graphics.Path
 import android.graphics.PointF
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.util.TypedValue
@@ -35,6 +36,7 @@ import androidx.core.view.doOnPreDraw
 import androidx.core.view.get
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -48,6 +50,7 @@ import com.absinthe.libchecker.annotation.STATUS_START_INIT
 import com.absinthe.libchecker.constant.Constants
 import com.absinthe.libchecker.constant.GlobalValues
 import com.absinthe.libchecker.constant.OnceTag
+import com.absinthe.libchecker.database.backup.RoomBackup
 import com.absinthe.libchecker.databinding.ActivityMainBinding
 import com.absinthe.libchecker.domain.app.detail.navigation.EXTRA_PACKAGE_NAME
 import com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity
@@ -60,6 +63,8 @@ import com.absinthe.libchecker.domain.home.ui.view.RecentVisitsPopup
 import com.absinthe.libchecker.domain.home.ui.view.startRecentVisitDrag
 import com.absinthe.libchecker.domain.rules.CloudRulesRepository
 import com.absinthe.libchecker.domain.settings.ui.SettingsContainerFragment
+import com.absinthe.libchecker.domain.snapshot.backup.ui.SnapshotBackupBottomSheetDialogFragment
+import com.absinthe.libchecker.domain.snapshot.backup.ui.SnapshotRoomBackupOwner
 import com.absinthe.libchecker.services.IWorkerService
 import com.absinthe.libchecker.services.WorkerService
 import com.absinthe.libchecker.ui.base.BaseActivity
@@ -114,7 +119,19 @@ class MainActivity :
   BaseActivity<ActivityMainBinding>(),
   INavViewContainer,
   IAppBarContainer,
-  IListControllerHost {
+  IListControllerHost,
+  SnapshotRoomBackupOwner {
+
+  override val snapshotRoomBackup = RoomBackup(this)
+  private var pendingRestoreUri: Uri? = null
+  private val fragmentLifecycleCallbacks =
+    object : FragmentManager.FragmentLifecycleCallbacks() {
+      override fun onFragmentDetached(fragmentManager: FragmentManager, fragment: Fragment) {
+        if (fragment is SnapshotBackupBottomSheetDialogFragment) {
+          binding.root.post(::dispatchPendingRestoreUri)
+        }
+      }
+    }
 
   override fun inflateBinding(inflater: LayoutInflater) = ActivityMainBinding.inflate(inflater)
 
@@ -183,6 +200,7 @@ class MainActivity :
       cloudRulesRepository.reinitializeRules()
     }
 
+    supportFragmentManager.registerFragmentLifecycleCallbacks(fragmentLifecycleCallbacks, false)
     initView()
     initObserver()
     bindService(
@@ -193,15 +211,62 @@ class MainActivity :
       BIND_AUTO_CREATE
     )
     appViewModel.clearApkCache()
-    handleIntent(intent)
+    if (savedInstanceState == null || intent.action != Intent.ACTION_VIEW) {
+      handleIntent(intent)
+    } else {
+      pendingRestoreUri = savedInstanceState.getString("pendingSnapshotRestore")?.let(Uri::parse)
+    }
   }
 
   override fun onNewIntent(intent: Intent) {
     super.onNewIntent(intent)
+    setIntent(intent)
     handleIntent(intent)
   }
 
+  override fun onSaveInstanceState(outState: Bundle) {
+    pendingRestoreUri?.let { outState.putString("pendingSnapshotRestore", it.toString()) }
+    super.onSaveInstanceState(outState)
+  }
+
+  override fun onResumeFragments() {
+    super.onResumeFragments()
+    dispatchPendingRestoreUri()
+  }
+
+  private fun dispatchPendingRestoreUri() {
+    val restoreUri = pendingRestoreUri ?: return
+    if (supportFragmentManager.isStateSaved) {
+      return
+    }
+    val tag = SnapshotBackupBottomSheetDialogFragment::class.java.name
+    val currentSheet =
+      supportFragmentManager.findFragmentByTag(tag) as? SnapshotBackupBottomSheetDialogFragment
+    if (currentSheet?.isRemoving == true) {
+      return
+    }
+    if (currentSheet != null) {
+      currentSheet.restoreFromLaunchUri(restoreUri)
+      pendingRestoreUri = null
+    } else if (showBackupBottomSheet(restoreUri)) {
+      pendingRestoreUri = null
+    }
+  }
+
+  private fun showBackupBottomSheet(restoreUri: Uri? = null): Boolean {
+    val tag = SnapshotBackupBottomSheetDialogFragment::class.java.name
+    if (supportFragmentManager.findFragmentByTag(tag) != null) {
+      return false
+    }
+    return runCatching {
+      SnapshotBackupBottomSheetDialogFragment
+        .newInstance(restoreUri)
+        .showNow(supportFragmentManager, tag)
+    }.onFailure(Timber::e).isSuccess
+  }
+
   override fun onDestroy() {
+    supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks)
     imeController?.dispose()
     recentVisitsPopup?.dismissImmediately()
     recentVisitsPopup = null
@@ -1130,7 +1195,14 @@ class MainActivity :
   }
 
   private fun handleIntent(intent: Intent) {
-    HomeDestination.fromLaunchAction(intent.action)?.let {
+    val destination = if (intent.action == Intent.ACTION_VIEW && intent.data?.scheme == "content") {
+      pendingRestoreUri = intent.data
+      dispatchPendingRestoreUri()
+      HomeDestination.SNAPSHOT
+    } else {
+      HomeDestination.fromLaunchAction(intent.action)
+    }
+    destination?.let {
       (binding.navView as? FloatingNavigationBar)?.setSelectedIndex(it.pageIndex, animate = false)
       binding.viewpager.setCurrentItem(it.pageIndex, false)
     }

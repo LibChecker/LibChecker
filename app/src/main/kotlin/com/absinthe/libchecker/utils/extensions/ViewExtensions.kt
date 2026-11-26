@@ -258,6 +258,14 @@ fun View.animatedBlurAction(action: () -> Unit): ValueAnimator {
   return animator
 }
 
+internal fun View.applyDiffuseElevation() {
+  elevation = 12.dp.toFloat()
+  if (OsUtils.atLeastP()) {
+    outlineAmbientShadowColor = 0xB3000000.toInt()
+    outlineSpotShadowColor = 0x50000000
+  }
+}
+
 fun MaterialCardView.setSmoothRoundCorner(radius: Int) {
   val radius = radius.toFloat()
   val shape = ShapeAppearanceModel.builder()

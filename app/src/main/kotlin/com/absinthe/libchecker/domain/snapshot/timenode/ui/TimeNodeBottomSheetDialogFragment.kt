@@ -18,7 +18,6 @@ import com.absinthe.libchecker.domain.snapshot.timenode.model.SnapshotUpdatedApp
 import com.absinthe.libchecker.domain.snapshot.timenode.model.TimeNodeBottomSheetAction
 import com.absinthe.libchecker.domain.snapshot.timenode.model.TimeNodeBottomSheetState
 import com.absinthe.libchecker.domain.snapshot.timenode.model.TimeNodeHeaderState
-import com.absinthe.libchecker.domain.snapshot.timenode.model.removeItemAt
 import com.absinthe.libchecker.domain.snapshot.timenode.model.withAutoRemoveThreshold
 import com.absinthe.libchecker.domain.snapshot.timenode.model.withContributionData
 import com.absinthe.libchecker.domain.snapshot.timenode.model.withListData
@@ -26,6 +25,7 @@ import com.absinthe.libchecker.domain.snapshot.timenode.model.withSelectedTile
 import com.absinthe.libchecker.domain.snapshot.timenode.model.withSelectedTimestamp
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.SnapshotContributionUpdatesPopup
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.view.TimeNodeBottomSheetView
+import com.absinthe.libchecker.ui.base.BaseAlertDialogBuilder
 import com.absinthe.libchecker.ui.base.BaseBottomSheetViewDialogFragment
 import com.absinthe.libchecker.utils.Telemetry
 import com.absinthe.libchecker.utils.Toasty
@@ -50,6 +50,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
   private var itemClickAction: ((position: Int, item: TimeStampItem) -> Unit)? = null
   private var onDismissAction: (() -> Unit)? = null
   private var addApkClickAction: ((isLeft: Boolean) -> Unit)? = null
+  private val managementMode get() = arguments?.getBoolean("manage") == true
   private var customTitle: String? = null
   private var isCompareMode: Boolean = false
   private var isLeftMode: Boolean = false
@@ -65,7 +66,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
     val initialSelected = arguments?.getLong(EXTRA_SELECTED_TIMESTAMP, 0L)?.takeIf { it > 0 }
     render(
       TimeNodeBottomSheetState(
-        title = customTitle ?: getString(R.string.dialog_title_change_timestamp),
+        title = customTitle ?: getString(if (managementMode) R.string.dialog_title_select_to_delete else R.string.dialog_title_change_timestamp),
         selectedTimestamp = initialSelected,
         selectedDate = initialSelected?.let {
           Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
@@ -96,7 +97,7 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
         root.scrollToSnapshot(timestamp)
         val timeStampItem = rawTimeStampItems.find { it.timestamp == timestamp }
           ?: TimeStampItem(timestamp, null, null)
-        itemClickAction?.invoke(action.position, timeStampItem)
+        if (managementMode) confirmDeletion(timestamp) else itemClickAction?.invoke(action.position, timeStampItem)
       }
 
       is TimeNodeBottomSheetAction.SelectTile -> {
@@ -229,14 +230,25 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
     addApkClickAction = action
   }
 
-  fun removeItem(position: Int) {
-    val currentState = dialogState ?: return
-    val updatedState = currentState.removeItemAt(position)
-    if (updatedState !== currentState) {
-      val timestamp = currentState.listData.items[position].timestamp
-      render(updatedState)
-      refreshTimeStampItems(rawTimeStampItems.filterNot { it.timestamp == timestamp })
-    }
+  private fun confirmDeletion(timestamp: Long) {
+    val host = requireActivity()
+    BaseAlertDialogBuilder(host)
+      .setTitle(R.string.dialog_title_confirm_to_delete)
+      .setMessage(getString(R.string.dialog_message_confirm_to_delete, viewModel.getFormatDateString(timestamp)))
+      .setNegativeButton(android.R.string.cancel, null)
+      .setPositiveButton(R.string.dialog_action_delete) { _, _ ->
+        viewLifecycleOwner.lifecycleScope.launch {
+          val loading = UiUtils.createLoadingDialog(host).also { it.show() }
+          try {
+            val remaining = withContext(Dispatchers.IO) { viewModel.deleteSnapshotTimeStamp(timestamp) }
+            requireArguments().putParcelableArrayList(EXTRA_TIMESTAMP_ITEMS, ArrayList(remaining))
+            if (remaining.isEmpty()) dismiss() else refreshTimeStampItems(remaining).join()
+          } finally {
+            loading.dismiss()
+          }
+        }
+      }
+      .show()
   }
 
   private fun refreshTimeStampItems(items: List<TimeStampItem>): Job {
@@ -348,10 +360,12 @@ class TimeNodeBottomSheetDialogFragment : BaseBottomSheetViewDialogFragment<Time
 
     fun newInstance(
       timestampItems: ArrayList<TimeStampItem>,
-      selectedTimestamp: Long = 0L
+      selectedTimestamp: Long = 0L,
+      manage: Boolean = false
     ): TimeNodeBottomSheetDialogFragment {
       return TimeNodeBottomSheetDialogFragment().putArguments(
         EXTRA_TIMESTAMP_ITEMS to timestampItems,
+        "manage" to manage,
         EXTRA_SELECTED_TIMESTAMP to selectedTimestamp
       )
     }

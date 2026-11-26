@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.os.Bundle
 import android.text.Html
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -38,7 +37,8 @@ import com.absinthe.libchecker.databinding.FragmentSnapshotBinding
 import com.absinthe.libchecker.domain.app.list.GetRandomAppIconUseCase
 import com.absinthe.libchecker.domain.home.presentation.HomeViewModel
 import com.absinthe.libchecker.domain.home.ui.INavViewContainer
-import com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity
+import com.absinthe.libchecker.domain.snapshot.backup.ui.SnapshotBackupBottomSheetDialogFragment
+import com.absinthe.libchecker.domain.snapshot.comparison.ui.ComparisonActivity
 import com.absinthe.libchecker.domain.snapshot.detail.repository.SnapshotDetailPayloadRepository
 import com.absinthe.libchecker.domain.snapshot.detail.ui.launchSnapshotDetail
 import com.absinthe.libchecker.domain.snapshot.detail.ui.model.shouldShowSnapshotNoDiffPopup
@@ -56,6 +56,7 @@ import com.absinthe.libchecker.domain.snapshot.list.ui.view.SnapshotDashboardVie
 import com.absinthe.libchecker.domain.snapshot.list.usecase.BuildSnapshotItemDisplayDataUseCase
 import com.absinthe.libchecker.domain.snapshot.model.SnapshotDiffItem
 import com.absinthe.libchecker.domain.snapshot.timenode.ui.TimeNodeBottomSheetDialogFragment
+import com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity
 import com.absinthe.libchecker.services.OnShootListener
 import com.absinthe.libchecker.services.ShootService
 import com.absinthe.libchecker.ui.animator.ParticleRemoveItemAnimator
@@ -159,14 +160,19 @@ class SnapshotFragment :
     var dashboardTimestampText: CharSequence = ""
     var dashboardAppsCountText: CharSequence = ""
     var dashboardSystemProps: List<SnapshotSystemPropDisplayData> = emptyList()
-    fun changeTimeNode() {
-      lifecycleScope.launch(Dispatchers.IO) {
+    fun changeTimeNode(manage: Boolean = false) {
+      viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
         val timeStampList = viewModel.getTimeStamps()
         withContext(Dispatchers.Main) {
+          val manager = context.supportFragmentManager
+          val tag = TimeNodeBottomSheetDialogFragment::class.java.name
+          if (manager.isStateSaved || manager.findFragmentByTag(tag) != null) return@withContext
           TimeNodeBottomSheetDialogFragment.newInstance(
             ArrayList(timeStampList),
-            viewModel.selectedSnapshotTimestamp
+            if (manage) 0L else viewModel.selectedSnapshotTimestamp,
+            manage = manage
           ).apply {
+            if (manage) return@apply
             setOnItemClickListener { _, item ->
               if (viewModel.selectedSnapshotTimestamp != item.timestamp) {
                 flip(VF_LOADING)
@@ -179,21 +185,29 @@ class SnapshotFragment :
                 viewModel.refreshSelectedSnapshot(shouldClearDiff = true)
               }
             }
-          }.show(
-            context.supportFragmentManager,
-            TimeNodeBottomSheetDialogFragment::class.java.name
-          )
+          }.showNow(manager, tag)
         }
       }
     }
     fun handleDashboardAction(action: SnapshotDashboardAction) {
       when (action) {
-        SnapshotDashboardAction.OpenAlbum -> {
-          startActivity(Intent(context, AlbumActivity::class.java))
-        }
+        SnapshotDashboardAction.Comparison -> startActivity(Intent(context, ComparisonActivity::class.java))
 
-        SnapshotDashboardAction.ChangeTimestamp -> changeTimeNode()
+        SnapshotDashboardAction.Track -> startActivity(Intent(context, TrackActivity::class.java))
+
+        SnapshotDashboardAction.Management -> changeTimeNode(manage = true)
+
+        SnapshotDashboardAction.BackupRestore -> {
+          val manager = context.supportFragmentManager
+          val tag = SnapshotBackupBottomSheetDialogFragment::class.java.name
+          if (!manager.isStateSaved && manager.findFragmentByTag(tag) == null) {
+            SnapshotBackupBottomSheetDialogFragment.newInstance().showNow(manager, tag)
+          }
+        }
       }
+    }
+    childFragmentManager.setFragmentResultListener(SnapshotActionsSheet.RESULT_KEY, viewLifecycleOwner) { _, result ->
+      result.getString(SnapshotActionsSheet.ACTION)?.let { handleDashboardAction(SnapshotDashboardAction.valueOf(it)) }
     }
     fun renderDashboard() {
       dashboard.bind(
@@ -202,7 +216,14 @@ class SnapshotFragment :
           appsCountText = dashboardAppsCountText,
           systemProps = dashboardSystemProps
         ),
-        onAction = ::handleDashboardAction
+        onOpenActions = {
+          val manager = childFragmentManager
+          val tag = SnapshotActionsSheet::class.java.name
+          if (!manager.isStateSaved && manager.findFragmentByTag(tag) == null) {
+            SnapshotActionsSheet().showNow(manager, tag)
+          }
+        },
+        onChangeTimestamp = { changeTimeNode() }
       )
     }
     renderDashboard()

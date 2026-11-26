@@ -27,7 +27,7 @@
       window:secondaryActivityName="com.absinthe.libchecker.domain.app.detail.ui.AppDetailActivity" />
 
     <SplitPairFilter
-      window:primaryActivityName="com.absinthe.libchecker.domain.snapshot.album.ui.AlbumActivity"
+      window:primaryActivityName="com.absinthe.libchecker.domain.home.ui.MainActivity"
       window:secondaryActivityName="com.absinthe.libchecker.domain.snapshot.track.ui.TrackActivity" />
   </SplitPairRule>
 
