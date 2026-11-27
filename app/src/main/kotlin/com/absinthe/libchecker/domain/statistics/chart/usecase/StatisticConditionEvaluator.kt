@@ -51,7 +51,7 @@ internal class StatisticConditionEvaluator {
     if (condition.evidence == StatisticEvidence.TARGET_SDK) {
       return matches(item, condition, known)
     }
-    val query = collectArtifactQueries(condition).single()
+    val query = condition.artifactQuery()
     return known[query] ?: run {
       pending += query
       null
@@ -59,6 +59,7 @@ internal class StatisticConditionEvaluator {
   }
 
   private fun cost(query: StatisticArtifactQuery): Int = when (query) {
+    is StatisticArtifactQuery.RequestedPermissions, is StatisticArtifactQuery.ApplicationIconTraits -> 0
     is StatisticArtifactQuery.NativeLibrary, is StatisticArtifactQuery.ArchiveEntries -> 0
     is StatisticArtifactQuery.ManifestReceiverActions, is StatisticArtifactQuery.ManifestAttribute -> 1
     is StatisticArtifactQuery.DexClasses -> 2
@@ -95,25 +96,7 @@ internal class StatisticConditionEvaluator {
         operator = operator
       )
 
-      StatisticEvidence.NATIVE_LIBRARY -> artifactMatches[
-        StatisticArtifactQuery.NativeLibrary(checkNotNull(value.string))
-      ] == true
-
-      StatisticEvidence.DEX_CLASS -> artifactMatches[
-        StatisticArtifactQuery.DexClasses(checkNotNull(value.dexClasses))
-      ] == true
-
-      StatisticEvidence.ARCHIVE_ENTRY -> artifactMatches[
-        StatisticArtifactQuery.ArchiveEntries(checkNotNull(value.strings))
-      ] == true
-
-      StatisticEvidence.MANIFEST_RECEIVER_ACTION -> artifactMatches[
-        StatisticArtifactQuery.ManifestReceiverActions(checkNotNull(value.strings))
-      ] == true
-
-      StatisticEvidence.MANIFEST_ATTRIBUTE -> artifactMatches[
-        StatisticArtifactQuery.ManifestAttribute(checkNotNull(value.manifestAttribute))
-      ] == true
+      else -> artifactMatches[condition.artifactQuery()] == true
     }
   }
 
@@ -123,29 +106,20 @@ internal class StatisticConditionEvaluator {
     all?.forEach { it.collectArtifactQueries(destination) }
     any?.forEach { it.collectArtifactQueries(destination) }
     not?.collectArtifactQueries(destination)
-    val value = value ?: return
-    when (evidence) {
-      StatisticEvidence.TARGET_SDK, null -> Unit
+    if (evidence != null && evidence != StatisticEvidence.TARGET_SDK) destination += artifactQuery()
+  }
 
-      StatisticEvidence.NATIVE_LIBRARY -> {
-        destination += StatisticArtifactQuery.NativeLibrary(checkNotNull(value.string))
-      }
-
-      StatisticEvidence.DEX_CLASS -> {
-        destination += StatisticArtifactQuery.DexClasses(checkNotNull(value.dexClasses))
-      }
-
-      StatisticEvidence.ARCHIVE_ENTRY -> {
-        destination += StatisticArtifactQuery.ArchiveEntries(checkNotNull(value.strings))
-      }
-
-      StatisticEvidence.MANIFEST_RECEIVER_ACTION -> {
-        destination += StatisticArtifactQuery.ManifestReceiverActions(checkNotNull(value.strings))
-      }
-
-      StatisticEvidence.MANIFEST_ATTRIBUTE -> {
-        destination += StatisticArtifactQuery.ManifestAttribute(checkNotNull(value.manifestAttribute))
-      }
+  private fun StatisticConditionSpec.artifactQuery(): StatisticArtifactQuery {
+    val operand = checkNotNull(value)
+    return when (checkNotNull(evidence)) {
+      StatisticEvidence.NATIVE_LIBRARY -> StatisticArtifactQuery.NativeLibrary(checkNotNull(operand.string))
+      StatisticEvidence.DEX_CLASS -> StatisticArtifactQuery.DexClasses(checkNotNull(operand.dexClasses))
+      StatisticEvidence.ARCHIVE_ENTRY -> StatisticArtifactQuery.ArchiveEntries(checkNotNull(operand.strings))
+      StatisticEvidence.REQUESTED_PERMISSION -> StatisticArtifactQuery.RequestedPermissions(checkNotNull(operand.strings))
+      StatisticEvidence.APPLICATION_ICON_TRAIT -> StatisticArtifactQuery.ApplicationIconTraits(checkNotNull(operand.strings))
+      StatisticEvidence.MANIFEST_RECEIVER_ACTION -> StatisticArtifactQuery.ManifestReceiverActions(checkNotNull(operand.strings))
+      StatisticEvidence.MANIFEST_ATTRIBUTE -> StatisticArtifactQuery.ManifestAttribute(checkNotNull(operand.manifestAttribute))
+      StatisticEvidence.TARGET_SDK -> error("Target SDK is available directly on the app item")
     }
   }
 

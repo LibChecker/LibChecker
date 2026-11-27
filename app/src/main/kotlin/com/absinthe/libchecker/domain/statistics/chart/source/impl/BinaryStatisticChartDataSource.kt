@@ -39,7 +39,8 @@ internal class BinaryStatisticChartDataSource(
       val entries = listOf(matchedTitle, unmatchedTitle).mapIndexed { index, title ->
         PieEntry(classifiedMap.getValue(index).data.size.toFloat(), title.resolve(context))
       }
-      chartView.showPieData(entries, listOf("#3ddc84".toColorInt(), "#073042".toColorInt()))
+      // Full rule-defined names are already shown in the group list and legend.
+      chartView.showPieData(entries, listOf("#3ddc84".toColorInt(), "#073042".toColorInt()), drawEntryLabels = false)
     }
   }
 

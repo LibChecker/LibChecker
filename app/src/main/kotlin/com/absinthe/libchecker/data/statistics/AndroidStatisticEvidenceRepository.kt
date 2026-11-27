@@ -2,6 +2,7 @@ package com.absinthe.libchecker.data.statistics
 
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.graphics.drawable.AdaptiveIconDrawable
 import android.util.LruCache
 import com.absinthe.libchecker.annotation.RECEIVER
 import com.absinthe.libchecker.compat.ZipFileCompat
@@ -54,6 +55,13 @@ class AndroidStatisticEvidenceRepository(
   ): Map<StatisticArtifactQuery, Boolean> {
     checkCancellation()
     if (queries.isEmpty()) return emptyMap()
+    val packageEvidenceOnly = queries.all {
+      it is StatisticArtifactQuery.RequestedPermissions || it is StatisticArtifactQuery.ApplicationIconTraits
+    }
+    if (packageEvidenceOnly && queries.any { it is StatisticArtifactQuery.RequestedPermissions }) {
+      val info = installedPermissionsInfo(packageName) ?: return queries.associateWith { false }
+      return evaluate(info, queries, {}, checkCancellation) { info }
+    }
     val packageInfo = installedAppRepository.getPackageInfo(packageName)
       ?: return queries.associateWith { false }
     return matchesAll(packageInfo, queries, {}, checkCancellation)
@@ -70,6 +78,22 @@ class AndroidStatisticEvidenceRepository(
     queries: Set<StatisticArtifactQuery>,
     onProgress: (Int) -> Unit,
     checkCancellation: () -> Unit
+  ): Map<StatisticArtifactQuery, Boolean> = evaluate(packageInfo, queries, onProgress, checkCancellation) {
+    installedPermissionsInfo(packageInfo.packageName)
+  }
+
+  private fun installedPermissionsInfo(packageName: String): PackageInfo? = installedAppRepository.getPackageInfo(
+    packageName,
+    PackageManager.GET_PERMISSIONS,
+    resolveFrozenArchiveInfo = false
+  )
+
+  private fun evaluate(
+    packageInfo: PackageInfo,
+    queries: Set<StatisticArtifactQuery>,
+    onProgress: (Int) -> Unit,
+    checkCancellation: () -> Unit,
+    permissionInfo: () -> PackageInfo?
   ): Map<StatisticArtifactQuery, Boolean> {
     checkCancellation()
     if (queries.isEmpty()) {
@@ -81,8 +105,35 @@ class AndroidStatisticEvidenceRepository(
       checkCancellation()
       onProgress(0)
       val results = LinkedHashMap<StatisticArtifactQuery, Boolean>(queries.size)
-      val version = packageInfo.artifactVersion()
+      val permissionQueries = queries.filterIsInstance<StatisticArtifactQuery.RequestedPermissions>()
+      if (permissionQueries.isNotEmpty()) {
+        val permissions = readPackageEvidence(packageInfo.packageName) {
+          permissionInfo()?.let { info ->
+            val flags = info.requestedPermissionsFlags
+            info.requestedPermissions.orEmpty().filterIndexedTo(mutableSetOf()) { index, _ ->
+              val permissionFlags = flags?.getOrNull(index) ?: 0
+              permissionFlags and PackageInfo.REQUESTED_PERMISSION_IMPLICIT == 0
+            }
+          }
+        }.orEmpty()
+        permissionQueries.forEach { query -> results[query] = query.names.any(permissions::contains) }
+      }
+      checkCancellation()
+      val iconQueries = queries.filterIsInstance<StatisticArtifactQuery.ApplicationIconTraits>()
+      if (iconQueries.isNotEmpty()) {
+        val info = packageInfo.applicationInfo
+        val adaptive = info != null && info.icon != 0 && readPackageEvidence(packageInfo.packageName) {
+          packageManager.getDrawable(info.packageName, info.icon, info) is AdaptiveIconDrawable
+        } == true
+        iconQueries.forEach { query -> results[query] = adaptive && "adaptive" in query.names }
+      }
+      checkCancellation()
 
+      if (results.size == queries.size) {
+        onProgress(100)
+        return results
+      }
+      val version = packageInfo.artifactVersion()
       val nativeQueries = queries.filterIsInstance<StatisticArtifactQuery.NativeLibrary>()
       if (nativeQueries.isNotEmpty()) {
         val nativeDirectory = packageInfo.applicationInfo?.nativeLibraryDir?.let(::File)
@@ -222,6 +273,15 @@ class AndroidStatisticEvidenceRepository(
       onProgress(100)
       queries.associateWith { false }
     }
+  }
+
+  private inline fun <T> readPackageEvidence(packageName: String, read: () -> T): T? = try {
+    read()
+  } catch (error: CancellationException) {
+    throw error
+  } catch (error: Exception) {
+    Timber.w(error, "Unable to read statistic evidence for %s", packageName)
+    null
   }
 
   private fun matchesDexClassGroups(
