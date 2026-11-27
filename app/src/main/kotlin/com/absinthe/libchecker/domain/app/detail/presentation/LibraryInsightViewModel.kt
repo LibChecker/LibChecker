@@ -32,8 +32,11 @@ class LibraryInsightViewModel(
   }
 
   fun load(libraryUuid: String, packageInfo: PackageInfo, localeTag: String) {
-    request = Request(libraryUuid, packageInfo, localeTag)
-    resolve(request ?: return)
+    resolve(Request(libraryUuid, packageInfo, localeTag, nativeLibrary = false))
+  }
+
+  fun loadNativeLibrary(name: String, packageInfo: PackageInfo, localeTag: String) {
+    resolve(Request(name, packageInfo, localeTag, nativeLibrary = true))
   }
 
   fun retry() {
@@ -41,23 +44,22 @@ class LibraryInsightViewModel(
   }
 
   private fun resolve(request: Request) {
+    this.request = request
     job?.cancel()
     _state.value = LibraryInsightUiState.Hidden
     job = viewModelScope.launch {
       var supported = false
       try {
         preloadJob?.join()
-        when (
-          val result = resolveLibraryInsight(
-            libraryUuid = request.libraryUuid,
-            packageInfo = request.packageInfo,
-            localeTag = request.localeTag,
-            onSupported = {
-              supported = true
-              _state.value = LibraryInsightUiState.Loading
-            }
-          )
-        ) {
+        val result = if (request.nativeLibrary) {
+          resolveLibraryInsight.resolveNativeLibrary(request.key, request.packageInfo, request.localeTag)
+        } else {
+          resolveLibraryInsight(request.key, request.packageInfo, request.localeTag) {
+            supported = true
+            _state.value = LibraryInsightUiState.Loading
+          }
+        }
+        when (result) {
           is LibraryInsightResult.Content -> _state.value = LibraryInsightUiState.Content(result.content)
           LibraryInsightResult.NotSupported -> _state.value = LibraryInsightUiState.Hidden
           LibraryInsightResult.Unavailable -> _state.value = LibraryInsightUiState.Unavailable
@@ -71,8 +73,9 @@ class LibraryInsightViewModel(
   }
 
   private data class Request(
-    val libraryUuid: String,
+    val key: String,
     val packageInfo: PackageInfo,
-    val localeTag: String
+    val localeTag: String,
+    val nativeLibrary: Boolean
   )
 }

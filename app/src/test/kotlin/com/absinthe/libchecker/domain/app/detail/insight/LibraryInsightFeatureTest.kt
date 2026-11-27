@@ -24,6 +24,115 @@ class LibraryInsightFeatureTest {
   private val validator = LibraryInsightDefinitionValidator()
 
   @Test
+  fun `archive field is unique across base and splits`() = runBlocking {
+    val definition = headerDefinition()
+    assertTrue(validator.isValid(definition, ANDROIDX_SDK_ID, ANDROIDX_LIBRARY_UUID))
+    val first = "X1.5\u0000".toByteArray()
+    val second = "X1.16\u0000".toByteArray()
+    val info = packageInfoWithEntries(mapOf("header" to first), mapOf("header" to first))
+    val engine = LibraryInsightProbeEngine()
+    val repository = FakeLibraryInsightRepository(
+      catalog(ANDROIDX_DEFINITION_PATH, ANDROIDX_SDK_ID, ANDROIDX_LIBRARY_UUID),
+      definition,
+      ANDROIDX_DEFINITION_PATH,
+      lookupDocuments = emptyMap()
+    )
+    val resolve = ResolveLibraryInsightUseCase(repository, validator, engine) { null }
+    val content = resolve(ANDROIDX_LIBRARY_UUID, info, "en") as LibraryInsightResult.Content
+    assertEquals(listOf("1.5"), content.content.summary.single().values)
+    val split = File(info.applicationInfo!!.splitSourceDirs!!.single())
+    ZipOutputStream(split.outputStream()).use { zip ->
+      zip.putNextEntry(ZipEntry("header"))
+      zip.write(second)
+    }
+    assertEquals(LibraryInsightResult.NotSupported, resolve(ANDROIDX_LIBRARY_UUID, info, "en"))
+  }
+
+  @Test
+  fun `archive field rejects native directories and unsafe definitions`() = runBlocking {
+    val definition = headerDefinition()
+    val info = packageInfoWithEntries()
+    info.applicationInfo!!.nativeLibraryDir = temporaryFolder.root.path
+    temporaryFolder.newFile("header").writeText("X1.5\u0000")
+    assertFalse(LibraryInsightProbeEngine().probe(info, definition).evidenceFound)
+    val probe = definition.probes.single()
+    listOf(
+      probe.copy(source = probe.source.copy(container = LibraryInsightDefinition.Container("unityfs", "../member"))),
+      probe.copy(source = probe.source.copy(fileName = "header")),
+      probe.copy(captures = listOf(probe.captures.single().copy(maxResults = 1)))
+    ).forEach {
+      assertFalse(validator.isValid(definition.copy(probes = listOf(it)), ANDROIDX_SDK_ID, ANDROIDX_LIBRARY_UUID))
+    }
+  }
+
+  @Test
+  fun `native filename trigger requires package evidence and hides conflicts`() = runBlocking {
+    val catalog = catalog(ANDROIDX_DEFINITION_PATH, ANDROIDX_SDK_ID, ANDROIDX_LIBRARY_UUID)
+    val names = listOf("libruntime.so")
+    val entry = catalog.entries.single().copy(nativeLibraryNames = names)
+    val repo = FakeLibraryInsightRepository(
+      catalog.copy(entries = listOf(entry)),
+      headerDefinition().copy(nativeLibraryNames = names),
+      ANDROIDX_DEFINITION_PATH,
+      lookupDocuments = emptyMap()
+    )
+    val resolve = ResolveLibraryInsightUseCase(repo, validator, LibraryInsightProbeEngine()) { null }
+    val info = packageInfoWithEntries(splitEntries = mapOf("header" to "X1.5\u0000".toByteArray()))
+    for (name in listOf("LIBruntime.so", "path/libruntime.so", "other.so")) {
+      assertEquals(LibraryInsightResult.NotSupported, resolve.resolveNativeLibrary(name, info, "en"))
+    }
+    assertTrue(repo.requestedDefinitionPaths.isEmpty())
+    val content = resolve.resolveNativeLibrary(names.single(), info, "en") as LibraryInsightResult.Content
+    assertEquals(listOf("1.5"), content.content.summary.single().values)
+    assertEquals(listOf(ANDROIDX_DEFINITION_PATH), repo.requestedDefinitionPaths)
+
+    ZipOutputStream(File(info.applicationInfo!!.sourceDir).outputStream()).use { zip ->
+      zip.putNextEntry(ZipEntry("header"))
+      zip.write("X2.0\u0000".toByteArray())
+    }
+    assertEquals(LibraryInsightResult.NotSupported, resolve.resolveNativeLibrary(names.single(), info, "en"))
+  }
+
+  @Test
+  fun `filename match alone and inconsistent metadata never show details`() = runBlocking {
+    val catalog = catalog(ANDROIDX_DEFINITION_PATH, ANDROIDX_SDK_ID, ANDROIDX_LIBRARY_UUID)
+    val names = listOf("libruntime.so")
+    val entry = catalog.entries.single().copy(nativeLibraryNames = names)
+    val definition = headerDefinition().copy(nativeLibraryNames = names)
+    for (invalid in listOf("../runtime.so", "lib*.so", "libruntime", "part/inner.so")) {
+      assertFalse(validator.isValid(catalog.copy(entries = listOf(entry.copy(nativeLibraryNames = listOf(invalid))))))
+    }
+    assertFalse(validator.isValid(definition, entry.copy(nativeLibraryNames = listOf("other.so"))))
+    val repo = FakeLibraryInsightRepository(
+      catalog.copy(entries = listOf(entry)),
+      definition,
+      ANDROIDX_DEFINITION_PATH,
+      lookupDocuments = emptyMap()
+    )
+    val resolve = ResolveLibraryInsightUseCase(repo, validator, LibraryInsightProbeEngine()) { null }
+    val info = packageInfoWithEntries(baseEntries = mapOf("nested/header" to byteArrayOf(1)))
+    assertEquals(LibraryInsightResult.NotSupported, resolve.resolveNativeLibrary(names.single(), info, "en"))
+    assertEquals(listOf(ANDROIDX_DEFINITION_PATH), repo.requestedDefinitionPaths)
+  }
+
+  private fun headerDefinition(): LibraryInsightDefinition {
+    val base = version2Definition("header", "ascii_z", "binary_header")
+    val probe = base.probes.single()
+    val layout = LibraryInsightDefinition.Layout(1, listOf(LibraryInsightDefinition.Check("u8@0", "eq", "88")))
+    return base.copy(
+      schemaVersion = 3,
+      probes = listOf(
+        probe.copy(
+          source = probe.source.copy(operator = "archive_entry", fileName = null),
+          reader = probe.reader.copy(layouts = listOf(layout)),
+          captures = listOf(probe.captures.single().copy(formats = listOf("#.#")))
+        )
+      ),
+      presentation = base.presentation.copy(summary = base.presentation.summary.map { it.copy(requireUnique = true) })
+    )
+  }
+
+  @Test
   fun `accepts the supported catalog and definition contract`() {
     assertTrue(validator.isValid(catalog()))
     assertTrue(validator.isValid(definition(), SDK_ID, LIBRARY_UUID))
@@ -454,7 +563,7 @@ class LibraryInsightFeatureTest {
   @Test
   fun `rejects missing mismatched and unsupported migration candidates without requesting fingerprints`() = runBlocking {
     val packageInfo = packageInfoWithEngine("\u0000$ENGINE_REVISION\u0000")
-    for (candidate in listOf(null, definition().copy(sdkId = "other"), definition().copy(schemaVersion = 3), legacyDefinition())) {
+    for (candidate in listOf(null, definition().copy(sdkId = "other"), definition().copy(schemaVersion = Int.MAX_VALUE), legacyDefinition())) {
       val repository = FakeLibraryInsightRepository(
         catalog = catalog(),
         definition = legacyDefinition(),

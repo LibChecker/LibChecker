@@ -22,6 +22,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.core.view.marginTop
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import coil.load
@@ -177,7 +178,12 @@ class LibDetailBottomSheetView(
     }
   }
 
+  private var descriptionMissing = false
+  private var hasInsight = false
+
   fun bind(state: LibraryDetailBottomSheetState) {
+    descriptionMissing = state is LibraryDetailBottomSheetState.NotFound
+    viewFlipper.isVisible = !(descriptionMissing && hasInsight)
     title.text = state.title
     val headerDisplay = when (state) {
       is LibraryDetailBottomSheetState.Loading -> state.header
@@ -234,6 +240,8 @@ class LibDetailBottomSheetView(
         }
       )
     }
+    hasInsight = displayState is LibraryInsightUiState.Content
+    viewFlipper.isVisible = !(descriptionMissing && hasInsight)
     extraInfoCard.render(displayState, onRetry)
     identityAndExtra.setSurfaceVisible(!willBeGone, shouldAnimate)
   }

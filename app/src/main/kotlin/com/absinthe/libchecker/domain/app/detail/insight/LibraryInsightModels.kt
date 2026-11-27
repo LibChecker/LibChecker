@@ -12,7 +12,8 @@ data class LibraryInsightCatalog(
   data class Entry(
     @Json(name = "sdk_id") val sdkId: String,
     @Json(name = "library_uuids") val libraryUuids: List<String>,
-    val definition: String
+    val definition: String,
+    @Json(name = "native_library_names") val nativeLibraryNames: List<String> = emptyList()
   )
 }
 
@@ -23,7 +24,8 @@ data class LibraryInsightDefinition(
   @Json(name = "target_uuids") val targetUuids: List<String>,
   val probes: List<Probe>,
   val lookups: List<Lookup> = emptyList(),
-  val presentation: Presentation
+  val presentation: Presentation,
+  @Json(name = "native_library_names") val nativeLibraryNames: List<String> = emptyList()
 ) {
   @JsonClass(generateAdapter = true)
   data class Probe(
@@ -36,15 +38,26 @@ data class LibraryInsightDefinition(
   @JsonClass(generateAdapter = true)
   data class Source(
     val operator: String,
-    @Json(name = "file_name") val fileName: String,
-    @Json(name = "archive_paths") val archivePaths: List<String>
+    @Json(name = "file_name") val fileName: String? = null,
+    @Json(name = "archive_paths") val archivePaths: List<String>,
+    val container: Container? = null
   )
+
+  @JsonClass(generateAdapter = true)
+  data class Container(val format: String, val entry: String)
+
+  @JsonClass(generateAdapter = true)
+  data class Layout(val offset: Int, val checks: List<Check>)
+
+  @JsonClass(generateAdapter = true)
+  data class Check(val left: String, val op: String, val right: String)
 
   @JsonClass(generateAdapter = true)
   data class Reader(
     val operator: String,
     @Json(name = "max_bytes_per_file") val maxBytesPerFile: Long,
-    @Json(name = "max_total_bytes") val maxTotalBytes: Long
+    @Json(name = "max_total_bytes") val maxTotalBytes: Long,
+    val layouts: List<Layout> = emptyList()
   )
 
   @JsonClass(generateAdapter = true)
@@ -52,7 +65,8 @@ data class LibraryInsightDefinition(
     val output: String,
     val type: String,
     val prefix: String? = null,
-    @Json(name = "max_results") val maxResults: Int
+    @Json(name = "max_results") val maxResults: Int,
+    val formats: List<String> = emptyList()
   )
 
   @JsonClass(generateAdapter = true)
@@ -84,7 +98,8 @@ data class LibraryInsightDefinition(
   data class Field(
     val label: Map<String, String>,
     val source: String,
-    @Json(name = "max_values") val maxValues: Int
+    @Json(name = "max_values") val maxValues: Int,
+    @Json(name = "require_unique") val requireUnique: Boolean = false
   )
 }
 
