@@ -95,6 +95,25 @@ After definition validation, fixed indexes download concurrently with the local
 probe; lookups still apply in definition order. Duplicate index paths share one
 request per query, and unused downloads are cancelled when probing finds no evidence.
 
+SDK-details definition v3 adds an exact `archive_entry` source and a bounded
+`binary_header` reader. Rules declare layouts, unsigned header checks, the offset
+of a NUL-terminated ASCII field, and optional capture masks. Offsets, format
+numbers, platform identifiers, masks, and source paths belong to Rules. A
+container adapter (currently UnityFS) only selects a named member and returns
+its prefix and logical size. The same header reader works on plain APK entries.
+A presentation field with `require_unique` is hidden when readable sources
+disagree. Existing definitions retain their presentation and lookup semantics.
+
+The library dialog can resolve a definition by UUID or, for a native library
+without a description, by an exact basename in the catalog's
+`native_library_names`. The name only selects a candidate. Its local probes
+must produce a validated value before the dialog shows SDK details.
+
+The reader inspects up to 512 bytes of an entry. Rule byte budgets include
+sequential reads needed to reach a compressed member inside a deflated ZIP
+entry. Unsupported encodings and over-budget inputs produce no value. The
+catalog remains v1. Release the client before promoting a v3 candidate.
+
 ## Local verification boundaries
 
 Run market R8 checks with the upload task explicitly excluded:

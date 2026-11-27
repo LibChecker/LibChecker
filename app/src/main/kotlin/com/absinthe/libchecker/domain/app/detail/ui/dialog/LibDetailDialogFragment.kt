@@ -45,7 +45,6 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
   }
   private val viewModel: DetailViewModel by activityViewModel()
   private val insightViewModel: LibraryInsightViewModel by viewModel()
-  private var isStickyEventReceived = false
   private val dialogTitle by lazy {
     if (type == ACTION) "< $libName >" else libName
   }
@@ -81,6 +80,7 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
           header = fallbackHeader
         )
       )
+      loadNativeInsightIfEnabled()
       return
     }
     if (shouldLoadLibraryInsight(isLibraryInsightEnabled, viewModel.isPackageInfoAvailable())) {
@@ -134,7 +134,8 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
           }
 
           DetailItemResolver.Result.NotFound -> {
-            showNotFoundAfterStickyEvent(header)
+            root.bind(LibraryDetailBottomSheetState.NotFound(dialogTitle, header))
+            loadNativeInsightIfEnabled()
           }
         }
       }.onFailure {
@@ -153,16 +154,9 @@ class LibDetailDialogFragment : BaseBottomSheetViewDialogFragment<LibDetailBotto
     }
   }
 
-  private fun showNotFoundAfterStickyEvent(header: LibraryDetailHeaderDisplay) {
-    if (isStickyEventReceived) {
-      root.bind(
-        LibraryDetailBottomSheetState.NotFound(
-          title = dialogTitle,
-          header = header
-        )
-      )
-    } else {
-      isStickyEventReceived = true
+  private fun loadNativeInsightIfEnabled() {
+    if (type == NATIVE && shouldLoadLibraryInsight(isLibraryInsightEnabled, viewModel.isPackageInfoAvailable())) {
+      insightViewModel.loadNativeLibrary(libName, viewModel.packageInfo, Locale.getDefault().toLanguageTag())
     }
   }
 

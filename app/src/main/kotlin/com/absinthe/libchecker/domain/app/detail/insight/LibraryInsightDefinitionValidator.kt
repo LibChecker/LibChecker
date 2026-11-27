@@ -11,6 +11,7 @@ class LibraryInsightDefinitionValidator {
         entry.libraryUuids.size <= MAX_TARGET_UUIDS &&
         entry.libraryUuids.distinct().size == entry.libraryUuids.size &&
         entry.libraryUuids.all(UUID::matches) &&
+        validNativeLibraryNames(entry.nativeLibraryNames) &&
         CATALOG_DEFINITION_PATH.matches(entry.definition) &&
         isSafeRemotePath(entry.definition)
     }
@@ -20,32 +21,44 @@ class LibraryInsightDefinitionValidator {
     definition: LibraryInsightDefinition,
     expectedSdkId: String,
     expectedUuid: String
-  ): Boolean {
+  ): Boolean = expectedUuid in definition.targetUuids && isValidDefinition(definition, expectedSdkId)
+
+  fun isValid(definition: LibraryInsightDefinition, entry: LibraryInsightCatalog.Entry): Boolean = definition.targetUuids.toSet() == entry.libraryUuids.toSet() &&
+    definition.nativeLibraryNames.toSet() == entry.nativeLibraryNames.toSet() &&
+    isValidDefinition(definition, entry.sdkId)
+
+  private fun validNativeLibraryNames(names: List<String>) = names.size <= 16 &&
+    names.distinct().size == names.size && names.all { it.length <= MAX_FILE_NAME_LENGTH && ".." !in it && NATIVE_NAME.matches(it) }
+
+  private fun isValidDefinition(definition: LibraryInsightDefinition, expectedSdkId: String): Boolean {
     if (definition.schemaVersion !in SUPPORTED_DEFINITION_SCHEMA_VERSIONS) return false
     if (definition.sdkId != expectedSdkId || !SDK_ID.matches(definition.sdkId)) return false
     if (definition.targetUuids.isEmpty() || definition.targetUuids.size > MAX_TARGET_UUIDS) return false
     if (definition.targetUuids.distinct().size != definition.targetUuids.size) return false
-    if (expectedUuid !in definition.targetUuids || definition.targetUuids.any { !UUID.matches(it) }) return false
+    if (definition.targetUuids.any { !UUID.matches(it) }) return false
+    if (definition.nativeLibraryNames.isNotEmpty() && (definition.schemaVersion < 3 || !validNativeLibraryNames(definition.nativeLibraryNames))) return false
     if (definition.probes.isEmpty() || definition.probes.size > MAX_PROBES) return false
 
     val outputs = mutableSetOf<String>()
     definition.probes.forEach { probe ->
       if (!SDK_ID.matches(probe.id)) return false
-      if (probe.source.operator != SOURCE_PACKAGE_FILE) return false
-      if (!isSafeFileName(probe.source.fileName)) return false
       if (probe.source.archivePaths.isEmpty() || probe.source.archivePaths.size > MAX_ARCHIVE_PATHS) return false
       if (probe.source.archivePaths.distinct().size != probe.source.archivePaths.size) return false
       if (probe.source.archivePaths.any { !isSafeArchivePath(it) }) return false
-      val readerOperators = if (definition.schemaVersion == 1) {
-        V1_READER_OPERATORS
+      val binaryHeader = probe.reader.operator == READER_BINARY_HEADER
+      if (binaryHeader) {
+        if (definition.schemaVersion < 3 || !validArchiveProbe(probe)) return false
       } else {
-        V2_READER_OPERATORS
+        if (probe.source.operator != SOURCE_PACKAGE_FILE || probe.source.container != null) return false
+        if (probe.source.fileName?.let(::isSafeFileName) != true || probe.reader.layouts.isNotEmpty()) return false
+        val readers = if (definition.schemaVersion == 1) V1_READER_OPERATORS else V2_READER_OPERATORS
+        if (probe.reader.operator !in readers) return false
       }
-      if (probe.reader.operator !in readerOperators) return false
       if (probe.reader.maxBytesPerFile !in 1..MAX_BYTES_PER_FILE) return false
       if (probe.reader.maxTotalBytes !in 1..MAX_TOTAL_BYTES) return false
       if (probe.captures.isEmpty() || probe.captures.size > MAX_CAPTURES) return false
       val captureTypes = when {
+        binaryHeader -> setOf(CAPTURE_ASCII_Z)
         definition.schemaVersion == 1 -> V1_CAPTURE_TYPES
         probe.reader.operator == READER_FILE_SHA256 -> V2_DIGEST_CAPTURE_TYPES
         else -> V2_ASCII_CAPTURE_TYPES
@@ -53,6 +66,7 @@ class LibraryInsightDefinitionValidator {
       probe.captures.forEach { capture ->
         if (!SDK_ID.matches(capture.output)) return false
         if (capture.type !in captureTypes) return false
+        if (capture.formats.isNotEmpty() && (!binaryHeader || capture.formats.size > 8 || !capture.formats.all(BinaryHeaderReader::validFormat))) return false
         if (capture.type == CAPTURE_PREFIXED_SEMVER) {
           if (!isSafeCapturePrefix(capture.prefix)) return false
         } else if (capture.prefix != null) {
@@ -91,12 +105,31 @@ class LibraryInsightDefinitionValidator {
     if (summary.isEmpty() || summary.size > MAX_SUMMARY_FIELDS || details.size > MAX_DETAIL_FIELDS) return false
     return (summary + details).all { field ->
       field.source in outputs &&
+        (!field.requireUnique || (definition.schemaVersion >= 3 && permitsUniqueField(definition, field.source))) &&
         field.maxValues in 1..MAX_PRESENTATION_VALUES &&
         field.label[DEFAULT_LABEL]?.isNotBlank() == true &&
         field.label.size <= MAX_LABELS &&
         field.label.values.all { it.isNotBlank() && it.length <= MAX_LABEL_LENGTH }
     }
   }
+
+  private fun permitsUniqueField(definition: LibraryInsightDefinition, source: String): Boolean {
+    if (definition.lookups.any { lookup -> lookup.outputs.any { it.output == source } }) return false
+    val captures = definition.probes.flatMap { it.captures }.filter { it.output == source }
+    return captures.isNotEmpty() && captures.all { it.maxResults >= 2 }
+  }
+
+  private fun validArchiveProbe(probe: LibraryInsightDefinition.Probe): Boolean {
+    val source = probe.source
+    val container = source.container
+    return source.operator == SOURCE_ARCHIVE_ENTRY && source.fileName == null &&
+      source.archivePaths.all(::isExactEntryPath) &&
+      (container == null || (container.format == "unityfs" && isExactEntryPath(container.entry))) &&
+      probe.reader.layouts.size in 1..8 && probe.reader.layouts.all(BinaryHeaderReader::validLayout)
+  }
+
+  private fun isExactEntryPath(path: String): Boolean = isSafeArchivePath(path) && path.all { it.code >= 0x20 } &&
+    path.split('/').none { it.isEmpty() || it == "." }
 
   fun isSafeRemotePath(path: String): Boolean {
     return isSafeLibraryInsightRemotePath(path)
@@ -126,6 +159,9 @@ class LibraryInsightDefinitionValidator {
 
   companion object {
     const val SUPPORTED_SCHEMA_VERSION = 1
+    const val SOURCE_ARCHIVE_ENTRY = "archive_entry"
+    const val READER_BINARY_HEADER = "binary_header"
+    const val CAPTURE_ASCII_Z = "ascii_z"
     const val SOURCE_PACKAGE_FILE = "package_file"
     const val READER_ASCII_STRINGS = "ascii_strings"
     const val READER_FILE_SHA256 = "file_sha256"
@@ -142,11 +178,12 @@ class LibraryInsightDefinitionValidator {
     const val SDK_DETAILS_PREFIX = "sdk-details/"
     val LOOKUP_VALUE = Regex("^[A-Za-z0-9._-]{1,128}$")
 
+    private val NATIVE_NAME = Regex("""[A-Za-z0-9_+.-]+\.so""")
     private val SDK_ID = Regex("^[a-z0-9][a-z0-9_-]{0,63}$")
     private val UUID = Regex("^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$")
     private val CATALOG_DEFINITION_PATH =
       Regex("^sdk-details/sdks/[a-z0-9_-]+/definition\\.json$")
-    private val SUPPORTED_DEFINITION_SCHEMA_VERSIONS = setOf(1, 2)
+    private val SUPPORTED_DEFINITION_SCHEMA_VERSIONS = setOf(1, 2, 3)
     private val V1_READER_OPERATORS = setOf(READER_ASCII_STRINGS)
     private val V2_READER_OPERATORS = setOf(READER_ASCII_STRINGS, READER_FILE_SHA256)
     private val V1_CAPTURE_TYPES = setOf(CAPTURE_SHA1, CAPTURE_SEMVER_CHANNEL)

@@ -24,8 +24,10 @@ class LibraryInsightProbeEngine {
     packageInfo: PackageInfo,
     definition: LibraryInsightDefinition
   ): LibraryInsightProbeResult = withContext(Dispatchers.IO) {
-    val files = packageArchiveFiles(packageInfo) + definition.probes.mapNotNull { probe ->
-      packageInfo.applicationInfo?.nativeLibraryDir?.let { File(it, probe.source.fileName) }
+    val archives = packageArchiveFiles(packageInfo)
+    val nativeDir = packageInfo.applicationInfo?.nativeLibraryDir
+    val files = archives + definition.probes.mapNotNull { probe ->
+      probe.source.fileName?.let { name -> nativeDir?.let { File(it, name) } }
     }
     val cacheKey = ProbeCacheKey(definition.probes, files.map(::fileStamp))
     cachedProbe?.takeIf { it.first == cacheKey }?.let { return@withContext it.second }
@@ -33,7 +35,12 @@ class LibraryInsightProbeEngine {
     var evidenceFound = false
     var readFailed = false
 
-    definition.probes.forEach { probe ->
+    val (archiveProbes, fileProbes) = definition.probes.partition { it.source.operator == LibraryInsightDefinitionValidator.SOURCE_ARCHIVE_ENTRY }
+    if (archiveProbes.isNotEmpty()) {
+      readFailed = !scanArchiveEntries(archives, archiveProbes, values, coroutineContext)
+      evidenceFound = values.values.any { it.isNotEmpty() }
+    }
+    fileProbes.forEach { probe ->
       coroutineContext.ensureActive()
       val probeContext = coroutineContext
       val captures = probe.captures.associateWith { values.getOrPut(it.output, ::linkedSetOf) }
@@ -68,9 +75,7 @@ class LibraryInsightProbeEngine {
         remainingTotal = (remainingTotal - consumed).coerceAtLeast(0)
       }
 
-      val directFile = packageInfo.applicationInfo?.nativeLibraryDir
-        ?.let(::File)
-        ?.resolve(probe.source.fileName)
+      val directFile = probe.source.fileName?.let { name -> nativeDir?.let { File(it, name) } }
         ?.takeIf { it.isFile && it.canRead() }
       var directSourceScanned = false
       if (directFile != null) {
@@ -91,7 +96,7 @@ class LibraryInsightProbeEngine {
         remainingTotal > 0 &&
         captures.any { (capture, output) -> output.size < capture.maxResults }
       ) {
-        for (archive in packageArchiveFiles(packageInfo)) {
+        for (archive in archives) {
           if (remainingTotal <= 0 || captures.all { (capture, output) -> output.size >= capture.maxResults }) {
             break
           }
@@ -121,6 +126,69 @@ class LibraryInsightProbeEngine {
         cachedProbe = cacheKey to result
       }
     }
+  }
+
+  private fun scanArchiveEntries(
+    archives: List<File>,
+    probes: List<LibraryInsightDefinition.Probe>,
+    values: MutableMap<String, LinkedHashSet<String>>,
+    context: CoroutineContext
+  ): Boolean {
+    val remaining = probes.map { it.reader.maxTotalBytes }.toLongArray()
+    var complete = true
+    for (archive in archives) {
+      context.ensureActive()
+      try {
+        ZipFileCompat(archive).use { zip ->
+          probes.forEachIndexed { index, probe ->
+            for (path in probe.source.archivePaths) {
+              val limit = minOf(remaining[index], probe.reader.maxBytesPerFile)
+              if (limit == 0L || probe.captures.all { values[it.output].orEmpty().size >= it.maxResults }) break
+              val entry = zip.getEntry(path) ?: continue
+              zip.getInputStream(entry).use { stream ->
+                val input = ProbeInputStream(stream, limit, context)
+                try {
+                  val prefix = readEntryPrefix(input, entry.size, probe.source.container) ?: return@use
+                  for (capture in probe.captures) {
+                    val output = values.getOrPut(capture.output, ::linkedSetOf)
+                    if (output.size < capture.maxResults) {
+                      BinaryHeaderReader.read(prefix.bytes, prefix.size, probe.reader.layouts, capture.formats)?.let(output::add)
+                    }
+                  }
+                } catch (error: java.io.IOException) {
+                  complete = false
+                } finally {
+                  remaining[index] -= input.consumed
+                }
+              }
+            }
+          }
+        }
+      } catch (exception: CancellationException) {
+        throw exception
+      } catch (_: Exception) {
+        complete = false
+      }
+    }
+    return complete
+  }
+
+  private fun readEntryPrefix(input: InputStream, size: Long, container: LibraryInsightDefinition.Container?): ArchiveEntryPrefix? {
+    if (container != null) {
+      return when (container.format) {
+        "unityfs" -> UnityFsArchive.readEntryPrefix(input, size, container.entry, HEADER_PREFIX_BYTES)
+        else -> null
+      }
+    }
+    if (size <= 0) return null
+    val bytes = ByteArray(minOf(size, HEADER_PREFIX_BYTES.toLong()).toInt())
+    var used = 0
+    while (used < bytes.size) {
+      val count = input.read(bytes, used, bytes.size - used)
+      if (count < 0) break
+      used += count
+    }
+    return ArchiveEntryPrefix(if (used == bytes.size) bytes else bytes.copyOf(used), size)
   }
 
   private fun fileStamp(file: File) = FileStamp(file.absolutePath, file.length(), file.lastModified(), file.canRead())
@@ -239,6 +307,7 @@ class LibraryInsightProbeEngine {
   }
 
   private companion object {
+    const val HEADER_PREFIX_BYTES = 512
     const val BUFFER_SIZE = 32 * 1024
     const val MIN_TOKEN_LENGTH = 4
     const val SEMVER_VALUE_PATTERN =
@@ -249,5 +318,29 @@ class LibraryInsightProbeEngine {
     val SEMVER = Regex("(?<![0-9A-Za-z])($SEMVER_VALUE_PATTERN)(?![0-9A-Za-z])")
     val PREFIXED_SEMVER = Regex("($SEMVER_VALUE_PATTERN)(?![0-9A-Za-z])")
     val SEMVER_CHANNEL = Regex("(?<![0-9A-Za-z])([0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?)\\s+\\((?:stable|beta|dev|main)\\)")
+  }
+}
+
+// InputStream.skip uses read on this wrapper, so traversing deflated outer entries costs budget too.
+private class ProbeInputStream(
+  private val upstream: InputStream,
+  private val limit: Long,
+  private val context: CoroutineContext
+) : InputStream() {
+  var consumed = 0L
+    private set
+
+  override fun read(): Int {
+    context.ensureActive()
+    if (consumed >= limit) return -1
+    return upstream.read().also { if (it >= 0) consumed++ }
+  }
+
+  override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
+    context.ensureActive()
+    if (length == 0) return 0
+    if (consumed >= limit) return -1
+    return upstream.read(buffer, offset, minOf(length.toLong(), limit - consumed).toInt())
+      .also { if (it > 0) consumed += it }
   }
 }

@@ -22,17 +22,29 @@ class ResolveLibraryInsightUseCase(
     localeTag: String,
     onSupported: () -> Unit = {}
   ): LibraryInsightResult {
-    val catalog = when (val result = repository.getCatalog()) {
-      is RemoteDocumentResult.Success -> result.value
-
-      RemoteDocumentResult.Failure,
-      RemoteDocumentResult.NotFound -> return LibraryInsightResult.NotSupported
-    }
-    if (!validator.isValid(catalog)) return LibraryInsightResult.NotSupported
+    val catalog = loadCatalog() ?: return LibraryInsightResult.NotSupported
     val entry = catalog.entries.firstOrNull { libraryUuid in it.libraryUuids }
       ?: return LibraryInsightResult.NotSupported
 
     onSupported()
+    return resolveEntry(entry, packageInfo, localeTag, libraryUuid)
+  }
+
+  suspend fun resolveNativeLibrary(name: String, packageInfo: PackageInfo, localeTag: String): LibraryInsightResult {
+    val catalog = loadCatalog() ?: return LibraryInsightResult.NotSupported
+    val entry = catalog.entries.singleOrNull { name in it.nativeLibraryNames } ?: return LibraryInsightResult.NotSupported
+    val result = resolveEntry(entry, packageInfo, localeTag)
+    return if (result is LibraryInsightResult.Content) result else LibraryInsightResult.NotSupported
+  }
+
+  private suspend fun loadCatalog(): LibraryInsightCatalog? = (repository.getCatalog() as? RemoteDocumentResult.Success)?.value?.takeIf(validator::isValid)
+
+  private suspend fun resolveEntry(
+    entry: LibraryInsightCatalog.Entry,
+    packageInfo: PackageInfo,
+    localeTag: String,
+    libraryUuid: String? = null
+  ): LibraryInsightResult {
     var definition = when (val result = repository.getDefinition(entry.definition)) {
       is RemoteDocumentResult.Success -> result.value
 
@@ -48,7 +60,12 @@ class ResolveLibraryInsightUseCase(
         RemoteDocumentResult.NotFound -> return LibraryInsightResult.Unavailable
       }
     }
-    if (!validator.isValid(definition, entry.sdkId, libraryUuid)) {
+    val valid = if (libraryUuid == null) {
+      validator.isValid(definition, entry)
+    } else {
+      validator.isValid(definition, entry.sdkId, libraryUuid)
+    }
+    if (!valid) {
       return LibraryInsightResult.Unavailable
     }
 
@@ -71,7 +88,13 @@ class ResolveLibraryInsightUseCase(
     if (!evidenceFound) return LibraryInsightResult.NotSupported
 
     val summary = definition.presentation.summary.mapNotNull { it.toDisplayField(values, localeTag) }
-    if (summary.isEmpty()) return LibraryInsightResult.Unavailable
+    if (summary.isEmpty()) {
+      return if (definition.presentation.summary.any { it.requireUnique && values[it.source].orEmpty().size > 1 }) {
+        LibraryInsightResult.NotSupported
+      } else {
+        LibraryInsightResult.Unavailable
+      }
+    }
     val details = definition.presentation.details.mapNotNull { it.toDisplayField(values, localeTag) }
     return LibraryInsightResult.Content(
       LibraryInsightContent(
@@ -145,7 +168,7 @@ class ResolveLibraryInsightUseCase(
     localeTag: String
   ): LibraryInsightField? {
     val sourceValues = values[source].orEmpty().toList()
-    if (sourceValues.isEmpty()) return null
+    if (sourceValues.isEmpty() || (requireUnique && sourceValues.size != 1)) return null
     return LibraryInsightField(
       label = label.localized(localeTag),
       values = sourceValues.take(maxValues),
