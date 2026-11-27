@@ -346,6 +346,19 @@ class ValidateStatisticCatalogUseCase {
         }
       }
 
+      StatisticEvidence.REQUESTED_PERMISSION, StatisticEvidence.APPLICATION_ICON_TRAIT -> {
+        val names = value.strings.orEmpty()
+        val valid = names.size in 1..MAX_STRING_VALUES && names.all { name ->
+          when (evidence) {
+            StatisticEvidence.REQUESTED_PERMISSION -> name.length <= 160 && PERMISSION_NAME.matches(name)
+            else -> name == "adaptive"
+          }
+        }
+        if (!valid || operator != StatisticComparisonOperator.CONTAINS_ANY) {
+          errors += "Invalid names or operator for $evidence: $statisticId"
+        }
+      }
+
       StatisticEvidence.MANIFEST_RECEIVER_ACTION -> {
         val actions = value.strings
         if (
@@ -455,6 +468,7 @@ class ValidateStatisticCatalogUseCase {
     val LOCALE_TAG = Regex("[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*")
     val NATIVE_LIBRARY_NAME = Regex("[A-Za-z0-9._+-]{1,160}")
     val ARCHIVE_ENTRY_NAME = Regex("[A-Za-z0-9][A-Za-z0-9._+/-]{0,159}")
+    val PERMISSION_NAME = Regex("[A-Za-z_][A-Za-z0-9_]*(?:[.][A-Za-z_][A-Za-z0-9_]*)+")
     val MANIFEST_ACTION = Regex("[A-Za-z0-9_.-]{1,160}")
     val MANIFEST_ATTRIBUTE_NAME = Regex("android:[A-Za-z][A-Za-z0-9_]{0,79}")
     val DEX_CLASS_PATTERN = Regex("L[A-Za-z0-9_$/-]{1,158};?")

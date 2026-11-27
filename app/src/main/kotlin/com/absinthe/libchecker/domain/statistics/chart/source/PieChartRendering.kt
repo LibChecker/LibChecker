@@ -10,7 +10,11 @@ import com.github.mikephil.charting.utils.MPPointF
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal suspend fun PieChart.showPieData(entries: List<PieEntry<*>>, colors: List<Int>) {
+internal suspend fun PieChart.showPieData(
+  entries: List<PieEntry<*>>,
+  colors: List<Int>,
+  drawEntryLabels: Boolean = true
+) {
   val colorOnSurface = context.getColorByAttr(com.google.android.material.R.attr.colorOnSurface)
   // Keep zero-sized categories for selection indices, but an all-zero pie is an empty result.
   val visibleEntries = entries.takeIf { values -> values.any { it.y > 0f } }.orEmpty()
@@ -31,6 +35,7 @@ internal suspend fun PieChart.showPieData(entries: List<PieEntry<*>>, colors: Li
     setValueTextColor(colorOnSurface)
   }
   withContext(Dispatchers.Main) {
+    isDrawEntryLabelsEnabled = drawEntryLabels
     data = pieData
     entryLabelColor = colorOnSurface
     highlightValues(emptyList())

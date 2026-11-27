@@ -23,9 +23,7 @@ open class BottomSheetScaffoldView(context: Context) :
 
   override fun getHeaderView(): BottomSheetHeaderView = header
 
-  /** Add the list after the header and other fixed content. Keep the sheet inset
-   * inside the scroll viewport so blurred pixels can spread into the side gutters.
-   */
+  /** Keep the list viewport full width and apply the sheet inset as content padding. */
   protected fun addFullWidthList(list: RecyclerView) {
     val start = paddingStart
     val end = paddingEnd

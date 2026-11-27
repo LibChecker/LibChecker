@@ -255,6 +255,12 @@ enum class StatisticEvidence {
   @Json(name = "archive_entry")
   ARCHIVE_ENTRY,
 
+  @Json(name = "requested_permission")
+  REQUESTED_PERMISSION,
+
+  @Json(name = "application_icon_trait")
+  APPLICATION_ICON_TRAIT,
+
   @Json(name = "manifest_receiver_action")
   MANIFEST_RECEIVER_ACTION,
 
